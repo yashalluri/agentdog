@@ -35,7 +35,7 @@ body {
 .nav-logo-container {
   display: flex;
   align-items: baseline;
-  gap: 12px;
+  gap: 8px;
 }
 
 .nav-logo {
