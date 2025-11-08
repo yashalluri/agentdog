@@ -321,10 +321,14 @@ body {
 }
 
 .section-title {
-  font-size: 15px;
+  font-size: 12px;
   font-weight: 600;
-  color: #0F172A;
-  margin-bottom: 16px;
+  color: #6B7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #E5E7EB;
 }
 
 .flow-tree {
