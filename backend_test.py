@@ -5,7 +5,7 @@ import time
 from datetime import datetime
 
 class AgentDogAPITester:
-    def __init__(self, base_url="https://agent-lens.preview.emergentagent.com"):
+    def __init__(self, base_url="https://visual-preview-15.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.tests_run = 0
