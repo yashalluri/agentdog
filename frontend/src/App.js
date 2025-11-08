@@ -96,6 +96,7 @@ function App() {
       toast.success('Summary generated');
     } catch (error) {
       toast.error('Failed to generate summary');
+      console.error('Summary error:', error);
     } finally {
       setLoading(false);
     }
@@ -113,18 +114,8 @@ function App() {
 
   const filteredRuns = runs.filter(run => {
     const matchesSearch = run.title.toLowerCase().includes(searchQuery.toLowerCase());
-    // Time filter logic can be added here
     return matchesSearch;
   });
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'success': return 'text-green-600';
-      case 'error': return 'text-red-600';
-      case 'running': return 'text-yellow-600';
-      default: return 'text-gray-600';
-    }
-  };
 
   const getStatusDot = (status) => {
     switch (status) {
@@ -136,12 +127,15 @@ function App() {
   };
 
   return (
-    <div className="app-container" data-testid="agentlens-app">
+    <div className="app-container" data-testid="agentdog-app">
       <Toaster position="top-right" />
       
       {/* Top Navigation */}
       <div className="top-nav" data-testid="top-nav">
-        <div className="nav-logo" data-testid="nav-logo">AgentLens</div>
+        <div className="nav-logo-container">
+          <div className="nav-logo" data-testid="nav-logo">AgentDog</div>
+          <div className="nav-tagline" data-testid="nav-tagline">Datadog for AI agents</div>
+        </div>
         <div className="nav-actions">
           <Button
             variant="ghost"
@@ -285,7 +279,7 @@ function App() {
               <div className="agent-flow" data-testid="agent-flow">
                 <h3 className="section-title">Agent Flow</h3>
                 <div className="flow-tree">
-                  {runSteps.map((step, index) => (
+                  {runSteps.map((step) => (
                     <div
                       key={step.id}
                       className={`flow-item ${selectedStep?.id === step.id ? 'selected' : ''}`}
@@ -313,7 +307,7 @@ function App() {
               {/* AI Summary Section */}
               {summary && (
                 <div className="summary-section" data-testid="summary-section">
-                  <h3 className="section-title">AI Summary</h3>
+                  <h3 className="section-title">AI Summary (Claude Sonnet 4)</h3>
                   <div className="summary-content" data-testid="summary-content">
                     {summary}
                   </div>

@@ -10,6 +10,7 @@ import uuid
 from datetime import datetime, timezone
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 import asyncio
+import json
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -129,36 +130,55 @@ async def replay_step(step_id: str):
 
 @api_router.post("/summary/{run_id}", response_model=SummaryResponse)
 async def generate_summary(run_id: str):
-    """Generate AI summary for a run using GPT-5"""
+    """Generate AI summary for a run using Anthropic Claude Sonnet 4"""
     run = store.get_run(run_id)
     if not run:
         raise HTTPException(status_code=404, detail="Run not found")
     
     steps = store.get_steps_by_run(run_id)
     
-    # Build context for LLM
-    context = f"Run: {run['title']}\nStatus: {run['status']}\nSteps: {run['num_steps']}\n\n"
+    # Build structured agent steps for summary
+    agent_steps = []
     for step in steps:
-        context += f"Agent: {step['name']}\nStatus: {step['status']}\nPrompt: {step['prompt'][:200]}...\nOutput: {step['output'][:200]}...\n\n"
+        agent_steps.append({
+            "name": step['name'],
+            "status": step['status'],
+            "prompt": step['prompt'][:300],  # Truncate for brevity
+            "output": step['output'][:300],
+            "latency_ms": step['latency_ms'],
+            "cost": step['cost']
+        })
     
-    # Use OpenAI GPT-5 via Emergent LLM key
+    # Use Anthropic Claude Sonnet 4 via Emergent LLM key
     try:
         chat = LlmChat(
             api_key=os.environ.get('EMERGENT_LLM_KEY'),
             session_id=f"summary-{run_id}",
-            system_message="You are an AI observability expert. Analyze agent runs and provide concise, actionable summaries."
-        ).with_model("openai", "gpt-5")
+            system_message="You are AgentDog, a reasoning observability assistant. Your job is to analyze multi-agent runs and provide clear, concise summaries."
+        ).with_model("anthropic", "claude-4-sonnet-20250514")
         
-        user_message = UserMessage(
-            text=f"Summarize this agent run. Highlight key decisions, errors, and improvements:\n\n{context}"
-        )
+        summary_prompt = f"""You are AgentDog, a reasoning observability assistant.
+Summarize the following multi-agent run concisely.
+
+Run: {run['title']}
+Status: {run['status']}
+Total Steps: {run['num_steps']}
+Succeeded: {run['num_success']}
+Failed: {run['num_failed']}
+
+Steps:
+{json.dumps(agent_steps, indent=2)}
+
+Provide a concise summary explaining what the agents collectively did, any failures or retries, and the overall outcome."""
+        
+        user_message = UserMessage(text=summary_prompt)
         
         response = await chat.send_message(user_message)
         
         return {"summary": response}
     except Exception as e:
         logging.error(f"Error generating summary: {e}")
-        raise HTTPException(status_code=500, detail="Failed to generate summary")
+        raise HTTPException(status_code=500, detail=f"Failed to generate summary: {str(e)}")
 
 @api_router.post("/ingest-sample")
 async def ingest_sample_data():

@@ -32,10 +32,22 @@ body {
   flex-shrink: 0;
 }
 
+.nav-logo-container {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
 .nav-logo {
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 600;
   color: #0F172A;
+}
+
+.nav-tagline {
+  font-size: 12px;
+  font-weight: 400;
+  color: #6B7280;
 }
 
 .nav-actions {
