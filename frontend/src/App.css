@@ -101,7 +101,7 @@ body {
 
 /* Left Sidebar */
 .sidebar {
-  width: 280px;
+  width: 260px;
   background: #FFFFFF;
   border-right: 1px solid #E5E7EB;
   display: flex;
