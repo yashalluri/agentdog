@@ -257,8 +257,8 @@ body {
 .run-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 24px;
+  align-items: center;
+  margin-bottom: 12px;
 }
 
 .run-title {
