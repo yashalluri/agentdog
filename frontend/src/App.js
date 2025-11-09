@@ -77,14 +77,8 @@ function App() {
               }
             });
             
-            // Update run metrics
-            setSelectedRun(prevRun => ({
-              ...prevRun,
-              num_steps: prevRun.num_steps + (prevSteps.findIndex(s => s.id === data.agent_id) >= 0 ? 0 : 1),
-              num_failed: prevRun.num_failed + (data.status === 'error' ? 1 : 0),
-              num_success: prevRun.num_success + (data.status === 'success' ? 1 : 0),
-              status: data.status === 'error' ? 'error' : prevRun.status
-            }));
+            // Fetch updated run details to get accurate metrics
+            fetchRunDetails(selectedRun.id);
           }
           
           // Refresh runs list in sidebar
