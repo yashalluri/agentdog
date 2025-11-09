@@ -1195,6 +1195,14 @@ body {
   overflow: hidden;
 }
 
+/* Mobile/Tablet: Full width, remaining height */
+@media (max-width: 1024px) {
+  .observability-panel-split {
+    width: 100% !important;
+    flex: 1;
+  }
+}
+
 .observability-panel-header {
   padding: 16px 20px;
   border-bottom: 1px solid #E5E7EB;
