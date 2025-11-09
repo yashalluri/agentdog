@@ -409,7 +409,7 @@ body {
 
 /* Right Drawer */
 .right-drawer {
-  width: 360px;
+  width: 400px;
   background: #FFFFFF;
   border-left: 1px solid #E5E7EB;
   display: flex;
