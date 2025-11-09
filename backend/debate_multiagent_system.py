@@ -81,7 +81,20 @@ class ResearchAgent:
             # Perform web searches using Perplexity API
             async with httpx.AsyncClient(timeout=30.0) as client:
                 for query in search_queries:
+                    # Create API call span
+                    api_span = None
+                    if self.tracer and agent_span:
+                        api_span = create_api_span(
+                            tracer=self.tracer,
+                            name=f"perplexity_search: {query[:50]}",
+                            method="POST",
+                            url="https://api.perplexity.ai/chat/completions",
+                            parent_span_id=agent_span.span_id
+                        )
+                        api_span.input_data = {"query": query, "model": "sonar", "temperature": 0.2, "max_tokens": 1024}
+                    
                     try:
+                        api_start = time.time()
                         response = await client.post(
                             "https://api.perplexity.ai/chat/completions",
                             headers={
