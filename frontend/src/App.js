@@ -548,7 +548,7 @@ function App() {
                   <div className="chat-msg-avatar">✨</div>
                   <div className="chat-msg-content">
                     <div className="chat-msg-text">
-                      <span className="typing-indicator">Thinking...</span>
+                      <span className="typing-indicator">{debateProgress}</span>
                     </div>
                   </div>
                 </div>
