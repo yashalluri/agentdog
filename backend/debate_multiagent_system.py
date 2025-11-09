@@ -141,6 +141,9 @@ class ResearchAgent:
             
             print(f"[{agent_name}] ✅ Research complete - Found {total_sources} sources")
             
+            # Small delay to ensure event is persisted before broadcasting
+            await asyncio.sleep(0.3)
+            
             return {
                 "success": True,
                 "queries": search_queries,
