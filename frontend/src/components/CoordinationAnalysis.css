@@ -358,10 +358,24 @@
   color: #9CA3AF;
   font-size: 12px;
   transition: transform 0.2s;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  background: #F9FAFB;
+}
+
+.expand-icon:hover {
+  background: #F3F4F6;
+  color: #6B7280;
 }
 
 .failure-item.expanded .expand-icon {
-  transform: rotate(0deg);
+  transform: rotate(90deg);
+  background: #EFF6FF;
+  color: #3B82F6;
 }
 
 /* Failure Details */
