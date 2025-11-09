@@ -24,6 +24,13 @@ load_dotenv()
 # Add backend to path to import SDK
 sys.path.insert(0, '/app/backend')
 from agentdog_sdk import AgentDog
+from observability_tracer import (
+    ObservabilityTracer, 
+    SpanType, 
+    SpanStatus,
+    create_llm_span,
+    create_api_span
+)
 
 
 class ResearchAgent:
