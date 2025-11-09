@@ -92,7 +92,7 @@ const TraceTimeline = ({ runId, api }) => {
         <div
           className={`trace-span ${isSelected ? 'selected' : ''}`}
           style={{ paddingLeft: `${depth * 20 + 8}px` }}
-          onClick={() => setSelectedSpan(span)}
+          onClick={() => handleSpanClick(span)}
         >
           {/* Expand/Collapse Icon */}
           {hasChildren && (
