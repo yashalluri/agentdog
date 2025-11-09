@@ -1026,22 +1026,41 @@ async def chat_with_agent(request: ChatRequest):
                     citations = debate_result.get('citations', [])
                     detailed_trace = debate_result.get('trace', None)
                     
-                    # Save detailed trace to workflow
+                    # Save detailed trace to workflow (append to array)
                     if detailed_trace:
+                        # Add timestamp and agent type to trace
+                        detailed_trace["timestamp"] = datetime.now(timezone.utc).isoformat()
+                        detailed_trace["agent_type"] = "debate"
+                        
+                        # Append to traces array
+                        await workflows_coll.update_one(
+                            {"run_id": run_id},
+                            {"$push": {"traces": detailed_trace}}
+                        )
+                        
+                        # Keep latest in detailed_trace for backward compatibility
                         await workflows_coll.update_one(
                             {"run_id": run_id},
                             {"$set": {"detailed_trace": detailed_trace}}
                         )
                         
-                        # Auto-analyze coordination after workflow completes
-                        workflow_doc = await workflows_coll.find_one({"run_id": run_id})
-                        if workflow_doc:
-                            analysis_result = analyze_workflow_coordination(workflow_doc)
-                            if analysis_result:
-                                await workflows_coll.update_one(
-                                    {"run_id": run_id},
-                                    {"$set": {"coordination_analysis": analysis_result}}
-                                )
+                        # Auto-analyze coordination for this specific trace
+                        analysis_result = analyze_workflow_coordination({"detailed_trace": detailed_trace, "run_id": run_id})
+                        if analysis_result:
+                            analysis_result["timestamp"] = datetime.now(timezone.utc).isoformat()
+                            analysis_result["agent_type"] = "debate"
+                            
+                            # Append to coordination_analyses array
+                            await workflows_coll.update_one(
+                                {"run_id": run_id},
+                                {"$push": {"coordination_analyses": analysis_result}}
+                            )
+                            
+                            # Keep latest for backward compatibility
+                            await workflows_coll.update_one(
+                                {"run_id": run_id},
+                                {"$set": {"coordination_analysis": analysis_result}}
+                            )
                 else:
                     response_text = str(debate_result)
                     citations = []
