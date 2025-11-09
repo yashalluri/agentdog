@@ -285,7 +285,7 @@ async def get_run(run_id: str):
     # Calculate total cost
     agent_runs_coll = get_agent_runs_collection()
     agents = await agent_runs_coll.find({"run_id": run_id}).to_list(length=None)
-    total_cost = sum(agent.get('cost_usd', 0) for agent in agents)
+    total_cost = sum(agent.get('cost_usd') or 0 for agent in agents)
     response_data['cost'] = total_cost
     
     return response_data
