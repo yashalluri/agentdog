@@ -70,19 +70,18 @@ class ResearchAgent:
                                 "Content-Type": "application/json"
                             },
                             json={
-                                "model": "llama-3.1-sonar-small-128k-online",
+                                "model": "sonar",
                                 "messages": [
-                                    {
-                                        "role": "system",
-                                        "content": "You are a research assistant. Provide factual information with sources."
-                                    },
                                     {
                                         "role": "user",
                                         "content": query
                                     }
                                 ],
                                 "temperature": 0.2,
-                                "max_tokens": 1024
+                                "max_tokens": 1024,
+                                "search_domain_filter": [],
+                                "return_citations": True,
+                                "return_related_questions": False
                             }
                         )
                         
