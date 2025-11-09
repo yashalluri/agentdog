@@ -1089,7 +1089,17 @@ body {
     width: 100% !important;
     border-right: none;
     border-bottom: 1px solid #E5E7EB;
-    max-height: 50vh;
+    height: 40vh;
+    min-height: 300px;
+  }
+  
+  .chat-messages-area {
+    flex: 1;
+    overflow-y: auto;
+  }
+  
+  .chat-input-container-new {
+    flex-shrink: 0;
   }
 }
 
