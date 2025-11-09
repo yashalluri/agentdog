@@ -133,7 +133,7 @@ function App() {
       {/* Top Navigation */}
       <div className="top-nav" data-testid="top-nav">
         <div className="nav-logo-container">
-          <div className="nav-logo" data-testid="nav-logo">AgentDog</div>
+          <div className="nav-logo" data-testid="nav-logo">AgentLens</div>
           <div className="nav-tagline" data-testid="nav-tagline">Datadog for AI agents</div>
         </div>
         <div className="nav-actions">
