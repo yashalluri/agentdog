@@ -347,7 +347,8 @@ Be specific and actionable."""
         try:
             chat = LlmChat(
                 api_key=self.llm_key,
-                session_id=f"{self.run_id}-{agent_name}"
+                session_id=f"{self.run_id}-{agent_name}",
+                system_message="You are an expert social media engagement strategist."
             ).with_model("anthropic", "claude-4-sonnet-20250514")
             
             user_msg = UserMessage(text=prompt)
