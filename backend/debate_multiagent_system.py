@@ -288,6 +288,9 @@ Provide a well-reasoned argument that:
             
             print(f"[{agent_name}] ✅ Argument constructed")
             
+            # Small delay to ensure event is persisted before broadcasting
+            await asyncio.sleep(0.3)
+            
             return {
                 "response": response,
                 "agent_id": self.agent_id
