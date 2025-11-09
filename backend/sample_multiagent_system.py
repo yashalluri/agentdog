@@ -56,8 +56,8 @@ class ResearchAssistant:
         final_report = await self.report_writer(topic, analyzed_content)
         
         print(f"\n{'='*60}")
-        print(f"Research Workflow Complete!")
-        print(f"View results at: http://localhost:3000")
+        print("Research Workflow Complete!")
+        print("View results at: http://localhost:3000")
         print(f"{'='*60}\n")
         
         return final_report
