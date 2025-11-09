@@ -485,7 +485,28 @@ Be specific and actionable."""
         print(f"[{agent_name}] Optimizing for engagement...")
         start_time = time.time()
         
+        # Create agent span
+        agent_span = None
+        if self.tracer:
+            agent_span = self.tracer.start_span(
+                name=agent_name,
+                span_type=SpanType.AGENT,
+                parent_span_id=parent_step_id,
+                metadata={"agent_type": "engagement_optimizer", "topic": topic}
+            )
+            agent_span.input_data = prompt
+        
         try:
+            # Create LLM call span
+            llm_span = None
+            if self.tracer and agent_span:
+                llm_span = create_llm_span(
+                    tracer=self.tracer,
+                    name="claude_engagement_optimization",
+                    model="claude-4-sonnet-20250514",
+                    parent_span_id=agent_span.span_id
+                )
+                llm_span.input_data = prompt
             chat = LlmChat(
                 api_key=self.llm_key,
                 session_id=f"{self.run_id}-{agent_name}",
