@@ -420,8 +420,8 @@ async def generate_summary(run_id: str):
         agent_steps.append({
             "name": agent['agent_name'],
             "status": agent['status'],
-            "prompt": agent.get('prompt', '')[:300],  # Truncate for brevity
-            "output": agent.get('output', '')[:300],
+            "prompt": (agent.get('prompt') or '')[:300],  # Truncate for brevity
+            "output": (agent.get('output') or '')[:300],
             "latency_ms": agent.get('latency_ms', 0),
             "cost": agent.get('cost_usd', 0)
         })
