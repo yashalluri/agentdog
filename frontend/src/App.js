@@ -505,7 +505,7 @@ function App() {
                   variant="outline"
                   size="sm"
                 >
-                  🔄 Start New Run
+                  Start New Run
                 </Button>
                 <span className="panel-size-hint">{Math.round(chatPanelWidth)}%</span>
               </div>
