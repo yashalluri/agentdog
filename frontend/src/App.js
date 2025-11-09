@@ -535,7 +535,9 @@ function App() {
                       )}
                     </div>
                     <div className="chat-msg-content">
-                      <div className="chat-msg-text">{msg.content}</div>
+                      <div className="chat-msg-text">
+                        {renderMessageWithCitations(msg.content)}
+                      </div>
                       <div className="chat-msg-time">
                         {new Date(msg.timestamp).toLocaleTimeString()}
                       </div>
