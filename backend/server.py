@@ -1136,6 +1136,75 @@ async def get_run_trace(run_id: str):
     
     return trace
 
+@api_router.get("/run/{run_id}/coordination-analysis")
+async def get_coordination_analysis(run_id: str):
+    """
+    Analyze coordination failures for a specific run
+    
+    Detects:
+    - Hallucinations: AI invents non-existent APIs, tools, models
+    - Logical Inconsistencies: Contradictions in reasoning
+    - Missing Context: Unverifiable claims
+    - Contract Violations: Broken coordination rules
+    """
+    workflows_coll = get_workflows_collection()
+    
+    workflow = await workflows_coll.find_one({"run_id": run_id})
+    if not workflow:
+        raise HTTPException(status_code=404, detail="Run not found")
+    
+    # Check if analysis already exists and is recent (< 5 minutes old)
+    existing_analysis = workflow.get("coordination_analysis")
+    if existing_analysis:
+        detected_at = existing_analysis.get("detected_at")
+        if detected_at:
+            from datetime import datetime, timezone, timedelta
+            detected_time = datetime.fromisoformat(detected_at.replace('Z', '+00:00'))
+            age = datetime.now(timezone.utc) - detected_time
+            if age < timedelta(minutes=5):
+                return existing_analysis
+    
+    # Run fresh analysis
+    analysis_result = analyze_workflow_coordination(workflow)
+    
+    if not analysis_result:
+        return {
+            "run_id": run_id,
+            "error": "No trace data available for analysis",
+            "has_failures": False,
+            "failure_count": 0
+        }
+    
+    # Store analysis results in workflow document
+    await workflows_coll.update_one(
+        {"run_id": run_id},
+        {"$set": {"coordination_analysis": analysis_result}}
+    )
+    
+    return analysis_result
+
+@api_router.post("/run/{run_id}/analyze-coordination")
+async def trigger_coordination_analysis(run_id: str):
+    """Force re-analysis of coordination (bypasses cache)"""
+    workflows_coll = get_workflows_collection()
+    
+    workflow = await workflows_coll.find_one({"run_id": run_id})
+    if not workflow:
+        raise HTTPException(status_code=404, detail="Run not found")
+    
+    analysis_result = analyze_workflow_coordination(workflow)
+    
+    if not analysis_result:
+        raise HTTPException(status_code=400, detail="No trace data available for analysis")
+    
+    # Store analysis results
+    await workflows_coll.update_one(
+        {"run_id": run_id},
+        {"$set": {"coordination_analysis": analysis_result}}
+    )
+    
+    return {"message": "Analysis complete", "result": analysis_result}
+
 # Include the router in the main app
 app.include_router(api_router)
 
