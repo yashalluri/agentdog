@@ -611,9 +611,11 @@ function App() {
           )}
         </div>
 
-        {/* Right Drawer - Agent Detail */}
+        {/* Right Drawer Modal - Agent Detail */}
         {selectedStep && (
-          <div className="right-drawer" data-testid="right-drawer">
+          <>
+            <div className="drawer-backdrop" onClick={() => setSelectedStep(null)}></div>
+            <div className="right-drawer-modal" data-testid="right-drawer">
             <div className="drawer-header" data-testid="drawer-header">
               <div className="drawer-header-content">
                 <div>
