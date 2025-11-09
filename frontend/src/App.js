@@ -443,40 +443,44 @@ function App() {
           {/* Left Panel - Chat */}
           <div className="chat-panel-split" style={{ width: `${chatPanelWidth}%` }}>
             <div className="chat-panel-header">
-              <h3 className="chat-panel-title">💬 Agent Chat</h3>
-              <div className="chat-panel-actions">
-                <span className="panel-size-hint">{Math.round(chatPanelWidth)}%</span>
+              <div className="chat-header-content">
+                <h3 className="chat-panel-title">💬 Agent Chat</h3>
+                <select 
+                  className="agent-selector"
+                  value={selectedAgent}
+                  onChange={(e) => setSelectedAgent(e.target.value)}
+                >
+                  {availableAgents.map(agent => (
+                    <option key={agent.id} value={agent.id}>
+                      {agent.name}
+                    </option>
+                  ))}
+                </select>
               </div>
+              <span className="panel-size-hint">{Math.round(chatPanelWidth)}%</span>
             </div>
             
             <div className="chat-messages-area">
-              {chatMessages.length === 0 ? (
-                <div className="chat-empty">
-                  <p>👋 Start a conversation with the agent</p>
-                  <p className="chat-empty-sub">Type a message to begin coordinating multi-agent tasks</p>
-                </div>
-              ) : (
-                chatMessages.map((msg, idx) => (
-                  <div key={idx} className={`chat-msg ${msg.role}`}>
-                    <div className="chat-msg-avatar">
-                      {msg.role === 'user' ? '👤' : '🤖'}
-                    </div>
-                    <div className="chat-msg-content">
-                      <div className="chat-msg-text">{msg.content}</div>
-                      <div className="chat-msg-time">
-                        {new Date(msg.timestamp).toLocaleTimeString()}
-                      </div>
+              {chatMessages.map((msg, idx) => (
+                <div key={idx} className={`chat-msg ${msg.role}`}>
+                  <div className="chat-msg-avatar">
+                    {msg.role === 'user' ? '👤' : '🤖'}
+                  </div>
+                  <div className="chat-msg-content">
+                    <div className="chat-msg-text">{msg.content}</div>
+                    <div className="chat-msg-time">
+                      {new Date(msg.timestamp).toLocaleTimeString()}
                     </div>
                   </div>
-                ))
-              )}
+                </div>
+              ))}
             </div>
             
             <div className="chat-input-area">
               <input
                 type="text"
                 className="chat-input"
-                placeholder="Ask agents to analyze, research, or coordinate..."
+                placeholder="Type your message..."
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
