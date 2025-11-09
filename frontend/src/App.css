@@ -593,6 +593,44 @@ body {
   border-color: #D1D5DB;
 }
 
+/* Mobile Menu Button */
+.mobile-menu-button {
+  display: none;
+  background: none;
+  border: none;
+  color: #0F172A;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.mobile-menu-button:hover {
+  background: #F3F4F6;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-button-text-short {
+  display: none;
+}
+
+/* Mobile Overlay */
+.mobile-overlay {
+  display: none;
+  position: fixed;
+  top: 56px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 40;
+}
+
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 8px;
@@ -626,4 +664,304 @@ body {
 .badge-secondary {
   background: #FEF3C7;
   color: #92400E;
+}
+
+/* ========================================
+   RESPONSIVE STYLES
+   ======================================== */
+
+/* Tablet - 768px to 1024px */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 240px;
+  }
+
+  .right-drawer {
+    width: 320px;
+  }
+
+  .metrics-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .metric-card:nth-child(4),
+  .metric-card:nth-child(5) {
+    grid-column: span 1;
+  }
+}
+
+/* Mobile - Less than 768px */
+@media (max-width: 768px) {
+  /* Show mobile menu button */
+  .mobile-menu-button {
+    display: flex;
+  }
+
+  /* Hide full button text, show short version */
+  .nav-button-text-full {
+    display: none;
+  }
+
+  .nav-button-text-short {
+    display: inline;
+  }
+
+  .nav-button-hide-mobile {
+    display: none;
+  }
+
+  /* Top Nav adjustments */
+  .top-nav {
+    padding: 0 16px;
+  }
+
+  .nav-logo {
+    font-size: 16px;
+  }
+
+  .nav-tagline {
+    display: none;
+  }
+
+  .nav-button-primary {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
+
+  /* Sidebar - slide in from left */
+  .sidebar {
+    position: fixed;
+    top: 56px;
+    left: -280px;
+    bottom: 0;
+    width: 280px;
+    z-index: 50;
+    transition: left 0.3s ease-in-out;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .sidebar.sidebar-open {
+    left: 0;
+  }
+
+  .mobile-overlay {
+    display: block;
+  }
+
+  /* Main panel takes full width */
+  .main-panel {
+    width: 100%;
+    padding: 16px;
+  }
+
+  /* Run detail adjustments */
+  .run-title {
+    font-size: 18px;
+  }
+
+  .run-subtitle {
+    font-size: 13px;
+  }
+
+  /* Metrics grid - 2 columns on mobile */
+  .metrics-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .metric-card {
+    height: auto;
+    padding: 12px;
+  }
+
+  .metric-label {
+    font-size: 10px;
+    margin-bottom: 6px;
+  }
+
+  .metric-value {
+    font-size: 18px;
+  }
+
+  /* Agent flow adjustments */
+  .flow-item {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .flow-item-name {
+    font-size: 13px;
+  }
+
+  .flow-metric {
+    font-size: 12px;
+  }
+
+  /* Right drawer - overlay on mobile */
+  .right-drawer {
+    position: fixed;
+    top: 56px;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 400px;
+    z-index: 60;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .drawer-header {
+    padding: 16px;
+  }
+
+  .drawer-title {
+    font-size: 16px;
+  }
+
+  .drawer-content {
+    padding: 16px;
+  }
+
+  .drawer-section {
+    margin-bottom: 20px;
+  }
+
+  .code-block {
+    font-size: 11px;
+    padding: 12px;
+    max-height: 150px;
+  }
+
+  .diagnostics-grid {
+    gap: 12px;
+  }
+
+  .diagnostic-value {
+    font-size: 14px;
+  }
+}
+
+/* Small Mobile - Less than 480px */
+@media (max-width: 480px) {
+  .top-nav {
+    height: 52px;
+    padding: 0 12px;
+  }
+
+  .main-layout {
+    height: calc(100vh - 52px);
+  }
+
+  .sidebar {
+    top: 52px;
+    width: 100%;
+    left: -100%;
+  }
+
+  .sidebar.sidebar-open {
+    left: 0;
+  }
+
+  .mobile-overlay {
+    top: 52px;
+  }
+
+  .nav-logo {
+    font-size: 15px;
+  }
+
+  .nav-button-primary {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .main-panel {
+    padding: 12px;
+  }
+
+  .run-title {
+    font-size: 16px;
+  }
+
+  .metrics-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .metric-card {
+    padding: 10px;
+  }
+
+  .metric-label {
+    font-size: 9px;
+  }
+
+  .metric-value {
+    font-size: 16px;
+  }
+
+  .section-title {
+    font-size: 11px;
+  }
+
+  .flow-item {
+    padding: 8px 10px;
+  }
+
+  .flow-item-name {
+    font-size: 12px;
+  }
+
+  .flow-metric {
+    font-size: 11px;
+  }
+
+  .right-drawer {
+    top: 52px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .drawer-header {
+    padding: 12px;
+  }
+
+  .drawer-title {
+    font-size: 15px;
+  }
+
+  .drawer-content {
+    padding: 12px;
+  }
+
+  .code-block {
+    font-size: 10px;
+    padding: 10px;
+  }
+
+  .diagnostics-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .diagnostic-label {
+    font-size: 10px;
+  }
+
+  .diagnostic-value {
+    font-size: 13px;
+  }
+
+  .replay-button,
+  .insight-button {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+}
+
+/* Landscape mobile adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+  .metrics-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
