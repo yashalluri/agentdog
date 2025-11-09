@@ -26,10 +26,9 @@ function App() {
   const [executionLog, setExecutionLog] = useState([]);
   
   // Chat interface state
-  const [chatOpen, setChatOpen] = useState(true);
-  const [chatWidth, setChatWidth] = useState(400); // pixels
   const [chatMessages, setChatMessages] = useState([]);
   const [chatInput, setChatInput] = useState('');
+  const [chatPanelWidth, setChatPanelWidth] = useState(40); // percentage
   const [isResizing, setIsResizing] = useState(false);
 
   // Fetch runs on mount and setup WebSocket
