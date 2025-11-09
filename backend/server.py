@@ -913,25 +913,30 @@ async def chat_with_agent(request: ChatRequest):
     try:
         if request.agent_type == 'debate':
             # Use debate multi-agent system
-            
-            # Progress callback for status updates
-            async def progress_callback(status: str):
-                await manager.broadcast({
-                    "type": "debate_progress",
-                    "run_id": run_id,
-                    "status": status,
-                    "timestamp": datetime.now(timezone.utc).isoformat()
-                })
-            
-            debate_system = DebateMultiAgentSystem(run_id=run_id, progress_callback=progress_callback)
-            debate_result = await debate_system.debate_with_user(request.message)
-            
-            # Extract response and citations
-            if isinstance(debate_result, dict):
-                response_text = debate_result.get('response', str(debate_result))
-                citations = debate_result.get('citations', [])
-            else:
-                response_text = str(debate_result)
+            try:
+                # Progress callback for status updates
+                async def progress_callback(status: str):
+                    await manager.broadcast({
+                        "type": "debate_progress",
+                        "run_id": run_id,
+                        "status": status,
+                        "timestamp": datetime.now(timezone.utc).isoformat()
+                    })
+                
+                debate_system = DebateMultiAgentSystem(run_id=run_id, progress_callback=progress_callback)
+                debate_result = await debate_system.debate_with_user(request.message)
+                
+                # Extract response and citations
+                if isinstance(debate_result, dict):
+                    response_text = debate_result.get('response', str(debate_result))
+                    citations = debate_result.get('citations', [])
+                else:
+                    response_text = str(debate_result)
+                    citations = []
+                    
+            except Exception as e:
+                logging.error(f"Debate system error: {e}")
+                response_text = f"I apologize, but I encountered an error with the debate system: {str(e)}"
                 citations = []
         else:
             # Use default single agent (Claude)
