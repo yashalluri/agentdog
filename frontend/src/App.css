@@ -1086,6 +1086,69 @@ body {
   flex-shrink: 0;
 }
 
+/* Chat Controls Section */
+.chat-controls {
+  padding: 16px 20px;
+  border-bottom: 1px solid #E5E7EB;
+  background: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.agent-selector-full {
+  width: 100%;
+  padding: 10px 14px;
+  background: #F9FAFB;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.agent-selector-full:hover {
+  border-color: #2563EB;
+  background: #FFFFFF;
+}
+
+.agent-selector-full:focus {
+  border-color: #2563EB;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.start-new-run-btn {
+  width: 100%;
+  padding: 10px 16px;
+  background: #FFFFFF;
+  color: #374151;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.start-new-run-btn:hover {
+  background: #F9FAFB;
+  border-color: #2563EB;
+  color: #2563EB;
+}
+
+.start-new-run-btn:active {
+  background: #EFF6FF;
+}
+
 .chat-panel-title {
   font-size: 16px;
   font-weight: 600;
