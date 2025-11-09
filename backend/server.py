@@ -573,14 +573,15 @@ async def run_multiagent_demo():
     This creates a workflow with multiple agents that coordinate and send telemetry
     """
     import time
+    import threading
     from agentdog_sdk import AgentDog
     
     # Generate unique run ID
     timestamp = datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')
     run_id = f"live-demo-{timestamp}"
     
-    # Run demo workflow in background task
-    async def run_demo_workflow():
+    # Run demo workflow in background thread (not async to avoid blocking)
+    def run_demo_workflow():
         agentdog = AgentDog(api_url="http://localhost:8001/api")
         
         try:
