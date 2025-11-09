@@ -1,6 +1,7 @@
 from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 import os
 import logging
 from pathlib import Path
@@ -11,12 +12,16 @@ from datetime import datetime, timezone
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 import asyncio
 import json
+import queue
 from database import (
     connect_to_mongo, 
     close_mongo_connection, 
     get_workflows_collection,
     get_agent_runs_collection
 )
+
+# Global queue for SSE events
+sse_queues = []
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
