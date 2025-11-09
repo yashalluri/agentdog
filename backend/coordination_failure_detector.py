@@ -82,6 +82,45 @@ class CoordinationFailureDetector:
         # Flatten trace for easier analysis
         self._flatten_spans(self.trace.get("trace"))
         
+    def _detect_workflow_type(self) -> str:
+        """Detect the type of workflow from trace data"""
+        root_span = self.trace.get("trace", {})
+        root_name = root_span.get("name", "")
+        root_metadata = root_span.get("metadata", {})
+        
+        # Check root span name
+        if "social_media" in root_name.lower():
+            return "social_media"
+        if "debate" in root_name.lower():
+            return "debate"
+            
+        # Check metadata
+        workflow_type = root_metadata.get("workflow_type", "")
+        if workflow_type:
+            return workflow_type
+            
+        # Check children span names
+        children = root_span.get("children", [])
+        for child in children:
+            child_name = child.get("name", "").lower()
+            if "research_agent" in child_name or "debate_agent" in child_name:
+                return "debate"
+            if any(platform in child_name for platform in ["twitter", "linkedin", "instagram", "facebook", "hashtag"]):
+                return "social_media"
+        
+        return "unknown"
+    
+    def _get_valid_models_for_workflow(self) -> set:
+        """Get valid models based on workflow type"""
+        valid_models = self.BASE_VALID_MODELS.copy()
+        
+        if self.workflow_type == "debate":
+            valid_models.update(self.DEBATE_WORKFLOW_MODELS)
+        elif self.workflow_type == "social_media":
+            valid_models.update(self.SOCIAL_MEDIA_WORKFLOW_MODELS)
+        
+        return valid_models
+    
     def _flatten_spans(self, span: Optional[Dict], parent_span: Optional[Dict] = None):
         """Recursively flatten trace tree into list with parent references"""
         if not span:
