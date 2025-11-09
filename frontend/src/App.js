@@ -48,6 +48,43 @@ function App() {
     { id: 'test_faulty', name: 'Test: Faulty Multi-Agent', description: '3 agents with 8 coordination failures' }
   ];
 
+  // Calculate performance stats from runs
+  const calculatePerformanceStats = () => {
+    if (!runs || runs.length === 0) {
+      setPerformanceStats({
+        total: 0,
+        success: 0,
+        error: 0,
+        running: 0,
+        successRate: 0,
+        errorRate: 0,
+        avgSteps: 0
+      });
+      return;
+    }
+
+    const total = runs.length;
+    const success = runs.filter(r => r.status === 'success').length;
+    const error = runs.filter(r => r.status === 'error').length;
+    const running = runs.filter(r => r.status === 'running').length;
+    const totalSteps = runs.reduce((sum, r) => sum + (r.num_steps || 0), 0);
+
+    setPerformanceStats({
+      total,
+      success,
+      error,
+      running,
+      successRate: total > 0 ? ((success / total) * 100).toFixed(1) : 0,
+      errorRate: total > 0 ? ((error / total) * 100).toFixed(1) : 0,
+      avgSteps: total > 0 ? (totalSteps / total).toFixed(1) : 0
+    });
+  };
+
+  // Update stats whenever runs change
+  useEffect(() => {
+    calculatePerformanceStats();
+  }, [runs]);
+
   // Fetch runs on mount and setup WebSocket
   useEffect(() => {
     fetchRuns();
