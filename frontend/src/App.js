@@ -374,89 +374,9 @@ function App() {
           </ScrollArea>
         </div>
 
-        {/* Main Panel - Live Execution or Run Detail */}
+        {/* Main Panel - Run Detail */}
         <div className="main-panel" data-testid="main-panel">
-          {liveExecution ? (
-            /* Live Execution Chat View */
-            <div className="execution-chat" data-testid="execution-chat">
-              <div className="chat-header">
-                <div>
-                  <h2 className="chat-title">🤖 Multi-Agent Execution</h2>
-                  <p className="chat-subtitle">Run ID: {liveExecution.run_id}</p>
-                </div>
-                <button 
-                  className="chat-close"
-                  onClick={() => {
-                    setLiveExecution(null);
-                    setExecutionLog([]);
-                  }}
-                >
-                  ✕
-                </button>
-              </div>
-
-              <div className="execution-timeline">
-                {executionLog.length === 0 && (
-                  <div className="timeline-item initializing">
-                    <div className="timeline-time">
-                      {new Date().toLocaleTimeString('en-US', { hour12: false })}
-                    </div>
-                    <div className="timeline-content">
-                      <div className="timeline-card">
-                        <div className="timeline-card-header">
-                          <div className="timeline-icon running">⚡</div>
-                          <div className="timeline-card-title">Initializing workflow...</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                
-                {executionLog.map((log, index) => (
-                  <div key={index} className={`timeline-item ${log.status}`}>
-                    <div className="timeline-time">
-                      {new Date(log.timestamp).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                    </div>
-                    <div className="timeline-content">
-                      <div className="timeline-card">
-                        <div className="timeline-card-header">
-                          <div className={`timeline-icon ${log.status}`}>
-                            {log.status === 'success' ? '✓' : log.status === 'error' ? '✗' : '○'}
-                          </div>
-                          <div className="timeline-card-info">
-                            <div className="timeline-card-title">{log.agent_name}</div>
-                            {log.latency_ms && (
-                              <div className="timeline-duration">
-                                {log.latency_ms < 1000 ? `${log.latency_ms}ms` : `${(log.latency_ms / 1000).toFixed(2)}s`}
-                              </div>
-                            )}
-                          </div>
-                          {log.status === 'success' && <div className="timeline-status-badge success">Completed</div>}
-                          {log.status === 'error' && <div className="timeline-status-badge error">Failed</div>}
-                        </div>
-                        
-                        {log.coordination_issue && (
-                          <div className="timeline-alert">
-                            <div className="alert-icon">⚠️</div>
-                            <div className="alert-content">
-                              <div className="alert-title">Coordination Issue</div>
-                              <div className="alert-message">{log.coordination_issue}</div>
-                            </div>
-                          </div>
-                        )}
-                        
-                        {log.error_message && !log.coordination_issue && (
-                          <div className="timeline-error-detail">
-                            <span className="error-label">Error:</span> {log.error_message}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : !selectedRun ? (
+          {!selectedRun ? (
             <div className="empty-main" data-testid="empty-main">
               <p>Select a run to view details or click "Run Multi-Agent Demo" to watch live execution</p>
             </div>
