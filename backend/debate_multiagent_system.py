@@ -43,7 +43,7 @@ class ResearchAgent:
         self.agent_id = None
         self.tracer = tracer
         
-    async def research_topic(self, user_position: str, parent_step_id: Optional[str] = None) -> Dict:
+    async def research_topic(self, user_position: str, parent_step_id: Optional[str] = None, parent_span_id: Optional[str] = None) -> Dict:
         """
         Research a topic using Perplexity API to find counter-arguments and facts
         
