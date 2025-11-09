@@ -1,12 +1,11 @@
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
 import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Set
 import uuid
 from datetime import datetime, timezone
 from emergentintegrations.llm.chat import LlmChat, UserMessage
@@ -19,8 +18,31 @@ from database import (
     get_agent_runs_collection
 )
 
-# Global list for SSE clients
-sse_clients = []
+# WebSocket connection manager
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: Set[WebSocket] = set()
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.add(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.discard(websocket)
+
+    async def broadcast(self, message: dict):
+        """Broadcast message to all connected clients"""
+        dead_connections = set()
+        for connection in self.active_connections:
+            try:
+                await connection.send_json(message)
+            except:
+                dead_connections.add(connection)
+        
+        # Clean up dead connections
+        self.active_connections -= dead_connections
+
+manager = ConnectionManager()
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
