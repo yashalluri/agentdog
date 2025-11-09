@@ -132,6 +132,26 @@ class AgentRun(BaseModel):
 class SummaryResponse(BaseModel):
     summary: str
 
+class EventRequest(BaseModel):
+    """Request model for telemetry event ingestion"""
+    run_id: str
+    agent_name: str
+    parent_step_id: Optional[str] = None
+    status: str  # "started" | "success" | "error"
+    start_time: Optional[str] = None
+    end_time: Optional[str] = None
+    latency_ms: Optional[int] = None
+    prompt: Optional[str] = None
+    output: Optional[str] = None
+    tokens: Optional[int] = None
+    cost_usd: Optional[float] = None
+    error_message: Optional[str] = None
+
+class EventResponse(BaseModel):
+    """Response model for event ingestion"""
+    status: str
+    agent_id: str
+
 # API Routes
 @api_router.get("/runs")
 async def get_runs(status: Optional[str] = None, limit: int = 100):
