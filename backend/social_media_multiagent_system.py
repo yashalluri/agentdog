@@ -223,7 +223,29 @@ Create engaging, platform-optimized content that follows these specs exactly."""
         print(f"[{agent_name}] Writing {self.platform} content...")
         start_time = time.time()
         
+        # Create agent span
+        agent_span = None
+        if self.tracer:
+            agent_span = self.tracer.start_span(
+                name=agent_name,
+                span_type=SpanType.AGENT,
+                parent_span_id=parent_step_id,
+                metadata={"agent_type": "platform_writer", "platform": self.platform}
+            )
+            agent_span.input_data = prompt[:500]
+        
         try:
+            # Create LLM call span
+            llm_span = None
+            if self.tracer and agent_span:
+                llm_span = create_llm_span(
+                    tracer=self.tracer,
+                    name=f"claude_{self.platform.lower()}_writer",
+                    model="claude-4-sonnet-20250514",
+                    parent_span_id=agent_span.span_id
+                )
+                llm_span.input_data = prompt[:500]
+            
             chat = LlmChat(
                 api_key=self.llm_key,
                 session_id=f"{self.run_id}-{agent_name}",
@@ -235,6 +257,17 @@ Create engaging, platform-optimized content that follows these specs exactly."""
             
             if asyncio.iscoroutine(response):
                 response = await response
+            
+            # Complete LLM span
+            if llm_span:
+                llm_span.output_data = response[:1000]
+                llm_span.add_llm_details(
+                    model="claude-4-sonnet-20250514",
+                    tokens_input=len(prompt.split()),
+                    tokens_output=len(response.split()),
+                    cost_usd=0.003
+                )
+                self.tracer.end_span(llm_span.span_id, SpanStatus.SUCCESS)
             
             latency_ms = int((time.time() - start_time) * 1000)
             
