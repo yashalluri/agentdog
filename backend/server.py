@@ -598,7 +598,7 @@ async def run_multiagent_demo():
             
             # AGENT 2: Web Searcher 1
             start = time.time()
-            await asyncio.sleep(0.7)
+            time.sleep(0.7)
             s1_id = agentdog.emit_event(
                 run_id=run_id, agent_name="web_searcher_1", status="success",
                 prompt="Search: Latest AI agent frameworks",
