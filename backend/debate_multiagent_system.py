@@ -188,6 +188,13 @@ class ResearchAgent:
             
             print(f"[{agent_name}] ✅ Research complete - Found {total_sources} sources")
             
+            # Complete agent span
+            if agent_span:
+                agent_span.output_data = research_summary[:1000]
+                agent_span.metadata["total_sources"] = total_sources
+                agent_span.metadata["queries_count"] = len(search_queries)
+                self.tracer.end_span(agent_span.span_id, SpanStatus.SUCCESS)
+            
             # Small delay to ensure event is persisted before broadcasting
             await asyncio.sleep(0.3)
             
@@ -197,7 +204,8 @@ class ResearchAgent:
                 "results": all_results,
                 "summary": research_summary,
                 "total_sources": total_sources,
-                "agent_id": self.agent_id
+                "agent_id": self.agent_id,
+                "span_id": agent_span.span_id if agent_span else None
             }
             
         except Exception as e:
