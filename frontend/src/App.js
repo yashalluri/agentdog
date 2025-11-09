@@ -1025,6 +1025,135 @@ function App() {
       </div>
       </div>
     </div>
+
+    {/* Performance Modal */}
+    {showPerformanceModal && performanceStats && (
+      <>
+        <div className="drawer-backdrop" onClick={() => setShowPerformanceModal(false)}></div>
+        <div className="right-drawer-modal performance-modal">
+          <div className="drawer-header">
+            <div className="drawer-header-content">
+              <div>
+                <h3 className="drawer-title">System Performance</h3>
+                <p className="drawer-subtitle">Real-time metrics across all runs</p>
+              </div>
+            </div>
+            <button 
+              className="drawer-close" 
+              onClick={() => setShowPerformanceModal(false)}
+            >
+              ×
+            </button>
+          </div>
+
+          <div className="drawer-content">
+            {/* Overview Stats */}
+            <div className="performance-stats-grid">
+              <div className="perf-stat-card">
+                <div className="perf-stat-label">Total Runs</div>
+                <div className="perf-stat-value">{performanceStats.total}</div>
+              </div>
+              <div className="perf-stat-card success">
+                <div className="perf-stat-label">Success Rate</div>
+                <div className="perf-stat-value">{performanceStats.successRate}%</div>
+                <div className="perf-stat-sublabel">{performanceStats.success} successful</div>
+              </div>
+              <div className="perf-stat-card error">
+                <div className="perf-stat-label">Error Rate</div>
+                <div className="perf-stat-value">{performanceStats.errorRate}%</div>
+                <div className="perf-stat-sublabel">{performanceStats.error} failed</div>
+              </div>
+              <div className="perf-stat-card">
+                <div className="perf-stat-label">Avg Steps</div>
+                <div className="perf-stat-value">{performanceStats.avgSteps}</div>
+              </div>
+            </div>
+
+            {/* Status Breakdown */}
+            <div className="performance-section">
+              <h4 className="performance-section-title">Run Status Breakdown</h4>
+              <div className="status-breakdown">
+                <div className="status-bar-container">
+                  <div className="status-bar-labels">
+                    <span>Success</span>
+                    <span>{performanceStats.success}</span>
+                  </div>
+                  <div className="status-bar">
+                    <div 
+                      className="status-bar-fill success" 
+                      style={{ width: `${performanceStats.successRate}%` }}
+                    ></div>
+                  </div>
+                </div>
+                <div className="status-bar-container">
+                  <div className="status-bar-labels">
+                    <span>Errors</span>
+                    <span>{performanceStats.error}</span>
+                  </div>
+                  <div className="status-bar">
+                    <div 
+                      className="status-bar-fill error" 
+                      style={{ width: `${performanceStats.errorRate}%` }}
+                    ></div>
+                  </div>
+                </div>
+                {performanceStats.running > 0 && (
+                  <div className="status-bar-container">
+                    <div className="status-bar-labels">
+                      <span>Running</span>
+                      <span>{performanceStats.running}</span>
+                    </div>
+                    <div className="status-bar">
+                      <div 
+                        className="status-bar-fill running" 
+                        style={{ width: `${(performanceStats.running / performanceStats.total * 100).toFixed(1)}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Health Indicator */}
+            <div className="performance-section">
+              <h4 className="performance-section-title">System Health</h4>
+              <div className="health-indicator">
+                {performanceStats.errorRate < 5 ? (
+                  <div className="health-status excellent">
+                    <span className="health-icon">✓</span>
+                    <div>
+                      <div className="health-label">Excellent</div>
+                      <div className="health-description">System running smoothly</div>
+                    </div>
+                  </div>
+                ) : performanceStats.errorRate < 15 ? (
+                  <div className="health-status good">
+                    <span className="health-icon">⚠</span>
+                    <div>
+                      <div className="health-label">Good</div>
+                      <div className="health-description">Some errors detected</div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="health-status poor">
+                    <span className="health-icon">✗</span>
+                    <div>
+                      <div className="health-label">Needs Attention</div>
+                      <div className="health-description">High error rate detected</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="performance-footer">
+              <p className="performance-note">Updates automatically as new runs complete</p>
+            </div>
+          </div>
+        </div>
+      </>
+    )}
+  </div>
   );
 }
 
