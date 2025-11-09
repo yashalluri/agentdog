@@ -145,8 +145,23 @@ class ResearchAgent:
                             })
                             total_sources += len(formatted_citations)
                             
+                            # Update API span with success
+                            if api_span:
+                                api_span.output_data = {"content": content[:500], "citations_count": len(formatted_citations)}
+                                api_span.http_status = 200
+                                api_span.add_llm_details(
+                                    model="sonar",
+                                    tokens_input=len(query.split()),
+                                    tokens_output=len(content.split()),
+                                    cost_usd=0.002
+                                )
+                                self.tracer.end_span(api_span.span_id, SpanStatus.SUCCESS)
+                            
                             print(f"[{agent_name}] ✅ Search completed: {query[:50]}... ({len(citations)} sources)")
                         else:
+                            if api_span:
+                                api_span.http_status = response.status_code
+                                self.tracer.end_span(api_span.span_id, SpanStatus.ERROR, error=f"HTTP {response.status_code}")
                             print(f"[{agent_name}] ⚠️ Search failed with status {response.status_code}")
                             
                     except Exception as e:
