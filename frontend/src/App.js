@@ -341,35 +341,61 @@ function App() {
                 </button>
               </div>
 
-              <div className="chat-messages">
+              <div className="execution-timeline">
                 {executionLog.length === 0 && (
-                  <div className="chat-message system">
-                    <div className="message-icon">⚡</div>
-                    <div className="message-content">
-                      <div className="message-text">Initializing agents...</div>
+                  <div className="timeline-item initializing">
+                    <div className="timeline-time">
+                      {new Date().toLocaleTimeString('en-US', { hour12: false })}
+                    </div>
+                    <div className="timeline-content">
+                      <div className="timeline-card">
+                        <div className="timeline-card-header">
+                          <div className="timeline-icon running">⚡</div>
+                          <div className="timeline-card-title">Initializing workflow...</div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
                 
                 {executionLog.map((log, index) => (
-                  <div key={index} className={`chat-message ${log.status}`}>
-                    <div className="message-icon">
-                      {log.status === 'success' ? '✅' : log.status === 'error' ? '❌' : '🔄'}
+                  <div key={index} className={`timeline-item ${log.status}`}>
+                    <div className="timeline-time">
+                      {new Date(log.timestamp).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                     </div>
-                    <div className="message-content">
-                      <div className="message-agent-name">{log.agent_name}</div>
-                      <div className="message-text">
-                        {log.status === 'started' && `Starting ${log.agent_name}...`}
-                        {log.status === 'success' && `Completed in ${log.latency_ms}ms`}
-                        {log.status === 'error' && `Failed: ${log.error_message}`}
+                    <div className="timeline-content">
+                      <div className="timeline-card">
+                        <div className="timeline-card-header">
+                          <div className={`timeline-icon ${log.status}`}>
+                            {log.status === 'success' ? '✓' : log.status === 'error' ? '✗' : '○'}
+                          </div>
+                          <div className="timeline-card-info">
+                            <div className="timeline-card-title">{log.agent_name}</div>
+                            {log.latency_ms && (
+                              <div className="timeline-duration">
+                                {log.latency_ms < 1000 ? `${log.latency_ms}ms` : `${(log.latency_ms / 1000).toFixed(2)}s`}
+                              </div>
+                            )}
+                          </div>
+                          {log.status === 'success' && <div className="timeline-status-badge success">Completed</div>}
+                          {log.status === 'error' && <div className="timeline-status-badge error">Failed</div>}
+                        </div>
+                        
                         {log.coordination_issue && (
-                          <div className="coordination-alert">
-                            ⚠️ Coordination Issue: {log.coordination_issue}
+                          <div className="timeline-alert">
+                            <div className="alert-icon">⚠️</div>
+                            <div className="alert-content">
+                              <div className="alert-title">Coordination Issue</div>
+                              <div className="alert-message">{log.coordination_issue}</div>
+                            </div>
                           </div>
                         )}
-                      </div>
-                      <div className="message-time">
-                        {new Date(log.timestamp).toLocaleTimeString()}
+                        
+                        {log.error_message && !log.coordination_issue && (
+                          <div className="timeline-error-detail">
+                            <span className="error-label">Error:</span> {log.error_message}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
