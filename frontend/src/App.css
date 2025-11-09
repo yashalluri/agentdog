@@ -423,6 +423,38 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  gap: 16px;
+}
+
+.drawer-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex: 1;
+  gap: 12px;
+}
+
+.drawer-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #9CA3AF;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.drawer-close:hover {
+  background: #F3F4F6;
+  color: #374151;
 }
 
 .drawer-title {
