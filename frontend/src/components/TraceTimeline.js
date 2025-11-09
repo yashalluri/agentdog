@@ -14,6 +14,7 @@ const TraceTimeline = ({ runId, api }) => {
   useEffect(() => {
     if (runId) {
       fetchTrace();
+      fetchCoordinationFailures();
     }
   }, [runId]);
 
@@ -26,14 +27,25 @@ const TraceTimeline = ({ runId, api }) => {
       // Handle new array format (multiple traces) or backward compatible single trace
       if (data.latest_trace) {
         setTrace(data.latest_trace);
-        // Auto-expand root span
+        // Auto-expand root span and first level children
         if (data.latest_trace.trace) {
-          setExpandedSpans(new Set([data.latest_trace.trace.span_id]));
+          const expandedSet = new Set([data.latest_trace.trace.span_id]);
+          // Auto-expand first level children for better visibility
+          if (data.latest_trace.trace.children) {
+            data.latest_trace.trace.children.forEach(child => {
+              expandedSet.add(child.span_id);
+            });
+          }
+          setExpandedSpans(expandedSet);
         }
       } else if (data.trace) {
         // Backward compatibility - single trace
         setTrace(data);
-        setExpandedSpans(new Set([data.trace.span_id]));
+        const expandedSet = new Set([data.trace.span_id]);
+        if (data.trace.children) {
+          data.trace.children.forEach(child => expandedSet.add(child.span_id));
+        }
+        setExpandedSpans(expandedSet);
       } else {
         setTrace(data);
       }
@@ -41,6 +53,31 @@ const TraceTimeline = ({ runId, api }) => {
       console.error('Error fetching trace:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCoordinationFailures = async () => {
+    try {
+      const response = await fetch(`${api}/run/${runId}/coordination-analysis`);
+      const data = await response.json();
+      
+      // Extract failures and map by span_id
+      const failuresMap = new Map();
+      const analysis = data.latest_analysis || data;
+      
+      if (analysis && analysis.failures) {
+        analysis.failures.forEach(failure => {
+          const spanId = failure.span_id;
+          if (!failuresMap.has(spanId)) {
+            failuresMap.set(spanId, []);
+          }
+          failuresMap.get(spanId).push(failure);
+        });
+      }
+      
+      setCoordinationFailures(failuresMap);
+    } catch (error) {
+      console.error('Error fetching coordination failures:', error);
     }
   };
 
