@@ -19,6 +19,8 @@ from database import (
 )
 from debate_multiagent_system import DebateMultiAgentSystem
 from coordination_failure_detector import analyze_workflow_coordination
+from test_buggy_single_agent import BuggySummarizerAgent
+from test_faulty_multiagent import FaultyMultiAgentSystem
 
 # WebSocket connection manager
 class ConnectionManager:
