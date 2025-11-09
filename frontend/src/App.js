@@ -760,6 +760,8 @@ function App() {
               </div>
             ) : observabilityView === 'trace' ? (
               <TraceTimeline runId={selectedRun.id} api={API} />
+            ) : observabilityView === 'coordination' ? (
+              <CoordinationAnalysis runId={selectedRun.id} api={API} />
             ) : (
             <div className="run-detail" data-testid="run-detail">
               {/* Run Header */}
