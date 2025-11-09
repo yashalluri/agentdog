@@ -347,6 +347,12 @@ class DebateMultiAgentSystem:
                 "citations": []
             }
         
+        # Update progress: Research complete (triggers observability refresh)
+        if self.progress_callback:
+            await self.progress_callback("✅ Research complete")
+        
+        await asyncio.sleep(0.5)
+        
         # Update progress: Analyzing findings
         if self.progress_callback:
             await self.progress_callback("📊 Analyzing findings...")
