@@ -1024,10 +1024,9 @@ function App() {
         </div>
       </div>
       </div>
-    </div>
 
-    {/* Performance Modal */}
-    {showPerformanceModal && performanceStats && (
+      {/* Performance Modal */}
+      {showPerformanceModal && performanceStats && (
       <>
         <div className="drawer-backdrop" onClick={() => setShowPerformanceModal(false)}></div>
         <div className="right-drawer-modal performance-modal">
