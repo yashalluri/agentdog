@@ -39,11 +39,12 @@ from observability_tracer import (
 class ContentStrategistAgent:
     """Analyzes topic and creates content strategy"""
     
-    def __init__(self, run_id: str, agentdog: AgentDog):
+    def __init__(self, run_id: str, agentdog: AgentDog, tracer: Optional[ObservabilityTracer] = None):
         self.run_id = run_id
         self.agentdog = agentdog
         self.llm_key = os.environ.get('EMERGENT_LLM_KEY')
         self.agent_id = None
+        self.tracer = tracer
         
     async def analyze_topic(self, user_topic: str) -> Dict:
         """Analyze the topic and create content strategy"""
