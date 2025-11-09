@@ -483,9 +483,10 @@ class CoordinationFailureDetector:
                         "message": f"{agent_name} exceeded maximum allowed duration",
                         "evidence": {
                             "duration_ms": duration,
-                        "max_allowed_ms": contracts["content_strategist"]["max_duration_ms"]
-                    }
-                })
+                            "max_allowed_ms": max_duration,
+                            "contract": f"{agent_name}.max_duration_ms"
+                        }
+                    })
         
         self.detection_results["failures"].extend(violations)
         self.detection_results["failure_count"] += len(violations)
