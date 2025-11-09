@@ -12,7 +12,6 @@ from datetime import datetime, timezone
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 import asyncio
 import json
-import queue
 from database import (
     connect_to_mongo, 
     close_mongo_connection, 
@@ -20,8 +19,8 @@ from database import (
     get_agent_runs_collection
 )
 
-# Global queue for SSE events
-sse_queues = []
+# Global list for SSE clients
+sse_clients = []
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
