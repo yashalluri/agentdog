@@ -233,7 +233,11 @@ Provide a well-reasoned argument that:
             ).with_model("anthropic", "claude-4-sonnet-20250514")
             
             user_message = UserMessage(text=prompt)
-            response = await chat.send_message(user_message)
+            response = chat.send_message(user_message)
+            
+            # Handle async if needed
+            if asyncio.iscoroutine(response):
+                response = await response
             
             latency_ms = int((time.time() - start_time) * 1000)
             
