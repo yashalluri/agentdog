@@ -25,7 +25,17 @@ const CoordinationAnalysis = ({ runId, api }) => {
       }
       
       const data = await response.json();
-      setAnalysis(data);
+      
+      // Handle new array format (multiple analyses) or backward compatible single analysis
+      if (data.latest_analysis) {
+        setAnalysis(data.latest_analysis);
+      } else if (data.analyses && data.analyses.length > 0) {
+        // Use latest if no latest_analysis field
+        setAnalysis(data.analyses[data.analyses.length - 1]);
+      } else {
+        // Backward compatibility - single analysis
+        setAnalysis(data);
+      }
     } catch (err) {
       console.error('Error fetching coordination analysis:', err);
       setError(err.message);
