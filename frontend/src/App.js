@@ -228,7 +228,60 @@ function App() {
     setSelectedRun(null);
     setRunSteps([]);
     setSummary(null);
+    setDebateProgress('Thinking...');
     toast.success('Ready to start new conversation');
+  };
+
+  const renderMessageWithCitations = (content) => {
+    if (!content) return '';
+    
+    // Split content by "Sources:" section
+    const parts = content.split('---');
+    
+    if (parts.length === 1) {
+      // No citations, return as-is
+      return content;
+    }
+    
+    const mainContent = parts[0];
+    const sourcesSection = parts[1];
+    
+    // Parse sources section and create clickable links
+    const sourceLines = sourcesSection.split('\n').filter(line => line.trim().startsWith('['));
+    
+    return (
+      <div>
+        <div style={{ whiteSpace: 'pre-wrap' }}>{mainContent}</div>
+        {sourceLines.length > 0 && (
+          <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #E5E7EB' }}>
+            <div style={{ fontSize: '12px', fontWeight: '600', color: '#6B7280', marginBottom: '8px' }}>
+              SOURCES:
+            </div>
+            {sourceLines.map((line, idx) => {
+              // Extract [number] and URL
+              const match = line.match(/\[(\d+)\]\s+(.+)/);
+              if (match) {
+                const [, num, url] = match;
+                return (
+                  <div key={idx} style={{ fontSize: '12px', marginBottom: '4px' }}>
+                    <span style={{ color: '#6B7280', marginRight: '4px' }}>[{num}]</span>
+                    <a 
+                      href={url.trim()} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      style={{ color: '#2563EB', textDecoration: 'underline' }}
+                    >
+                      {url.trim().substring(0, 60)}{url.trim().length > 60 ? '...' : ''}
+                    </a>
+                  </div>
+                );
+              }
+              return null;
+            })}
+          </div>
+        )}
+      </div>
+    );
   };
 
   const handleSendMessage = async () => {
