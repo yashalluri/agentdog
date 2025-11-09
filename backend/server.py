@@ -11,6 +11,12 @@ from datetime import datetime, timezone
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 import asyncio
 import json
+from database import (
+    connect_to_mongo, 
+    close_mongo_connection, 
+    get_workflows_collection,
+    get_agent_runs_collection
+)
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -20,6 +26,19 @@ app = FastAPI()
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
+
+# Startup and shutdown events
+@app.on_event("startup")
+async def startup_db_client():
+    """Connect to MongoDB on startup"""
+    await connect_to_mongo()
+    logging.info("AgentDog backend started - MongoDB connected")
+
+@app.on_event("shutdown")
+async def shutdown_db_client():
+    """Close MongoDB connection on shutdown"""
+    await close_mongo_connection()
+    logging.info("AgentDog backend shutdown - MongoDB disconnected")
 
 # In-memory storage (easily swappable to MongoDB)
 class InMemoryStore:
