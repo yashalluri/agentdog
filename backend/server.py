@@ -489,16 +489,19 @@ Provide a concise summary explaining what the agents collectively did, any failu
         logging.error(f"Error generating summary: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to generate summary: {str(e)}")
 
-@app.websocket("/ws")
+@app.websocket("/api/ws")
 async def websocket_endpoint(websocket: WebSocket):
     """WebSocket endpoint for real-time agent execution updates"""
     await manager.connect(websocket)
+    logging.info("WebSocket client connected")
     try:
         while True:
-            # Keep connection alive
-            await websocket.receive_text()
+            # Keep connection alive and handle any messages from client
+            data = await websocket.receive_text()
+            logging.debug(f"Received from client: {data}")
     except WebSocketDisconnect:
         manager.disconnect(websocket)
+        logging.info("WebSocket client disconnected")
     except Exception as e:
         logging.error(f"WebSocket error: {e}")
         manager.disconnect(websocket)
