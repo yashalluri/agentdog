@@ -42,18 +42,53 @@ function App() {
         const data = JSON.parse(event.data);
         
         if (data.type === 'agent_update') {
-          // Add to execution log if this is the live execution
-          if (liveExecution && data.run_id === liveExecution.run_id) {
-            setExecutionLog(prev => [...prev, data]);
-          }
-          
-          // Refresh runs list
-          fetchRuns();
-          
-          // If viewing this run, refresh its details
+          // If this is for the currently selected run, update it live
           if (selectedRun && data.run_id === selectedRun.id) {
-            fetchRunDetails(selectedRun.id);
+            // Add/update the agent in runSteps
+            setRunSteps(prevSteps => {
+              // Check if agent already exists
+              const existingIndex = prevSteps.findIndex(s => s.id === data.agent_id);
+              const newAgent = {
+                id: data.agent_id,
+                run_id: data.run_id,
+                name: data.agent_name,
+                agent_name: data.agent_name,
+                status: data.status,
+                latency_ms: data.latency_ms || 0,
+                cost: data.cost_usd || 0,
+                cost_usd: data.cost_usd || 0,
+                parent_step_id: data.parent_step_id,
+                coordination_status: data.coordination_status,
+                coordination_issue: data.coordination_issue,
+                error_message: data.error_message,
+                prompt: '',
+                output: '',
+                tokens: 0
+              };
+              
+              if (existingIndex >= 0) {
+                // Update existing agent
+                const updated = [...prevSteps];
+                updated[existingIndex] = newAgent;
+                return updated;
+              } else {
+                // Add new agent
+                return [...prevSteps, newAgent];
+              }
+            });
+            
+            // Update run metrics
+            setSelectedRun(prevRun => ({
+              ...prevRun,
+              num_steps: prevRun.num_steps + (prevSteps.findIndex(s => s.id === data.agent_id) >= 0 ? 0 : 1),
+              num_failed: prevRun.num_failed + (data.status === 'error' ? 1 : 0),
+              num_success: prevRun.num_success + (data.status === 'success' ? 1 : 0),
+              status: data.status === 'error' ? 'error' : prevRun.status
+            }));
           }
+          
+          // Refresh runs list in sidebar
+          fetchRuns();
         }
       } catch (e) {
         console.error('WebSocket parse error:', e);
