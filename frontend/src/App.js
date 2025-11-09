@@ -25,39 +25,53 @@ function App() {
   const [liveExecution, setLiveExecution] = useState(null);
   const [executionLog, setExecutionLog] = useState([]);
 
-  // Fetch runs on mount and setup SSE
+  // Fetch runs on mount and setup WebSocket
   useEffect(() => {
     fetchRuns();
     
-    // Setup Server-Sent Events for real-time updates
-    const eventSource = new EventSource(`${API}/stream`);
+    // Setup WebSocket for real-time updates
+    const wsUrl = BACKEND_URL.replace('https://', 'wss://').replace('http://', 'ws://');
+    const ws = new WebSocket(`${wsUrl}/ws`);
     
-    eventSource.onmessage = (event) => {
+    ws.onopen = () => {
+      console.log('WebSocket connected');
+    };
+    
+    ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
         
-        if (data.type === 'agent_created') {
-          // Refresh runs when new agent is created
+        if (data.type === 'agent_update') {
+          // Add to execution log if this is the live execution
+          if (liveExecution && data.run_id === liveExecution.run_id) {
+            setExecutionLog(prev => [...prev, data]);
+          }
+          
+          // Refresh runs list
           fetchRuns();
           
-          // If this is for the currently selected run, refresh its steps
-          if (selectedRun && data.data.run_id === selectedRun.id) {
+          // If viewing this run, refresh its details
+          if (selectedRun && data.run_id === selectedRun.id) {
             fetchRunDetails(selectedRun.id);
           }
         }
       } catch (e) {
-        console.error('SSE parse error:', e);
+        console.error('WebSocket parse error:', e);
       }
     };
     
-    eventSource.onerror = (error) => {
-      console.error('SSE error:', error);
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+    
+    ws.onclose = () => {
+      console.log('WebSocket disconnected');
     };
     
     return () => {
-      eventSource.close();
+      ws.close();
     };
-  }, []);
+  }, [liveExecution]);
 
   // Poll for updates when a run is selected and status is running
   useEffect(() => {
