@@ -1026,6 +1026,81 @@ async def chat_with_agent(request: ChatRequest):
                 logging.error(f"Debate system error: {e}")
                 response_text = f"I apologize, but I encountered an error with the debate system: {str(e)}"
                 citations = []
+        
+        elif request.agent_type == "test_buggy":
+            # Use Test Buggy Single Agent
+            try:
+                buggy_agent = BuggySummarizerAgent(run_id)
+                buggy_result = await buggy_agent.summarize_text(request.message)
+                
+                # Extract response and trace
+                if isinstance(buggy_result, dict):
+                    response_text = buggy_result.get('response', str(buggy_result))
+                    detailed_trace = buggy_result.get('trace', None)
+                    
+                    # Save detailed trace to workflow
+                    if detailed_trace:
+                        await workflows_coll.update_one(
+                            {"run_id": run_id},
+                            {"$set": {"detailed_trace": detailed_trace}}
+                        )
+                        
+                        # Auto-analyze coordination after workflow completes
+                        workflow_doc = await workflows_coll.find_one({"run_id": run_id})
+                        if workflow_doc:
+                            analysis_result = analyze_workflow_coordination(workflow_doc)
+                            if analysis_result:
+                                await workflows_coll.update_one(
+                                    {"run_id": run_id},
+                                    {"$set": {"coordination_analysis": analysis_result}}
+                                )
+                else:
+                    response_text = str(buggy_result)
+                
+                citations = []
+                
+            except Exception as e:
+                logging.error(f"Test buggy agent error: {e}")
+                response_text = f"Test agent error: {str(e)}"
+                citations = []
+        
+        elif request.agent_type == "test_faulty":
+            # Use Test Faulty Multi-Agent System
+            try:
+                faulty_system = FaultyMultiAgentSystem(run_id)
+                faulty_result = await faulty_system.run_analysis(request.message)
+                
+                # Extract response and trace
+                if isinstance(faulty_result, dict):
+                    response_text = faulty_result.get('response', str(faulty_result))
+                    detailed_trace = faulty_result.get('trace', None)
+                    
+                    # Save detailed trace to workflow
+                    if detailed_trace:
+                        await workflows_coll.update_one(
+                            {"run_id": run_id},
+                            {"$set": {"detailed_trace": detailed_trace}}
+                        )
+                        
+                        # Auto-analyze coordination after workflow completes
+                        workflow_doc = await workflows_coll.find_one({"run_id": run_id})
+                        if workflow_doc:
+                            analysis_result = analyze_workflow_coordination(workflow_doc)
+                            if analysis_result:
+                                await workflows_coll.update_one(
+                                    {"run_id": run_id},
+                                    {"$set": {"coordination_analysis": analysis_result}}
+                                )
+                else:
+                    response_text = str(faulty_result)
+                
+                citations = []
+                
+            except Exception as e:
+                logging.error(f"Test faulty multi-agent error: {e}")
+                response_text = f"Test multi-agent error: {str(e)}"
+                citations = []
+        
         else:
             # Use default single agent (Claude)
             chat = LlmChat(
