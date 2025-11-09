@@ -285,6 +285,28 @@ body {
   font-weight: 600;
   color: #0F172A;
   margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.live-indicator {
+  font-size: 12px;
+  font-weight: 600;
+  color: #DC2626;
+  background: #FEE2E2;
+  padding: 4px 8px;
+  border-radius: 4px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
 }
 
 .run-subtitle {
