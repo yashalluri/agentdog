@@ -938,10 +938,12 @@ async def chat_with_agent(request: ChatRequest):
                 
                 social_media_system = SocialMediaMultiAgentSystem(run_id=run_id, progress_callback=progress_callback)
                 response_text = await social_media_system.create_content(request.message)
+                citations = []  # Social media doesn't have citations
                 
             except Exception as e:
                 logging.error(f"Social media system error: {e}")
                 response_text = f"I apologize, but I encountered an error with the social media system: {str(e)}"
+                citations = []
         
         elif request.agent_type == 'debate':
             # Use debate multi-agent system
