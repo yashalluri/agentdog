@@ -1083,6 +1083,16 @@ body {
   overflow: hidden;
 }
 
+/* Mobile/Tablet: Full width, border bottom instead of right */
+@media (max-width: 1024px) {
+  .chat-panel-split {
+    width: 100% !important;
+    border-right: none;
+    border-bottom: 1px solid #E5E7EB;
+    max-height: 50vh;
+  }
+}
+
 .chat-panel-header {
   padding: 16px 20px;
   border-bottom: 1px solid #E5E7EB;
