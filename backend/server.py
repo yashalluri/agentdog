@@ -848,6 +848,155 @@ async def ingest_sample_data():
     
     return {"message": "Sample data ingested successfully", "run_id": run_id}
 
+class ChatRequest(BaseModel):
+    """Request model for chat interaction"""
+    run_id: Optional[str] = None
+    message: str
+    agent_type: str = "default"
+
+class ChatResponse(BaseModel):
+    """Response model for chat interaction"""
+    run_id: str
+    response: str
+    agent_name: str
+
+@api_router.post("/chat", response_model=ChatResponse)
+async def chat_with_agent(request: ChatRequest):
+    """
+    Chat with a multi-agent system
+    - Creates a new run if run_id is not provided
+    - Processes user message with selected agent
+    - Stores conversation history
+    - Returns agent response
+    """
+    workflows_coll = get_workflows_collection()
+    current_time = datetime.now(timezone.utc).isoformat()
+    
+    # If no run_id provided, create a new run
+    if not request.run_id:
+        run_id = f"chat-{datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')}"
+        
+        workflow_doc = {
+            "run_id": run_id,
+            "created_at": current_time,
+            "updated_at": current_time,
+            "final_status": "running",
+            "initiator": "chat",
+            "summary": None,
+            "coordination_health": None,
+            "total_agents": 0,
+            "failed_agents": 0,
+            "messages": []  # Store chat messages
+        }
+        await workflows_coll.insert_one(workflow_doc)
+        logging.info(f"Created new chat run: {run_id}")
+    else:
+        run_id = request.run_id
+    
+    # Store user message
+    user_message = {
+        "role": "user",
+        "content": request.message,
+        "timestamp": current_time
+    }
+    
+    await workflows_coll.update_one(
+        {"run_id": run_id},
+        {
+            "$push": {"messages": user_message},
+            "$set": {"updated_at": current_time}
+        }
+    )
+    
+    # Process message with agent (using Anthropic Claude via Emergent LLM key)
+    try:
+        chat = LlmChat(
+            api_key=os.environ.get('EMERGENT_LLM_KEY'),
+            session_id=run_id,
+            system_message="You are a helpful AI assistant. Provide clear, concise, and helpful responses to user queries."
+        ).with_model("anthropic", "claude-4-sonnet-20250514")
+        
+        # Get conversation history for context
+        workflow = await workflows_coll.find_one({"run_id": run_id})
+        messages = workflow.get('messages', [])
+        
+        # Build context from recent messages (last 10)
+        context = ""
+        if len(messages) > 1:  # More than just the current message
+            recent_messages = messages[-11:-1]  # Exclude the current message
+            for msg in recent_messages:
+                role = msg['role'].capitalize()
+                context += f"{role}: {msg['content']}\n\n"
+        
+        # Generate response
+        prompt = f"{context}User: {request.message}" if context else request.message
+        user_msg = UserMessage(text=prompt)
+        response_text = await chat.send_message(user_msg)
+        
+        # Store assistant response
+        assistant_message = {
+            "role": "assistant",
+            "content": response_text,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "agent_name": f"{request.agent_type}_agent"
+        }
+        
+        await workflows_coll.update_one(
+            {"run_id": run_id},
+            {
+                "$push": {"messages": assistant_message},
+                "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}
+            }
+        )
+        
+        # Broadcast chat update via WebSocket
+        asyncio.create_task(manager.broadcast({
+            "type": "chat_update",
+            "run_id": run_id,
+            "message": assistant_message,
+            "timestamp": assistant_message["timestamp"]
+        }))
+        
+        return ChatResponse(
+            run_id=run_id,
+            response=response_text,
+            agent_name=f"{request.agent_type}_agent"
+        )
+        
+    except Exception as e:
+        logging.error(f"Error processing chat message: {e}")
+        
+        # Store error message
+        error_message = {
+            "role": "assistant",
+            "content": "I apologize, but I encountered an error processing your message. Please try again.",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "error": True
+        }
+        
+        await workflows_coll.update_one(
+            {"run_id": run_id},
+            {
+                "$push": {"messages": error_message},
+                "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}
+            }
+        )
+        
+        raise HTTPException(status_code=500, detail=f"Failed to process message: {str(e)}")
+
+@api_router.get("/run/{run_id}/messages")
+async def get_run_messages(run_id: str):
+    """Get chat messages for a specific run"""
+    workflows_coll = get_workflows_collection()
+    
+    workflow = await workflows_coll.find_one({"run_id": run_id})
+    if not workflow:
+        raise HTTPException(status_code=404, detail="Run not found")
+    
+    messages = workflow.get('messages', [])
+    
+    return {"messages": messages, "run_id": run_id}
+
 # Include the router in the main app
 app.include_router(api_router)
 
