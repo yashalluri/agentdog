@@ -205,7 +205,7 @@ class DebateAgent:
         user_position: str, 
         research_findings: Dict,
         parent_step_id: Optional[str] = None
-    ) -> str:
+    ) -> Dict:
         """
         Construct a debate argument against the user's position using research
         
