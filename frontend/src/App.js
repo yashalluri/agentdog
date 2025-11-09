@@ -521,7 +521,7 @@ function App() {
                 chatMessages.map((msg, idx) => (
                   <div key={idx} className={`chat-msg ${msg.role}`}>
                     <div className="chat-msg-avatar">
-                      {msg.role === 'user' ? '👤' : '🤖'}
+                      {msg.role === 'user' ? '👤' : '✨'}
                     </div>
                     <div className="chat-msg-content">
                       <div className="chat-msg-text">{msg.content}</div>
@@ -534,7 +534,7 @@ function App() {
               )}
               {isSendingMessage && (
                 <div className="chat-msg assistant">
-                  <div className="chat-msg-avatar">🤖</div>
+                  <div className="chat-msg-avatar">✨</div>
                   <div className="chat-msg-content">
                     <div className="chat-msg-text">
                       <span className="typing-indicator">Thinking...</span>
