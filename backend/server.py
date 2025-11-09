@@ -480,23 +480,24 @@ Provide a concise summary explaining what the agents collectively did, any failu
 async def stream_events():
     """Server-Sent Events endpoint for real-time updates"""
     async def event_generator():
-        # Create a queue for this client
-        client_queue = queue.Queue()
-        sse_queues.append(client_queue)
+        # Create an async queue for this client
+        client_queue = asyncio.Queue()
+        sse_clients.append(client_queue)
         
         try:
             while True:
-                # Check for new events
+                # Wait for new events with timeout
                 try:
-                    event = client_queue.get(timeout=30)
+                    event = await asyncio.wait_for(client_queue.get(), timeout=30.0)
                     yield f"data: {event}\n\n"
-                except queue.Empty:
+                except asyncio.TimeoutError:
                     # Send keepalive
                     yield f": keepalive\n\n"
         except Exception as e:
             logging.error(f"SSE client disconnected: {e}")
         finally:
-            sse_queues.remove(client_queue)
+            if client_queue in sse_clients:
+                sse_clients.remove(client_queue)
     
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
