@@ -60,6 +60,17 @@ class ResearchAgent:
         print(f"[{agent_name}] Starting web research...")
         start_time = time.time()
         
+        # Create agent span if tracer is available
+        agent_span = None
+        if self.tracer:
+            agent_span = self.tracer.start_span(
+                name=agent_name,
+                span_type=SpanType.AGENT,
+                parent_span_id=parent_span_id,
+                metadata={"agent_type": "research", "user_position": user_position}
+            )
+            agent_span.input_data = prompt
+        
         try:
             # Generate search queries for comprehensive research
             search_queries = self._generate_search_queries(user_position)
