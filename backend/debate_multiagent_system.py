@@ -211,6 +211,10 @@ class ResearchAgent:
         except Exception as e:
             latency_ms = int((time.time() - start_time) * 1000)
             
+            # Complete agent span with error
+            if agent_span:
+                self.tracer.end_span(agent_span.span_id, SpanStatus.ERROR, error=str(e))
+            
             self.agent_id = self.agentdog.fail_agent(
                 run_id=self.run_id,
                 agent_name=agent_name,
@@ -224,7 +228,8 @@ class ResearchAgent:
             return {
                 "success": False,
                 "error": str(e),
-                "agent_id": self.agent_id
+                "agent_id": self.agent_id,
+                "span_id": agent_span.span_id if agent_span else None
             }
     
     def _generate_search_queries(self, user_position: str) -> List[str]:
