@@ -834,6 +834,11 @@ body {
     padding: 16px;
   }
 
+  /* Observability content responsive padding */
+  .observability-content {
+    padding: 16px;
+  }
+
   /* Run detail adjustments */
   .run-title {
     font-size: 18px;
