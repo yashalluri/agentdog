@@ -609,7 +609,7 @@ async def run_multiagent_demo():
             
             # AGENT 3: Web Searcher 2  
             start = time.time()
-            await asyncio.sleep(0.6)
+            time.sleep(0.6)
             s2_id = agentdog.emit_event(
                 run_id=run_id, agent_name="web_searcher_2", status="success",
                 prompt="Search: Multi-agent coordination patterns",
