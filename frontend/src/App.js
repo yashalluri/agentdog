@@ -19,6 +19,8 @@ function App() {
   const [filterTime, setFilterTime] = useState('all');
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showFullPrompt, setShowFullPrompt] = useState(false);
+  const [showFullOutput, setShowFullOutput] = useState(false);
 
   // Fetch runs on mount
   useEffect(() => {
