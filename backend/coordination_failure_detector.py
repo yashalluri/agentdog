@@ -154,18 +154,19 @@ class CoordinationFailureDetector:
             model = span.get("model")
             output_data = str(span.get("output", ""))
             
-            # Check 1: Invalid model claims
-            if model and model not in self.VALID_MODELS:
+            # Check 1: Invalid model claims (context-aware)
+            if model and model not in self.valid_models:
                 hallucinations.append({
                     "type": "hallucination",
                     "subtype": "invalid_model",
                     "severity": "high",
                     "span_id": span.get("span_id"),
                     "span_name": span_name,
-                    "message": f"Agent claims to use model '{model}' which doesn't exist in our system",
+                    "message": f"Agent claims to use model '{model}' which is not valid for {self.workflow_type} workflow",
                     "evidence": {
                         "claimed_model": model,
-                        "valid_models": list(self.VALID_MODELS)
+                        "workflow_type": self.workflow_type,
+                        "valid_models_for_workflow": list(self.valid_models)
                     }
                 })
             
