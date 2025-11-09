@@ -506,7 +506,7 @@ function App() {
   };
 
   return (
-    <div className="app-container" data-testid="agentlens-app">
+    <div className="app-container" data-testid="agentdog-app">
       <Toaster position="top-right" />
       
       {/* Top Navigation */}
