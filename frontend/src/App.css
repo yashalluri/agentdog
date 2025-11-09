@@ -1153,6 +1153,13 @@ body {
   border-radius: 4px;
 }
 
+/* Mobile/Tablet: Hide panel size hint */
+@media (max-width: 1024px) {
+  .panel-size-hint {
+    display: none;
+  }
+}
+
 /* Panel Divider */
 .panel-divider {
   width: 8px;
