@@ -148,6 +148,10 @@ class CoordinationFailureDetector:
         """Detect if AI invented non-existent APIs, tools, models, fields"""
         hallucinations = []
         
+        # Track what we've already detected to avoid duplicates
+        detected_apis = set()
+        detected_fields = set()
+        
         for span in self.all_spans:
             span_name = span.get("name", "")
             span_type = span.get("span_type", "")
@@ -185,10 +189,11 @@ class CoordinationFailureDetector:
                     }
                 })
             
-            # Check 3: References to non-existent APIs in output
+            # Check 3: References to non-existent APIs in output (deduplicated)
             api_references = re.findall(r'/api/[a-zA-Z0-9_/-]+', output_data)
             for api_ref in api_references:
-                if not self._is_valid_api(api_ref):
+                if not self._is_valid_api(api_ref) and api_ref not in detected_apis:
+                    detected_apis.add(api_ref)  # Mark as detected
                     hallucinations.append({
                         "type": "hallucination",
                         "subtype": "invented_api",
@@ -198,15 +203,17 @@ class CoordinationFailureDetector:
                         "message": f"Agent references non-existent API endpoint '{api_ref}'",
                         "evidence": {
                             "claimed_api": api_ref,
-                            "found_in": "output"
+                            "found_in": "output",
+                            "first_detected_in_span": span_name
                         }
                     })
             
-            # Check 4: Claims about non-existent fields
+            # Check 4: Claims about non-existent fields (deduplicated, only check agent spans)
             if span_type == "agent":
                 claimed_fields = self._extract_field_references(output_data)
                 for field in claimed_fields:
-                    if not self._field_exists_in_trace(field):
+                    if not self._field_exists_in_trace(field) and field not in detected_fields:
+                        detected_fields.add(field)  # Mark as detected
                         hallucinations.append({
                             "type": "hallucination",
                             "subtype": "invented_field",
