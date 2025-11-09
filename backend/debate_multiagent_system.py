@@ -358,11 +358,13 @@ class DebateMultiAgentSystem:
             await self.progress_callback("💡 Making points...")
         
         # Step 2: Debate Agent constructs argument using research
-        debate_response = await self.debate_agent.construct_argument(
+        debate_result = await self.debate_agent.construct_argument(
             user_position=user_position,
             research_findings=research_results,
             parent_step_id=research_results['agent_id']
         )
+        
+        debate_response = debate_result.get('response', str(debate_result))
         
         # Update progress: Final argument draft
         if self.progress_callback:
