@@ -601,6 +601,52 @@ requests.post("${ingestionUrl}", json={
                   </div>
                 </div>
               </div>
+
+              {/* Hallucination Detection Panel */}
+              {selectedStep.hallucination_flags && selectedStep.hallucination_flags.length > 0 && (
+                <div className="drawer-section">
+                  <div className="drawer-section-label">
+                    <AlertTriangle className="w-4 h-4 inline mr-2" style={{ color: '#EF4444' }} />
+                    HALLUCINATION CHECKS
+                  </div>
+                  
+                  <div className="hallucination-warnings">
+                    {selectedStep.hallucination_flags.map((flag, i) => {
+                      const label = getHallucinationLabel(flag);
+                      return (
+                        <div key={i} className="hallucination-warning">
+                          <div className="hallucination-warning-header">
+                            <AlertTriangle className="w-4 h-4" />
+                            <strong>{label.title}</strong>
+                          </div>
+                          <p className="hallucination-warning-text">{label.description}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  
+                  {(selectedStep.claimed_actions?.length > 0 || selectedStep.actual_actions?.length > 0) && (
+                    <div className="action-details">
+                      <div className="action-detail-row">
+                        <span className="action-detail-label">Claimed actions:</span>
+                        <span className="action-detail-value">
+                          {selectedStep.claimed_actions?.length > 0 
+                            ? selectedStep.claimed_actions.join(', ') 
+                            : 'None'}
+                        </span>
+                      </div>
+                      <div className="action-detail-row">
+                        <span className="action-detail-label">Actual actions:</span>
+                        <span className="action-detail-value">
+                          {selectedStep.actual_actions?.length > 0 
+                            ? selectedStep.actual_actions.join(', ') 
+                            : 'None'}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         )}
