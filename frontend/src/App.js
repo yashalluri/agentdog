@@ -37,7 +37,8 @@ function App() {
   
   // Available agents
   const availableAgents = [
-    { id: 'debate', name: 'Debate Agent (Multi-Agent)' }
+    { id: 'debate', name: 'Debate Agent (Multi-Agent)' },
+    { id: 'social_media', name: 'Social Media Creator (7 Agents)' }
   ];
 
   // Fetch runs on mount and setup WebSocket
