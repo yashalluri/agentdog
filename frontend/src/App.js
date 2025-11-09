@@ -31,7 +31,7 @@ function App() {
     
     // Setup WebSocket for real-time updates
     const wsUrl = BACKEND_URL.replace('https://', 'wss://').replace('http://', 'ws://');
-    const ws = new WebSocket(`${wsUrl}/ws`);
+    const ws = new WebSocket(`${wsUrl}/api/ws`);
     
     ws.onopen = () => {
       console.log('WebSocket connected');
