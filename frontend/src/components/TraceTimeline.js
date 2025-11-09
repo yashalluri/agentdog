@@ -164,6 +164,13 @@ const TraceTimeline = ({ runId, api }) => {
           {/* Span Name */}
           <span className="span-name">{span.name}</span>
 
+          {/* Coordination Failure Badges */}
+          {hasFailures && (
+            <span className={`coordination-failure-badge ${criticalFailures > 0 ? 'critical' : 'warning'}`} title={`${failures.length} coordination issue${failures.length > 1 ? 's' : ''}`}>
+              {criticalFailures > 0 ? '⚠' : '!'} {failures.length}
+            </span>
+          )}
+
           {/* Status Badge */}
           <span className={`span-status ${span.status}`}>
             {span.status === 'success' ? '✓' : span.status === 'error' ? '✗' : '⋯'}
