@@ -226,7 +226,7 @@ const CoordinationAnalysis = ({ runId, api }) => {
         </div>
       ) : (
         <div className="no-failures">
-          <div className="success-icon">✅</div>
+          <div className="success-icon">✓</div>
           <h3>No Coordination Issues Detected</h3>
           <p>All agents executed correctly with proper coordination</p>
         </div>
