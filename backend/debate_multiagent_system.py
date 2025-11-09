@@ -36,11 +36,12 @@ from observability_tracer import (
 class ResearchAgent:
     """Agent responsible for web research using Perplexity API"""
     
-    def __init__(self, run_id: str, agentdog: AgentDog):
+    def __init__(self, run_id: str, agentdog: AgentDog, tracer: Optional[ObservabilityTracer] = None):
         self.run_id = run_id
         self.agentdog = agentdog
         self.perplexity_api_key = os.environ.get('PERPLEXITY_API_KEY')
         self.agent_id = None
+        self.tracer = tracer
         
     async def research_topic(self, user_position: str, parent_step_id: Optional[str] = None) -> Dict:
         """
