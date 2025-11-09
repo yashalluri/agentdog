@@ -233,6 +233,20 @@ function Dashboard() {
     return { variant: 'destructive', text: 'Low' };
   };
 
+  const getHallucinationLabel = (flag) => {
+    const labels = {
+      'TOOL_NOT_AVAILABLE': {
+        title: 'Tool Not Used',
+        description: 'Agent claimed to use a tool that was not actually called.'
+      },
+      'CLAIMED_WITHOUT_ACTION': {
+        title: 'Claimed Without Action',
+        description: 'Agent said it completed a task, but no action was recorded.'
+      }
+    };
+    return labels[flag] || { title: flag, description: 'Unknown hallucination type' };
+  };
+
   const buildTree = (steps) => {
     const stepMap = {};
     const roots = [];
