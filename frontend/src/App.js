@@ -98,6 +98,9 @@ function App() {
           
           // Refresh runs list in sidebar
           fetchRuns();
+        } else if (data.type === 'debate_progress') {
+          // Update debate progress status
+          setDebateProgress(data.status);
         }
       } catch (e) {
         console.error('WebSocket parse error:', e);
