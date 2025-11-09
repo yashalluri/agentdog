@@ -512,13 +512,29 @@ class CoordinationFailureDetector:
         return matches >= len(key_terms) / 2 if key_terms else True
     
     def _reference_exists_in_trace(self, reference: str) -> bool:
-        """Check if reference exists in trace"""
-        ref_lower = reference.lower()
+        """Check if reference exists in trace (strict matching)"""
+        ref_lower = reference.lower().strip()
+        
+        # Extract key nouns/phrases (at least 2 significant words)
+        words = [w for w in ref_lower.split() if len(w) > 3 and w not in ['the', 'this', 'that', 'with', 'from', 'data']]
+        
+        # Need at least 2 significant words to check
+        if len(words) < 2:
+            return True  # Too generic to check
+        
+        # Check if the specific reference (or key parts) exists in trace
         for span in self.all_spans:
-            if ref_lower in str(span.get("output", "")).lower():
+            span_output = str(span.get("output", "")).lower()
+            span_input = str(span.get("input", "")).lower()
+            
+            # Check if at least 2 key words from reference appear together
+            matches_in_output = sum(1 for word in words if word in span_output)
+            matches_in_input = sum(1 for word in words if word in span_input)
+            
+            # If at least 2 key words found, consider it exists
+            if matches_in_output >= 2 or matches_in_input >= 2:
                 return True
-            if ref_lower in str(span.get("input", "")).lower():
-                return True
+        
         return False
     
     def _generate_summary(self) -> Dict:
