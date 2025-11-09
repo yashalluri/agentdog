@@ -78,7 +78,7 @@ class BuggySummarizerAgent:
         await asyncio.sleep(2.0)
         
         # Generate fake summary with bugs
-        summary = f"""Summary of the text:
+        summary = """Summary of the text:
 
 This analysis was performed using our advanced /api/magic-summarize endpoint which doesn't exist.
 
@@ -153,7 +153,7 @@ async def test_buggy_agent():
     print("BUGGY AGENT TEST COMPLETE")
     print("="*60)
     print(f"Run ID: {run_id}")
-    print(f"\nExpected Failures:")
+    print("\nExpected Failures:")
     print("1. HALLUCINATION: Invalid model 'gpt-5'")
     print("2. HALLUCINATION: References /api/magic-summarize")
     print("3. LOGICAL_INCONSISTENCY: Token math (50+30≠100)")
