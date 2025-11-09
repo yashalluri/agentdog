@@ -74,7 +74,8 @@ class ResearchAssistant:
             # Use Emergent LLM key with GPT-4o-mini
             chat = LlmChat(
                 api_key=self.llm_key,
-                session_id=f"{self.run_id}-{agent_name}"
+                session_id=f"{self.run_id}-{agent_name}",
+                system_message="You are a helpful research assistant."
             ).with_model("openai", "gpt-4o-mini")
             
             user_message = UserMessage(text=prompt)
