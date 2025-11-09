@@ -156,12 +156,12 @@ class EventResponse(BaseModel):
     status: str
     agent_id: str
 
-def broadcast_event(event_type: str, data: dict):
+async def broadcast_event(event_type: str, data: dict):
     """Broadcast event to all connected SSE clients"""
     event_data = json.dumps({"type": event_type, "data": data})
-    for q in sse_queues:
+    for client_queue in sse_clients:
         try:
-            q.put_nowait(event_data)
+            await client_queue.put(event_data)
         except:
             pass
 
