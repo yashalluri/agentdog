@@ -235,7 +235,7 @@ const CoordinationAnalysis = ({ runId, api }) => {
       {/* Refresh Button */}
       <div className="coordination-footer">
         <button onClick={fetchAnalysis} className="refresh-button">
-          🔄 Refresh Analysis
+          Refresh Analysis
         </button>
         <span className="analysis-timestamp">
           Analyzed: {analysis.detected_at ? new Date(analysis.detected_at).toLocaleString() : 'Unknown'}
