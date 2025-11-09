@@ -400,8 +400,16 @@ function App() {
                   </div>
                   <div className="diagnostic-item">
                     <div className="diagnostic-label">Step ID</div>
-                    <div className="diagnostic-value" data-testid="diagnostic-stepid">{selectedStep.id.substring(0, 12)}...</div>
+                    <div className="diagnostic-value" data-testid="diagnostic-stepid">{selectedStep.id.substring(0, 10)}...</div>
                   </div>
+                  {selectedStep.parent_step_id && (
+                    <div className="diagnostic-item">
+                      <div className="diagnostic-label">Parent</div>
+                      <div className="diagnostic-value" data-testid="diagnostic-parent">
+                        {runSteps.find(s => s.id === selectedStep.parent_step_id)?.name || 'N/A'}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
