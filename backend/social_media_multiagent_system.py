@@ -417,11 +417,12 @@ FACEBOOK: #hashtag1 #hashtag2 #hashtag3"""
 class EngagementOptimizerAgent:
     """Provides engagement optimization tips"""
     
-    def __init__(self, run_id: str, agentdog: AgentDog):
+    def __init__(self, run_id: str, agentdog: AgentDog, tracer: Optional[ObservabilityTracer] = None):
         self.run_id = run_id
         self.agentdog = agentdog
         self.llm_key = os.environ.get('EMERGENT_LLM_KEY')
         self.agent_id = None
+        self.tracer = tracer
         
     async def optimize(self, topic: str, all_content: Dict, parent_step_id: str) -> Dict:
         """Provide engagement optimization tips"""
