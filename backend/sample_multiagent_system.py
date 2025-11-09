@@ -137,7 +137,11 @@ class ResearchAssistant:
             
             search_prompt = f"Provide 2-3 key facts about: {query}"
             user_message = UserMessage(text=search_prompt)
-            response = await chat.send_message(user_message)
+            response = chat.send_message(user_message)
+            
+            # Handle async if needed
+            if asyncio.iscoroutine(response):
+                response = await response
             
             latency_ms = int((time.time() - start_time) * 1000)
             
