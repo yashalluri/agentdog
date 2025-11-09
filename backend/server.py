@@ -571,15 +571,19 @@ async def receive_event(event: EventRequest):
     result = await agent_runs_coll.insert_one(agent_doc)
     agent_id = str(result.inserted_id)
     
-    # Broadcast agent creation event via SSE (don't await to keep response fast)
-    asyncio.create_task(broadcast_event("agent_created", {
+    # Broadcast agent event via WebSocket
+    asyncio.create_task(manager.broadcast({
+        "type": "agent_update",
         "run_id": event.run_id,
         "agent_id": agent_id,
         "agent_name": event.agent_name,
         "status": event.status,
         "parent_step_id": event.parent_step_id,
+        "latency_ms": event.latency_ms,
+        "error_message": event.error_message,
         "coordination_status": agent_doc.get("coordination_status"),
-        "coordination_issue": agent_doc.get("coordination_issue")
+        "coordination_issue": agent_doc.get("coordination_issue"),
+        "timestamp": current_time
     }))
     
     # Update workflow statistics
