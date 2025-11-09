@@ -385,7 +385,12 @@ function App() {
               {/* Run Header */}
               <div className="run-header" data-testid="run-header">
                 <div>
-                  <h2 className="run-title" data-testid="run-title">Run: {selectedRun.title}</h2>
+                  <h2 className="run-title" data-testid="run-title">
+                    {liveExecution && selectedRun.id === liveExecution.run_id && (
+                      <span className="live-indicator">🔴 LIVE</span>
+                    )}
+                    Run: {selectedRun.title}
+                  </h2>
                   <p className="run-subtitle" data-testid="run-subtitle">
                     Started {new Date(selectedRun.start_time).toLocaleTimeString()} • {selectedRun.num_steps} agents • 
                     {selectedRun.num_failed > 0 ? ` ${selectedRun.num_failed} failed • ` : ' '}
