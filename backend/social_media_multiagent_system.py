@@ -524,13 +524,20 @@ class SocialMediaMultiAgentSystem:
         print(f"Topic: {user_topic}")
         print(f"{'='*60}\n")
         
+        # Start root span
+        root_span = self.tracer.start_root_span(
+            name="social_media_workflow",
+            metadata={"topic": user_topic, "workflow_type": "social_media"}
+        )
+        root_span.input_data = user_topic
+        
         # Step 1: Content Strategy
         if self.progress_callback:
             await self.progress_callback("🎯 Creating content strategy...")
         
         await asyncio.sleep(0.2)
         
-        strategy_result = await self.strategist.analyze_topic(user_topic)
+        strategy_result = await self.strategist.analyze_topic(user_topic, parent_span_id=root_span.span_id)
         
         if not strategy_result['success']:
             return "I apologize, but I couldn't create a content strategy."
