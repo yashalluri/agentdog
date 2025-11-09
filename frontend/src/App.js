@@ -141,27 +141,37 @@ function App() {
       
       {/* Top Navigation */}
       <div className="top-nav" data-testid="top-nav">
-        <div className="nav-logo-container">
-          <div className="nav-logo" data-testid="nav-logo">AgentLens</div>
-          <div className="nav-tagline" data-testid="nav-tagline">Datadog for AI agents</div>
+        <div className="nav-left">
+          <button 
+            className="mobile-menu-button"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            aria-label="Toggle menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+          <div className="nav-logo-container">
+            <div className="nav-logo" data-testid="nav-logo">AgentLens</div>
+            <div className="nav-tagline" data-testid="nav-tagline">Datadog for AI agents</div>
+          </div>
         </div>
         <div className="nav-actions">
           <Button
             variant="ghost"
             onClick={handleGenerateSummary}
             disabled={!selectedRun || loading}
-            className="nav-button"
+            className="nav-button nav-button-hide-mobile"
             data-testid="generate-summary-btn"
           >
             <Sparkles className="w-4 h-4 mr-2" />
-            Generate AI Summary
+            <span className="nav-button-text">Generate AI Summary</span>
           </Button>
           <Button
             onClick={handleIngestSample}
             className="nav-button-primary"
             data-testid="ingest-sample-btn"
           >
-            Ingest Sample Run
+            <span className="nav-button-text-full">Ingest Sample Run</span>
+            <span className="nav-button-text-short">Ingest</span>
           </Button>
         </div>
       </div>
