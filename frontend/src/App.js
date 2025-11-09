@@ -21,6 +21,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [showFullPrompt, setShowFullPrompt] = useState(false);
   const [showFullOutput, setShowFullOutput] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Fetch runs on mount
   useEffect(() => {
