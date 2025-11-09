@@ -1041,7 +1041,61 @@ body {
   }
 
   .run-title {
-    font-size: 16px;
+    font-size: 15px;
+  }
+  
+  .run-subtitle {
+    font-size: 11px;
+  }
+  
+  /* Metrics - single column on very small screens */
+  .metrics-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  
+  .metric-card {
+    padding: 10px;
+  }
+  
+  .metric-label {
+    font-size: 9px;
+    margin-bottom: 4px;
+  }
+  
+  .metric-value {
+    font-size: 15px;
+  }
+  
+  .agent-flow {
+    padding: 12px;
+  }
+  
+  .section-title {
+    font-size: 11px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+  }
+  
+  .flow-item {
+    padding: 8px 10px;
+  }
+  
+  .flow-item-name {
+    font-size: 12px;
+  }
+  
+  .flow-metric {
+    font-size: 11px;
+  }
+  
+  .summary-section {
+    padding: 12px;
+  }
+  
+  .summary-content {
+    font-size: 12px;
   }
 
   .metrics-row {
