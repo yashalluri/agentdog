@@ -1217,6 +1217,12 @@ body {
   .observability-panel-split {
     width: 100% !important;
     flex: 1;
+    min-height: 0;
+  }
+  
+  .observability-content {
+    padding: 16px;
+    overflow-y: auto;
   }
 }
 
