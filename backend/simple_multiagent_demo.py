@@ -138,7 +138,7 @@ def run_multiagent_workflow():
     print(f"{'='*70}")
     print(f"✅ Multi-Agent Workflow Complete!")
     print(f"{'='*70}")
-    print(f"\n🔍 View in AgentDog: https://social-trace-agent.preview.emergentagent.com")
+    print(f"\n🔍 View in AgentDog: https://better-docs-8.preview.emergentagent.com")
     print(f"   Look for run: {run_id}\n")
     print(f"Summary:")
     print(f"  • Total Agents: 6")
