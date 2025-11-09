@@ -566,6 +566,35 @@ async def receive_event(event: EventRequest):
     
     return EventResponse(status="ok", agent_id=agent_id)
 
+@api_router.post("/run-multiagent-demo")
+async def run_multiagent_demo():
+    """
+    Run a live multi-agent workflow demo with real execution
+    This creates a workflow with multiple agents that coordinate and send telemetry
+    """
+    import subprocess
+    import threading
+    
+    timestamp = datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')
+    run_id = f"live-demo-{timestamp}"
+    
+    # Run the demo script in background
+    def run_demo():
+        subprocess.run(
+            ["python", "/app/backend/simple_multiagent_demo.py"],
+            capture_output=True,
+            text=True
+        )
+    
+    thread = threading.Thread(target=run_demo)
+    thread.start()
+    
+    return {
+        "message": "Multi-agent demo started", 
+        "run_id": run_id,
+        "note": "Watch the agents execute in real-time in the UI"
+    }
+
 @api_router.post("/ingest-sample")
 async def ingest_sample_data():
     """Ingest sample data for demonstration"""
