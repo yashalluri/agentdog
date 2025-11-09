@@ -411,16 +411,6 @@ function App() {
             <span className="nav-button-text">Generate AI Summary</span>
           </Button>
           <Button
-            onClick={handleRunMultiAgentDemo}
-            className="nav-button-primary"
-            data-testid="run-multiagent-btn"
-            style={{ background: '#10B981' }}
-          >
-            <Play className="w-4 h-4 mr-2" />
-            <span className="nav-button-text-full">Run Multi-Agent Demo</span>
-            <span className="nav-button-text-short">Run Demo</span>
-          </Button>
-          <Button
             onClick={handleIngestSample}
             className="nav-button-secondary"
             data-testid="ingest-sample-btn"
