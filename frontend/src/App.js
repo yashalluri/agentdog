@@ -741,6 +741,13 @@ function App() {
                   >
                     Trace
                   </button>
+                  <button
+                    className={`view-toggle-btn ${observabilityView === 'coordination' ? 'active' : ''}`}
+                    onClick={() => setObservabilityView('coordination')}
+                    disabled={!selectedRun}
+                  >
+                    Coordination
+                  </button>
                 </div>
                 <div className="panel-size-hint">{Math.round(100 - chatPanelWidth)}%</div>
               </div>
