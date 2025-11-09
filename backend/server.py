@@ -914,12 +914,20 @@ async def chat_with_agent(request: ChatRequest):
         if request.agent_type == 'debate':
             # Use debate multi-agent system
             try:
-                # Progress callback for status updates
+                # Progress callback for status updates and observability
                 async def progress_callback(status: str):
+                    # Broadcast progress status
                     await manager.broadcast({
                         "type": "debate_progress",
                         "run_id": run_id,
                         "status": status,
+                        "timestamp": datetime.now(timezone.utc).isoformat()
+                    })
+                    
+                    # Also broadcast run update to refresh observability
+                    await manager.broadcast({
+                        "type": "run_update",
+                        "run_id": run_id,
                         "timestamp": datetime.now(timezone.utc).isoformat()
                     })
                 
