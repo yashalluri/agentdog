@@ -294,7 +294,7 @@ class AgentDogAPITester:
                 break
                 
         if not test_workflow:
-            print("❌ Scenario 4 failed - test-workflow-001 not found")
+            print(f"❌ Scenario 4 failed - {unique_run_id} not found")
             return False
             
         print(f"   Found workflow: {test_workflow.get('run_id')} with {test_workflow.get('total_agents', 0)} agents, {test_workflow.get('failed_agents', 0)} failed")
