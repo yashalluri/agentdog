@@ -326,6 +326,13 @@ body {
   border-radius: 12px;
 }
 
+@media (max-width: 768px) {
+  .status-badge {
+    font-size: 11px;
+    padding: 3px 10px;
+  }
+}
+
 /* Metrics Row */
 .metrics-row {
   display: grid;
