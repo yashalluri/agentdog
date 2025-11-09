@@ -170,11 +170,14 @@ function App() {
     try {
       toast.info('🚀 Starting multi-agent workflow...');
       const response = await axios.post(`${API}/run-multiagent-demo`);
-      toast.success('✨ Watch agents execute in real-time below!');
+      const runId = response.data.run_id;
       
-      // SSE will handle real-time updates automatically
-      // Just fetch immediately to show the new workflow
-      setTimeout(() => fetchRuns(), 500);
+      // Set up live execution view
+      setLiveExecution({ run_id: runId, started: Date.now() });
+      setExecutionLog([]);
+      setSelectedRun(null); // Clear selected run to show live view
+      
+      toast.success('✨ Watch agents execute in real-time!');
       
     } catch (error) {
       toast.error('Failed to start multi-agent demo');
