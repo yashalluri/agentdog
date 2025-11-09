@@ -913,7 +913,37 @@ async def chat_with_agent(request: ChatRequest):
     
     # Process message with selected agent
     try:
-        if request.agent_type == 'debate':
+        # Check which multi-agent system is selected
+        if request.agent_type == "social_media":
+            # Use Social Media Multi-Agent System
+            try:
+                from social_media_multiagent_system import SocialMediaMultiAgentSystem
+                
+                # Progress callback for status updates
+                async def progress_callback(status: str):
+                    # Broadcast progress status
+                    await manager.broadcast({
+                        "type": "debate_progress",
+                        "run_id": run_id,
+                        "status": status,
+                        "timestamp": datetime.now(timezone.utc).isoformat()
+                    })
+                    
+                    # Also broadcast run update to refresh observability
+                    await manager.broadcast({
+                        "type": "run_update",
+                        "run_id": run_id,
+                        "timestamp": datetime.now(timezone.utc).isoformat()
+                    })
+                
+                social_media_system = SocialMediaMultiAgentSystem(run_id=run_id, progress_callback=progress_callback)
+                response_text = await social_media_system.create_content(request.message)
+                
+            except Exception as e:
+                logging.error(f"Social media system error: {e}")
+                response_text = f"I apologize, but I encountered an error with the social media system: {str(e)}"
+        
+        elif request.agent_type == 'debate':
             # Use debate multi-agent system
             try:
                 # Progress callback for status updates and observability
