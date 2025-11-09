@@ -391,9 +391,9 @@ class DebateMultiAgentSystem:
         if not citations:
             return response
         
-        # Add sources section
+        # Add sources section with title and URL
         sources_section = "\n\n---\n\n**Sources:**\n"
-        for citation in citations[:10]:  # Limit to first 10 sources
+        for citation in citations[:15]:  # Limit to first 15 sources
             sources_section += f"\n[{citation['id']}] {citation['url']}"
         
         return response + sources_section
