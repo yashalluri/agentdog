@@ -15,7 +15,11 @@ import time
 import httpx
 from datetime import datetime, timezone
 from typing import List, Optional, Dict
+from dotenv import load_dotenv
 from emergentintegrations.llm.chat import LlmChat, UserMessage
+
+# Load environment variables
+load_dotenv()
 
 # Add backend to path to import SDK
 sys.path.insert(0, '/app/backend')
