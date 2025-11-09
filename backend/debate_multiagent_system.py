@@ -89,13 +89,29 @@ class ResearchAgent:
                             data = response.json()
                             content = data['choices'][0]['message']['content']
                             citations = data.get('citations', [])
+                            search_results = data.get('search_results', [])
+                            
+                            # Extract title and URL from search_results if available
+                            formatted_citations = []
+                            for idx, citation_url in enumerate(citations):
+                                # Try to find matching search result for title
+                                title = f"Source {idx + 1}"
+                                for sr in search_results:
+                                    if sr.get('url') == citation_url:
+                                        title = sr.get('title', title)
+                                        break
+                                
+                                formatted_citations.append({
+                                    "url": citation_url,
+                                    "title": title
+                                })
                             
                             all_results.append({
                                 "query": query,
                                 "content": content,
-                                "citations": citations
+                                "citations": formatted_citations
                             })
-                            total_sources += len(citations)
+                            total_sources += len(formatted_citations)
                             
                             print(f"[{agent_name}] ✅ Search completed: {query[:50]}... ({len(citations)} sources)")
                         else:
