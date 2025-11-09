@@ -33,6 +33,7 @@ function App() {
   const [selectedAgent, setSelectedAgent] = useState('debate');
   const [currentRunId, setCurrentRunId] = useState(null); // Track active chat run
   const [isSendingMessage, setIsSendingMessage] = useState(false);
+  const [debateProgress, setDebateProgress] = useState('Thinking...');
   
   // Available agents
   const availableAgents = [
