@@ -21,11 +21,20 @@ const TraceTimeline = ({ runId, api }) => {
       setLoading(true);
       const response = await fetch(`${api}/run/${runId}/trace`);
       const data = await response.json();
-      setTrace(data);
       
-      // Auto-expand root span
-      if (data.trace) {
+      // Handle new array format (multiple traces) or backward compatible single trace
+      if (data.latest_trace) {
+        setTrace(data.latest_trace);
+        // Auto-expand root span
+        if (data.latest_trace.trace) {
+          setExpandedSpans(new Set([data.latest_trace.trace.span_id]));
+        }
+      } else if (data.trace) {
+        // Backward compatibility - single trace
+        setTrace(data);
         setExpandedSpans(new Set([data.trace.span_id]));
+      } else {
+        setTrace(data);
       }
     } catch (error) {
       console.error('Error fetching trace:', error);
