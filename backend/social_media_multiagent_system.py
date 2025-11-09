@@ -166,12 +166,13 @@ Be concise and strategic."""
 class PlatformWriterAgent:
     """Base class for platform-specific content writers"""
     
-    def __init__(self, run_id: str, agentdog: AgentDog, platform: str):
+    def __init__(self, run_id: str, agentdog: AgentDog, platform: str, tracer: Optional[ObservabilityTracer] = None):
         self.run_id = run_id
         self.agentdog = agentdog
         self.platform = platform
         self.llm_key = os.environ.get('EMERGENT_LLM_KEY')
         self.agent_id = None
+        self.tracer = tracer
         
     async def write_content(self, topic: str, strategy: str, parent_step_id: str) -> Dict:
         """Write platform-specific content"""
