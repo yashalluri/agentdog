@@ -350,25 +350,31 @@ async def replay_step(step_id: str):
     
     return {"message": "Replay initiated", "step_id": step_id}
 
+class SummaryResponse(BaseModel):
+    summary: str
+
 @api_router.post("/summary/{run_id}", response_model=SummaryResponse)
 async def generate_summary(run_id: str):
     """Generate AI summary for a run using Anthropic Claude Sonnet 4"""
-    run = store.get_run(run_id)
-    if not run:
+    workflows_coll = get_workflows_collection()
+    agent_runs_coll = get_agent_runs_collection()
+    
+    workflow = await workflows_coll.find_one({"run_id": run_id})
+    if not workflow:
         raise HTTPException(status_code=404, detail="Run not found")
     
-    steps = store.get_steps_by_run(run_id)
+    agents = await agent_runs_coll.find({"run_id": run_id}).to_list(length=None)
     
     # Build structured agent steps for summary
     agent_steps = []
-    for step in steps:
+    for agent in agents:
         agent_steps.append({
-            "name": step['name'],
-            "status": step['status'],
-            "prompt": step['prompt'][:300],  # Truncate for brevity
-            "output": step['output'][:300],
-            "latency_ms": step['latency_ms'],
-            "cost": step['cost']
+            "name": agent['agent_name'],
+            "status": agent['status'],
+            "prompt": agent.get('prompt', '')[:300],  # Truncate for brevity
+            "output": agent.get('output', '')[:300],
+            "latency_ms": agent.get('latency_ms', 0),
+            "cost": agent.get('cost_usd', 0)
         })
     
     # Use Anthropic Claude Sonnet 4 via Emergent LLM key
@@ -382,11 +388,11 @@ async def generate_summary(run_id: str):
         summary_prompt = f"""You are AgentDog, a reasoning observability assistant.
 Summarize the following multi-agent run concisely.
 
-Run: {run['title']}
-Status: {run['status']}
-Total Steps: {run['num_steps']}
-Succeeded: {run['num_success']}
-Failed: {run['num_failed']}
+Run: {workflow['run_id']}
+Status: {workflow['final_status']}
+Total Steps: {workflow.get('total_agents', 0)}
+Succeeded: {workflow.get('total_agents', 0) - workflow.get('failed_agents', 0)}
+Failed: {workflow.get('failed_agents', 0)}
 
 Steps:
 {json.dumps(agent_steps, indent=2)}
@@ -396,6 +402,12 @@ Provide a concise summary explaining what the agents collectively did, any failu
         user_message = UserMessage(text=summary_prompt)
         
         response = await chat.send_message(user_message)
+        
+        # Update workflow with summary
+        await workflows_coll.update_one(
+            {"run_id": run_id},
+            {"$set": {"summary": response, "updated_at": datetime.now(timezone.utc).isoformat()}}
+        )
         
         return {"summary": response}
     except Exception as e:
