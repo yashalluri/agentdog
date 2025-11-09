@@ -98,8 +98,6 @@ class CoordinationFailureDetector:
             span_name = span.get("name", "")
             span_type = span.get("span_type", "")
             model = span.get("model")
-            metadata = span.get("metadata", {})
-            input_data = str(span.get("input", ""))
             output_data = str(span.get("output", ""))
             
             # Check 1: Invalid model claims
