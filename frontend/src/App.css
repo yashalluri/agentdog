@@ -275,6 +275,7 @@ body {
 
 .run-detail {
   max-width: 1200px;
+  width: 100%;
 }
 
 .run-header {
