@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Badge } from '@/components/ui/badge';
 import './TraceTimeline.css';
 
 const TraceTimeline = ({ runId, api }) => {
@@ -6,6 +7,8 @@ const TraceTimeline = ({ runId, api }) => {
   const [loading, setLoading] = useState(true);
   const [expandedSpans, setExpandedSpans] = useState(new Set());
   const [selectedSpan, setSelectedSpan] = useState(null);
+  const [showFullInput, setShowFullInput] = useState(false);
+  const [showFullOutput, setShowFullOutput] = useState(false);
 
   useEffect(() => {
     if (runId) {
