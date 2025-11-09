@@ -519,6 +519,17 @@ Be specific and actionable."""
             if asyncio.iscoroutine(response):
                 response = await response
             
+            # Complete LLM span
+            if llm_span:
+                llm_span.output_data = response[:1000]
+                llm_span.add_llm_details(
+                    model="claude-4-sonnet-20250514",
+                    tokens_input=len(prompt.split()),
+                    tokens_output=len(response.split()),
+                    cost_usd=0.003
+                )
+                self.tracer.end_span(llm_span.span_id, SpanStatus.SUCCESS)
+            
             latency_ms = int((time.time() - start_time) * 1000)
             
             self.agent_id = self.agentdog.emit_event(
@@ -535,16 +546,26 @@ Be specific and actionable."""
             
             print(f"[{agent_name}] ✅ Optimization complete")
             
+            # Complete agent span
+            if agent_span:
+                agent_span.output_data = response[:1000]
+                self.tracer.end_span(agent_span.span_id, SpanStatus.SUCCESS)
+            
             await asyncio.sleep(0.3)  # Ensure persistence
             
             return {
                 "success": True,
                 "optimization_tips": response,
-                "agent_id": self.agent_id
+                "agent_id": self.agent_id,
+                "span_id": agent_span.span_id if agent_span else None
             }
             
         except Exception as e:
             latency_ms = int((time.time() - start_time) * 1000)
+            
+            # Complete agent span with error
+            if agent_span:
+                self.tracer.end_span(agent_span.span_id, SpanStatus.ERROR, error=str(e))
             
             self.agent_id = self.agentdog.fail_agent(
                 run_id=self.run_id,
@@ -559,7 +580,8 @@ Be specific and actionable."""
             return {
                 "success": False,
                 "error": str(e),
-                "agent_id": self.agent_id
+                "agent_id": self.agent_id,
+                "span_id": agent_span.span_id if agent_span else None
             }
 
 
