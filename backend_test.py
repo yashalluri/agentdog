@@ -177,6 +177,173 @@ class AgentDogAPITester:
             return True
         return False
 
+    def test_event_ingestion_scenarios(self):
+        """Test the POST /api/event endpoint with specific scenarios"""
+        print("\n🔍 Testing Event Ingestion Scenarios...")
+        
+        # Test Scenario 1: Create a new workflow with successful agent
+        scenario1_data = {
+            "run_id": "test-workflow-001",
+            "agent_name": "data_collector",
+            "status": "success",
+            "start_time": "2025-11-09T00:55:00Z",
+            "end_time": "2025-11-09T00:55:02Z",
+            "latency_ms": 2000,
+            "prompt": "Collect data from API endpoints",
+            "output": "Successfully collected 100 records",
+            "tokens": 250,
+            "cost_usd": 0.005
+        }
+        
+        success1, response1 = self.run_test(
+            "Scenario 1: Create workflow with successful agent",
+            "POST",
+            "event",
+            200,
+            scenario1_data
+        )
+        
+        if not success1 or not isinstance(response1, dict) or 'agent_id' not in response1:
+            print("❌ Scenario 1 failed - no agent_id returned")
+            return False
+            
+        agent_id_1 = response1['agent_id']
+        print(f"   Agent ID from Scenario 1: {agent_id_1}")
+        
+        # Test Scenario 2: Add agent with parent (success)
+        scenario2_data = {
+            "run_id": "test-workflow-001",
+            "agent_name": "data_processor",
+            "parent_step_id": agent_id_1,
+            "status": "success",
+            "start_time": "2025-11-09T00:55:03Z",
+            "end_time": "2025-11-09T00:55:05Z",
+            "latency_ms": 2000,
+            "prompt": "Process collected data",
+            "output": "Processed 100 records successfully",
+            "tokens": 300,
+            "cost_usd": 0.007
+        }
+        
+        success2, response2 = self.run_test(
+            "Scenario 2: Add agent with parent (success)",
+            "POST",
+            "event",
+            200,
+            scenario2_data
+        )
+        
+        if not success2 or not isinstance(response2, dict) or 'agent_id' not in response2:
+            print("❌ Scenario 2 failed - no agent_id returned")
+            return False
+            
+        agent_id_2 = response2['agent_id']
+        print(f"   Agent ID from Scenario 2: {agent_id_2}")
+        
+        # Test Scenario 3: Add agent with error and coordination failure detection
+        scenario3_data = {
+            "run_id": "test-workflow-001",
+            "agent_name": "data_validator",
+            "parent_step_id": agent_id_2,
+            "status": "error",
+            "start_time": "2025-11-09T00:55:06Z",
+            "end_time": "2025-11-09T00:55:07Z",
+            "latency_ms": 1000,
+            "prompt": "Validate processed data",
+            "error_message": "KeyError: 'validation_schema' - field not found in parent output",
+            "tokens": 50,
+            "cost_usd": 0.001
+        }
+        
+        success3, response3 = self.run_test(
+            "Scenario 3: Add agent with error and coordination failure",
+            "POST",
+            "event",
+            200,
+            scenario3_data
+        )
+        
+        if not success3 or not isinstance(response3, dict) or 'agent_id' not in response3:
+            print("❌ Scenario 3 failed - no agent_id returned")
+            return False
+            
+        agent_id_3 = response3['agent_id']
+        print(f"   Agent ID from Scenario 3: {agent_id_3}")
+        
+        # Test Scenario 4: Verify workflow was created and updated
+        success4, response4 = self.run_test(
+            "Scenario 4: Verify workflow exists",
+            "GET",
+            "runs",
+            200
+        )
+        
+        if not success4 or not isinstance(response4, list):
+            print("❌ Scenario 4 failed - could not get runs")
+            return False
+            
+        # Find our test workflow
+        test_workflow = None
+        for workflow in response4:
+            if workflow.get('run_id') == 'test-workflow-001':
+                test_workflow = workflow
+                break
+                
+        if not test_workflow:
+            print("❌ Scenario 4 failed - test-workflow-001 not found")
+            return False
+            
+        print(f"   Found workflow: {test_workflow.get('run_id')} with {test_workflow.get('total_agents', 0)} agents, {test_workflow.get('failed_agents', 0)} failed")
+        
+        # Verify it has 3 agents, 1 failed
+        if test_workflow.get('total_agents') != 3:
+            print(f"❌ Expected 3 agents, got {test_workflow.get('total_agents')}")
+            return False
+            
+        if test_workflow.get('failed_agents') != 1:
+            print(f"❌ Expected 1 failed agent, got {test_workflow.get('failed_agents')}")
+            return False
+            
+        # Test Scenario 5: Verify agent details
+        success5, response5 = self.run_test(
+            "Scenario 5: Verify agent details",
+            "GET",
+            f"run/test-workflow-001/steps",
+            200
+        )
+        
+        if not success5 or not isinstance(response5, list):
+            print("❌ Scenario 5 failed - could not get steps")
+            return False
+            
+        if len(response5) != 3:
+            print(f"❌ Expected 3 agents, got {len(response5)}")
+            return False
+            
+        # Find the third agent (data_validator) and check coordination status
+        validator_agent = None
+        for agent in response5:
+            if agent.get('agent_name') == 'data_validator':
+                validator_agent = agent
+                break
+                
+        if not validator_agent:
+            print("❌ Could not find data_validator agent")
+            return False
+            
+        if validator_agent.get('coordination_status') != 'failed':
+            print(f"❌ Expected coordination_status='failed', got '{validator_agent.get('coordination_status')}'")
+            return False
+            
+        if not validator_agent.get('coordination_issue'):
+            print("❌ Expected coordination_issue to be set")
+            return False
+            
+        print(f"   Coordination issue detected: {validator_agent.get('coordination_issue')}")
+        
+        print("✅ All event ingestion scenarios passed!")
+        return True
+
     def test_error_handling(self):
         """Test error handling for invalid requests"""
         print("\n🔍 Testing Error Handling...")
