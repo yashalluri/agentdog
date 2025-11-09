@@ -1157,26 +1157,46 @@ async def chat_with_agent(request: ChatRequest):
                     
                     logging.info(f"Faulty detailed trace exists: {detailed_trace is not None}")
                     
-                    # Save detailed trace to workflow
+                    # Save detailed trace to workflow (append to array)
                     if detailed_trace:
                         logging.info(f"Saving faulty trace to MongoDB for run_id: {run_id}")
+                        
+                        # Add timestamp and agent type
+                        detailed_trace["timestamp"] = datetime.now(timezone.utc).isoformat()
+                        detailed_trace["agent_type"] = "test_faulty"
+                        
+                        # Append to traces array
                         result = await workflows_coll.update_one(
                             {"run_id": run_id},
-                            {"$set": {"detailed_trace": detailed_trace}}
+                            {"$push": {"traces": detailed_trace}}
                         )
                         logging.info(f"MongoDB update result: matched={result.matched_count}, modified={result.modified_count}")
                         
-                        # Auto-analyze coordination after workflow completes
-                        workflow_doc = await workflows_coll.find_one({"run_id": run_id})
-                        if workflow_doc:
-                            logging.info("Running coordination analysis for faulty agent...")
-                            analysis_result = analyze_workflow_coordination(workflow_doc)
-                            if analysis_result:
-                                logging.info(f"Faulty analysis complete: {analysis_result.get('failure_count', 0)} failures")
-                                await workflows_coll.update_one(
-                                    {"run_id": run_id},
-                                    {"$set": {"coordination_analysis": analysis_result}}
-                                )
+                        # Keep latest for backward compatibility
+                        await workflows_coll.update_one(
+                            {"run_id": run_id},
+                            {"$set": {"detailed_trace": detailed_trace}}
+                        )
+                        
+                        # Auto-analyze coordination
+                        logging.info("Running coordination analysis for faulty agent...")
+                        analysis_result = analyze_workflow_coordination({"detailed_trace": detailed_trace, "run_id": run_id})
+                        if analysis_result:
+                            logging.info(f"Faulty analysis complete: {analysis_result.get('failure_count', 0)} failures")
+                            analysis_result["timestamp"] = datetime.now(timezone.utc).isoformat()
+                            analysis_result["agent_type"] = "test_faulty"
+                            
+                            # Append to analyses array
+                            await workflows_coll.update_one(
+                                {"run_id": run_id},
+                                {"$push": {"coordination_analyses": analysis_result}}
+                            )
+                            
+                            # Keep latest for backward compatibility
+                            await workflows_coll.update_one(
+                                {"run_id": run_id},
+                                {"$set": {"coordination_analysis": analysis_result}}
+                            )
                     else:
                         logging.warning(f"No detailed trace in faulty result for run_id: {run_id}")
                 else:
