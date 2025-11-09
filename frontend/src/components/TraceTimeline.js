@@ -152,135 +152,15 @@ const TraceTimeline = ({ runId, api }) => {
     );
   };
 
-  const renderSpanDetails = () => {
-    if (!selectedSpan) {
-      return (
-        <div className="span-details-empty">
-          <p>Select a span to view details</p>
-        </div>
-      );
-    }
+  const handleSpanClick = (span) => {
+    setSelectedSpan(span);
+    setShowFullInput(false);
+    setShowFullOutput(false);
+  };
 
-    return (
-      <div className="span-details">
-        <div className="span-details-header">
-          <h3>
-            {getSpanIcon(selectedSpan.span_type)} {selectedSpan.name}
-          </h3>
-          <span className={`span-status-badge ${selectedSpan.status}`}>
-            {selectedSpan.status}
-          </span>
-        </div>
-
-        {/* Metadata Grid */}
-        <div className="span-details-grid">
-          <div className="detail-item">
-            <label>Type</label>
-            <value>{selectedSpan.span_type}</value>
-          </div>
-          <div className="detail-item">
-            <label>Duration</label>
-            <value>{formatDuration(selectedSpan.duration_ms)}</value>
-          </div>
-          {selectedSpan.model && (
-            <div className="detail-item">
-              <label>Model</label>
-              <value>{selectedSpan.model}</value>
-            </div>
-          )}
-          {selectedSpan.tokens_total && (
-            <>
-              <div className="detail-item">
-                <label>Tokens In</label>
-                <value>{selectedSpan.tokens_input}</value>
-              </div>
-              <div className="detail-item">
-                <label>Tokens Out</label>
-                <value>{selectedSpan.tokens_output}</value>
-              </div>
-              <div className="detail-item">
-                <label>Total Tokens</label>
-                <value>{selectedSpan.tokens_total}</value>
-              </div>
-            </>
-          )}
-          {selectedSpan.cost_usd && (
-            <div className="detail-item">
-              <label>Cost</label>
-              <value>${selectedSpan.cost_usd.toFixed(4)}</value>
-            </div>
-          )}
-          {selectedSpan.http_method && (
-            <>
-              <div className="detail-item">
-                <label>HTTP Method</label>
-                <value>{selectedSpan.http_method}</value>
-              </div>
-              <div className="detail-item">
-                <label>HTTP Status</label>
-                <value>{selectedSpan.http_status}</value>
-              </div>
-            </>
-          )}
-          {selectedSpan.temperature !== null && selectedSpan.temperature !== undefined && (
-            <div className="detail-item">
-              <label>Temperature</label>
-              <value>{selectedSpan.temperature}</value>
-            </div>
-          )}
-        </div>
-
-        {/* Metadata */}
-        {selectedSpan.metadata && Object.keys(selectedSpan.metadata).length > 0 && (
-          <div className="span-details-section">
-            <h4>Metadata</h4>
-            <pre className="span-details-code">
-              {JSON.stringify(selectedSpan.metadata, null, 2)}
-            </pre>
-          </div>
-        )}
-
-        {/* Input */}
-        {selectedSpan.input && (
-          <div className="span-details-section">
-            <h4>Input</h4>
-            <pre className="span-details-code">
-              {typeof selectedSpan.input === 'string' 
-                ? selectedSpan.input 
-                : JSON.stringify(selectedSpan.input, null, 2)}
-            </pre>
-          </div>
-        )}
-
-        {/* Output */}
-        {selectedSpan.output && (
-          <div className="span-details-section">
-            <h4>Output</h4>
-            <pre className="span-details-code">
-              {typeof selectedSpan.output === 'string'
-                ? selectedSpan.output
-                : JSON.stringify(selectedSpan.output, null, 2)}
-            </pre>
-          </div>
-        )}
-
-        {/* Error */}
-        {selectedSpan.error && (
-          <div className="span-details-section error">
-            <h4>Error</h4>
-            <pre className="span-details-code">{selectedSpan.error}</pre>
-          </div>
-        )}
-
-        {/* URL for API calls */}
-        {selectedSpan.http_url && (
-          <div className="span-details-section">
-            <h4>URL</h4>
-            <code className="span-url">{selectedSpan.http_url}</code>
-          </div>
-        )}
-      </div>
-    );
+  const formatInputOutput = (data) => {
+    if (!data) return '';
+    return typeof data === 'string' ? data : JSON.stringify(data, null, 2);
   };
 
   if (loading) {
