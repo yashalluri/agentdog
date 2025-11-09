@@ -937,7 +937,22 @@ async def chat_with_agent(request: ChatRequest):
                     })
                 
                 social_media_system = SocialMediaMultiAgentSystem(run_id=run_id, progress_callback=progress_callback)
-                response_text = await social_media_system.create_content(request.message)
+                social_media_result = await social_media_system.create_content(request.message)
+                
+                # Extract response and trace
+                if isinstance(social_media_result, dict):
+                    response_text = social_media_result.get('response', str(social_media_result))
+                    detailed_trace = social_media_result.get('trace', None)
+                    
+                    # Save detailed trace to workflow
+                    if detailed_trace:
+                        await workflows_coll.update_one(
+                            {"run_id": run_id},
+                            {"$set": {"detailed_trace": detailed_trace}}
+                        )
+                else:
+                    response_text = str(social_media_result)
+                
                 citations = []  # Social media doesn't have citations
                 
             except Exception as e:
