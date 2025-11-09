@@ -219,8 +219,16 @@ class DebateAgent:
         """
         agent_name = "debate_agent"
         
-        # Build context from research
+        # Build context from research with numbered citations
         research_context = research_findings.get('summary', 'No research available')
+        
+        # Build citation reference list for the prompt
+        citation_list = ""
+        for idx, result in enumerate(research_findings.get('results', []), 1):
+            citations = result.get('citations', [])
+            for cit_idx, citation in enumerate(citations[:5]):  # Max 5 per query
+                cit_title = citation.get('title', f'Source {idx}')
+                citation_list += f"[{idx}] {cit_title}\n"
         
         prompt = f"""You are debating against this position: "{user_position}"
 
@@ -228,11 +236,17 @@ Use the following research to construct a strong counter-argument:
 
 {research_context}
 
+Available sources for citation:
+{citation_list}
+
+IMPORTANT: When referencing information from the research, add inline citations using [1], [2], etc. Place the citation number immediately after the claim. For example:
+"Studies show that remote work can lead to isolation [3]. However, office environments provide better collaboration [7]."
+
 Provide a well-reasoned argument that:
 1. Directly addresses the user's position
-2. Uses facts and evidence from the research
+2. Uses facts and evidence from the research with INLINE CITATIONS
 3. Is respectful and logical
-4. Cites sources when possible
+4. Adds citation numbers [1], [2] etc. after each claim
 5. Is concise (2-3 paragraphs)
 """
         
