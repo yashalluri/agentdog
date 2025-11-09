@@ -30,6 +30,13 @@ function App() {
   const [chatInput, setChatInput] = useState('');
   const [chatPanelWidth, setChatPanelWidth] = useState(40); // percentage
   const [isResizing, setIsResizing] = useState(false);
+  const [selectedAgent, setSelectedAgent] = useState('default');
+  
+  // Available agents (default + custom agents)
+  const availableAgents = [
+    { id: 'default', name: 'Default Agent', description: 'General purpose multi-agent coordinator' },
+    // Add custom agents here as users create them
+  ];
 
   // Fetch runs on mount and setup WebSocket
   useEffect(() => {
