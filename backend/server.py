@@ -1033,34 +1033,49 @@ async def chat_with_agent(request: ChatRequest):
                 buggy_agent = BuggySummarizerAgent(run_id)
                 buggy_result = await buggy_agent.summarize_text(request.message)
                 
+                logging.info(f"Buggy result type: {type(buggy_result)}")
+                logging.info(f"Buggy result keys: {buggy_result.keys() if isinstance(buggy_result, dict) else 'not a dict'}")
+                
                 # Extract response and trace
                 if isinstance(buggy_result, dict):
                     response_text = buggy_result.get('response', str(buggy_result))
                     detailed_trace = buggy_result.get('trace', None)
                     
+                    logging.info(f"Detailed trace exists: {detailed_trace is not None}")
+                    logging.info(f"Detailed trace type: {type(detailed_trace) if detailed_trace else 'None'}")
+                    
                     # Save detailed trace to workflow
                     if detailed_trace:
-                        await workflows_coll.update_one(
+                        logging.info(f"Saving trace to MongoDB for run_id: {run_id}")
+                        result = await workflows_coll.update_one(
                             {"run_id": run_id},
                             {"$set": {"detailed_trace": detailed_trace}}
                         )
+                        logging.info(f"MongoDB update result: matched={result.matched_count}, modified={result.modified_count}")
                         
                         # Auto-analyze coordination after workflow completes
                         workflow_doc = await workflows_coll.find_one({"run_id": run_id})
                         if workflow_doc:
+                            logging.info("Running coordination analysis...")
                             analysis_result = analyze_workflow_coordination(workflow_doc)
                             if analysis_result:
+                                logging.info(f"Analysis complete, saving results: {analysis_result.get('failure_count', 0)} failures")
                                 await workflows_coll.update_one(
                                     {"run_id": run_id},
                                     {"$set": {"coordination_analysis": analysis_result}}
                                 )
+                    else:
+                        logging.warning(f"No detailed trace in buggy result for run_id: {run_id}")
                 else:
                     response_text = str(buggy_result)
+                    logging.warning(f"Buggy result is not a dict for run_id: {run_id}")
                 
                 citations = []
                 
             except Exception as e:
                 logging.error(f"Test buggy agent error: {e}")
+                import traceback
+                logging.error(traceback.format_exc())
                 response_text = f"Test agent error: {str(e)}"
                 citations = []
         
