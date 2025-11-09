@@ -116,6 +116,7 @@ body {
   display: flex;
   height: calc(100vh - 56px);
   overflow: hidden;
+  position: relative;
 }
 
 /* Left Sidebar */
