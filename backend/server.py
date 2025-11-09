@@ -463,6 +463,109 @@ Provide a concise summary explaining what the agents collectively did, any failu
         logging.error(f"Error generating summary: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to generate summary: {str(e)}")
 
+@api_router.post("/event", response_model=EventResponse)
+async def receive_event(event: EventRequest):
+    """
+    Receive telemetry events from instrumented multi-agent systems
+    
+    Flow:
+    1. Store agent run in MongoDB
+    2. Create or update workflow record
+    3. Phase 1 - Instant Analysis (< 50ms): Quick rule-based checks
+    4. Phase 2 - Deep AI Analysis: Queued for background processing (next phase)
+    """
+    workflows_coll = get_workflows_collection()
+    agent_runs_coll = get_agent_runs_collection()
+    
+    current_time = datetime.now(timezone.utc).isoformat()
+    
+    # Check if workflow exists, create if not
+    workflow = await workflows_coll.find_one({"run_id": event.run_id})
+    
+    if not workflow:
+        # Create new workflow
+        workflow_doc = {
+            "run_id": event.run_id,
+            "created_at": current_time,
+            "updated_at": current_time,
+            "final_status": "running",
+            "initiator": "sdk",
+            "summary": None,
+            "coordination_health": None,
+            "total_agents": 0,
+            "failed_agents": 0
+        }
+        await workflows_coll.insert_one(workflow_doc)
+        logging.info(f"Created new workflow: {event.run_id}")
+    
+    # Create agent run document
+    agent_doc = {
+        "run_id": event.run_id,
+        "agent_name": event.agent_name,
+        "parent_step_id": event.parent_step_id,
+        "status": event.status,
+        "start_time": event.start_time or current_time,
+        "end_time": event.end_time,
+        "latency_ms": event.latency_ms,
+        "prompt": event.prompt,
+        "output": event.output,
+        "tokens": event.tokens,
+        "cost_usd": event.cost_usd,
+        "error_message": event.error_message,
+        "coordination_status": None,
+        "coordination_issue": None,
+        "suggested_fix": None,
+        "created_at": current_time
+    }
+    
+    # Phase 1: Quick Coordination Check (< 50ms)
+    # If agent has parent AND status is "error", run quick check
+    if event.parent_step_id and event.status == "error" and event.error_message:
+        coordination_issue = quick_coordination_check(event.error_message)
+        if coordination_issue:
+            agent_doc["coordination_status"] = "failed"
+            agent_doc["coordination_issue"] = coordination_issue
+            logging.info(f"Quick coordination failure detected: {coordination_issue}")
+    
+    # Insert agent run
+    result = await agent_runs_coll.insert_one(agent_doc)
+    agent_id = str(result.inserted_id)
+    
+    # Update workflow statistics
+    update_ops = {
+        "$set": {
+            "updated_at": current_time
+        },
+        "$inc": {
+            "total_agents": 1
+        }
+    }
+    
+    # Update failed count if status is error
+    if event.status == "error":
+        update_ops["$inc"]["failed_agents"] = 1
+    
+    # Update workflow status based on agent status
+    if event.status == "error":
+        update_ops["$set"]["final_status"] = "error"
+    elif event.status == "success":
+        # Check if all agents are complete
+        agents = await agent_runs_coll.find({"run_id": event.run_id}).to_list(length=None)
+        all_complete = all(a["status"] in ["success", "error"] for a in agents)
+        has_errors = any(a["status"] == "error" for a in agents)
+        
+        if all_complete:
+            update_ops["$set"]["final_status"] = "error" if has_errors else "success"
+    
+    await workflows_coll.update_one(
+        {"run_id": event.run_id},
+        update_ops
+    )
+    
+    logging.info(f"Event processed: run_id={event.run_id}, agent={event.agent_name}, status={event.status}")
+    
+    return EventResponse(status="ok", agent_id=agent_id)
+
 @api_router.post("/ingest-sample")
 async def ingest_sample_data():
     """Ingest sample data for demonstration"""
