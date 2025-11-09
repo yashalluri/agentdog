@@ -11,7 +11,7 @@ import os
 import time
 
 # Configure AgentDog
-INGEST_URL = os.getenv("AGENTDOG_URL", "https://agentdog.emergent.run/api/agentdog/event")
+INGEST_URL = os.getenv("AGENTDOG_URL", "http://localhost:8001/api/agentdog/event")
 run_id = f"demo-run-{int(time.time())}"
 
 agentdog = AgentDogClient(ingestion_url=INGEST_URL, run_id=run_id)
