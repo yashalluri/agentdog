@@ -1008,7 +1008,118 @@ body {
 }
 
 /* ========================================
-   CHAT SECTION (Vertical Collapsible)
+   SPLIT PANEL LAYOUT
+   ======================================== */
+
+.split-panel-container {
+  display: flex;
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Chat Panel (Left) */
+.chat-panel-split {
+  display: flex;
+  flex-direction: column;
+  background: #FFFFFF;
+  border-right: 1px solid #E5E7EB;
+  overflow: hidden;
+}
+
+.chat-panel-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #E5E7EB;
+  background: #F9FAFB;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.chat-panel-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0F172A;
+  margin: 0;
+}
+
+.chat-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel-size-hint {
+  font-size: 11px;
+  color: #9CA3AF;
+  font-family: 'SF Mono', monospace;
+  background: #F3F4F6;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Panel Divider */
+.panel-divider {
+  width: 8px;
+  background: #F3F4F6;
+  cursor: col-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.panel-divider:hover {
+  background: #E5E7EB;
+}
+
+.divider-handle {
+  color: #9CA3AF;
+  font-size: 16px;
+  user-select: none;
+}
+
+.panel-divider:hover .divider-handle {
+  color: #6B7280;
+}
+
+/* Observability Panel (Right) */
+.observability-panel-split {
+  display: flex;
+  flex-direction: column;
+  background: #FFFFFF;
+  overflow: hidden;
+}
+
+.observability-panel-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #E5E7EB;
+  background: #F9FAFB;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.observability-panel-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0F172A;
+  margin: 0;
+}
+
+.observability-content {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ========================================
+   CHAT SECTION
    ======================================== */
 
 .chat-section {
