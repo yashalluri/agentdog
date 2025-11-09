@@ -538,6 +538,17 @@ function App() {
             <span className="nav-button-text">Generate AI Summary</span>
           </Button>
           <Button
+            variant="ghost"
+            onClick={() => {
+              calculatePerformanceStats();
+              setShowPerformanceModal(true);
+            }}
+            className="nav-button nav-button-hide-mobile"
+            data-testid="performance-btn"
+          >
+            <span className="nav-button-text">📊 Performance</span>
+          </Button>
+          <Button
             onClick={handleIngestSample}
             className="nav-button-secondary"
             data-testid="ingest-sample-btn"
