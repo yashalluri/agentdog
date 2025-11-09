@@ -334,9 +334,12 @@ class DebateMultiAgentSystem:
         print(f"User Position: {user_position}")
         print(f"{'='*60}\n")
         
-        # Update progress: Searching the web
+        # Update progress: Searching the web (send immediately)
         if self.progress_callback:
             await self.progress_callback("🔍 Searching the web...")
+        
+        # Small delay to ensure WebSocket message is sent before agent starts
+        await asyncio.sleep(0.2)
         
         # Step 1: Research Agent searches for counter-arguments
         research_results = await self.research_agent.research_topic(user_position)
