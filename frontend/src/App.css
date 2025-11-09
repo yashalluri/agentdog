@@ -1180,6 +1180,13 @@ body {
   color: #6B7280;
 }
 
+/* Mobile/Tablet: Hide divider */
+@media (max-width: 1024px) {
+  .panel-divider {
+    display: none;
+  }
+}
+
 /* Observability Panel (Right) */
 .observability-panel-split {
   display: flex;
