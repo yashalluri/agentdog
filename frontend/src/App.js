@@ -204,27 +204,75 @@ function App() {
     };
   }, [isResizing, sidebarOpen]);
 
-  const handleSendMessage = () => {
-    if (!chatInput.trim()) return;
+  const handleStartNewRun = () => {
+    // Clear current chat and reset session
+    setChatMessages([]);
+    setCurrentRunId(null);
+    setSelectedRun(null);
+    setRunSteps([]);
+    setSummary(null);
+    toast.success('Ready to start new conversation');
+  };
+
+  const handleSendMessage = async () => {
+    if (!chatInput.trim() || isSendingMessage) return;
     
-    // Add user message
-    setChatMessages(prev => [...prev, {
+    const userMessage = chatInput.trim();
+    setChatInput(''); // Clear input immediately
+    
+    // Add user message to chat
+    const userMsg = {
       role: 'user',
-      content: chatInput,
+      content: userMessage,
       timestamp: new Date().toISOString()
-    }]);
+    };
+    setChatMessages(prev => [...prev, userMsg]);
     
-    // TODO: Send to agent API
-    // For now, add a mock response
-    setTimeout(() => {
+    setIsSendingMessage(true);
+    
+    try {
+      // Send to backend chat API
+      const response = await axios.post(`${API}/chat`, {
+        run_id: currentRunId,
+        message: userMessage,
+        agent_type: selectedAgent
+      });
+      
+      const { run_id, response: agentResponse, agent_name } = response.data;
+      
+      // If this is a new run, set it as current and fetch runs list
+      if (!currentRunId) {
+        setCurrentRunId(run_id);
+        fetchRuns(); // Refresh sidebar to show new run
+        
+        // Set this run as selected to show observability
+        setTimeout(() => {
+          fetchRunDetails(run_id);
+        }, 500);
+      }
+      
+      // Add assistant response to chat
       setChatMessages(prev => [...prev, {
         role: 'assistant',
-        content: 'I am processing your request...',
-        timestamp: new Date().toISOString()
+        content: agentResponse,
+        timestamp: new Date().toISOString(),
+        agent_name: agent_name
       }]);
-    }, 500);
-    
-    setChatInput('');
+      
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast.error('Failed to send message');
+      
+      // Add error message to chat
+      setChatMessages(prev => [...prev, {
+        role: 'assistant',
+        content: 'Sorry, I encountered an error processing your message.',
+        timestamp: new Date().toISOString(),
+        error: true
+      }]);
+    } finally {
+      setIsSendingMessage(false);
+    }
   };
 
   const handleStepClick = (step) => {
