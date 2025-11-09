@@ -22,6 +22,8 @@ function App() {
   const [showFullPrompt, setShowFullPrompt] = useState(false);
   const [showFullOutput, setShowFullOutput] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [liveExecution, setLiveExecution] = useState(null);
+  const [executionLog, setExecutionLog] = useState([]);
 
   // Fetch runs on mount and setup SSE
   useEffect(() => {
