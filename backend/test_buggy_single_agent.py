@@ -47,9 +47,8 @@ class BuggySummarizerAgent:
         print(f"{'='*60}\n")
         
         # Start root span
-        root_span = self.tracer.start_span(
+        root_span = self.tracer.start_root_span(
             name="buggy_summarizer_workflow",
-            span_type=SpanType.ROOT,
             metadata={"workflow_type": "test_buggy", "text_length": len(user_text)}
         )
         root_span.input_data = user_text
