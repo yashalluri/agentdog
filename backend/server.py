@@ -1071,6 +1071,47 @@ async def get_run_messages(run_id: str):
     
     return {"messages": messages, "run_id": run_id}
 
+@api_router.get("/run/{run_id}/trace")
+async def get_run_trace(run_id: str):
+    """Get detailed trace/spans for a specific run"""
+    workflows_coll = get_workflows_collection()
+    
+    workflow = await workflows_coll.find_one({"run_id": run_id})
+    if not workflow:
+        raise HTTPException(status_code=404, detail="Run not found")
+    
+    # Get detailed trace if available
+    trace = workflow.get('detailed_trace', None)
+    
+    if not trace:
+        # Fallback: build basic trace from agent_runs
+        agent_runs_coll = get_agent_runs_collection()
+        agents = []
+        async for agent in agent_runs_coll.find({"workflow_id": run_id}).sort("created_at", 1):
+            agents.append({
+                "span_id": str(agent['_id']),
+                "name": agent['agent_name'],
+                "span_type": "agent",
+                "status": agent['status'],
+                "start_time": agent['created_at'],
+                "end_time": agent.get('updated_at'),
+                "duration_ms": agent.get('latency_ms'),
+                "input": agent.get('prompt', '')[:500],
+                "output": agent.get('output', '')[:500],
+                "tokens_total": agent.get('tokens'),
+                "cost_usd": agent.get('cost_usd'),
+                "model": "claude-4-sonnet-20250514",
+                "parent_span_id": agent.get('parent_step_id')
+            })
+        
+        trace = {
+            "run_id": run_id,
+            "spans": agents,
+            "total_spans": len(agents)
+        }
+    
+    return trace
+
 # Include the router in the main app
 app.include_router(api_router)
 
