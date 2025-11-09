@@ -750,6 +750,8 @@ function App() {
               <div className="empty-main" data-testid="empty-main">
                 <p>Select a run to view details or click "Run Multi-Agent Demo" to watch live execution</p>
               </div>
+            ) : observabilityView === 'trace' ? (
+              <TraceTimeline runId={selectedRun.id} api={API} />
             ) : (
             <div className="run-detail" data-testid="run-detail">
               {/* Run Header */}
