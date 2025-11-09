@@ -477,6 +477,30 @@ Provide a concise summary explaining what the agents collectively did, any failu
         logging.error(f"Error generating summary: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to generate summary: {str(e)}")
 
+@api_router.get("/stream")
+async def stream_events():
+    """Server-Sent Events endpoint for real-time updates"""
+    async def event_generator():
+        # Create a queue for this client
+        client_queue = queue.Queue()
+        sse_queues.append(client_queue)
+        
+        try:
+            while True:
+                # Check for new events
+                try:
+                    event = client_queue.get(timeout=30)
+                    yield f"data: {event}\n\n"
+                except queue.Empty:
+                    # Send keepalive
+                    yield f": keepalive\n\n"
+        except Exception as e:
+            logging.error(f"SSE client disconnected: {e}")
+        finally:
+            sse_queues.remove(client_queue)
+    
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
+
 @api_router.post("/event", response_model=EventResponse)
 async def receive_event(event: EventRequest):
     """
