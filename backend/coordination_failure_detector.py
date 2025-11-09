@@ -17,16 +17,23 @@ class CoordinationFailureDetector:
     """Detects coordination failures in multi-agent traces"""
     
     # Known valid models, APIs, tools in our system
-    VALID_MODELS = {
+    # Base models used across all workflows
+    BASE_VALID_MODELS = {
         "claude-4-sonnet-20250514",
         "claude-sonnet-4", 
         "gpt-4",
-        "gpt-3.5-turbo",
-        "sonar",  # Perplexity search model
+        "gpt-3.5-turbo"
+    }
+    
+    # Workflow-specific models
+    DEBATE_WORKFLOW_MODELS = {
+        "sonar",  # Perplexity search model for research agent
         "sonar-small-chat",
         "sonar-medium-chat",
         "sonar-pro"
     }
+    
+    SOCIAL_MEDIA_WORKFLOW_MODELS = set()  # Only uses base models
     
     VALID_AGENT_TYPES = {
         "content_strategist",
