@@ -9,6 +9,7 @@ const TraceTimeline = ({ runId, api }) => {
   const [selectedSpan, setSelectedSpan] = useState(null);
   const [showFullInput, setShowFullInput] = useState(false);
   const [showFullOutput, setShowFullOutput] = useState(false);
+  const [coordinationFailures, setCoordinationFailures] = useState(new Map()); // span_id -> failures
 
   useEffect(() => {
     if (runId) {
