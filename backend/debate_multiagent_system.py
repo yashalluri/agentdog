@@ -318,8 +318,32 @@ Provide a well-reasoned argument that:
         print(f"[{agent_name}] Constructing debate argument...")
         start_time = time.time()
         
+        # Create agent span
+        agent_span = None
+        if self.tracer:
+            agent_span = self.tracer.start_span(
+                name=agent_name,
+                span_type=SpanType.AGENT,
+                parent_span_id=parent_span_id,
+                metadata={"agent_type": "debate", "user_position": user_position}
+            )
+            agent_span.input_data = prompt
+        
         try:
+            # Create LLM call span
+            llm_span = None
+            if self.tracer and agent_span:
+                llm_span = create_llm_span(
+                    tracer=self.tracer,
+                    name="claude_4_sonnet_debate",
+                    model="claude-4-sonnet-20250514",
+                    parent_span_id=agent_span.span_id,
+                    metadata={"temperature": None, "max_tokens": None, "system_message": "You are an expert debater..."}
+                )
+                llm_span.input_data = prompt
+            
             # Use Claude 4 Sonnet for high-quality reasoning
+            llm_start = time.time()
             chat = LlmChat(
                 api_key=self.llm_key,
                 session_id=f"{self.run_id}-{agent_name}",
@@ -332,6 +356,17 @@ Provide a well-reasoned argument that:
             # Handle async if needed
             if asyncio.iscoroutine(response):
                 response = await response
+            
+            # Complete LLM span
+            if llm_span:
+                llm_span.output_data = response
+                llm_span.add_llm_details(
+                    model="claude-4-sonnet-20250514",
+                    tokens_input=len(prompt.split()),
+                    tokens_output=len(response.split()),
+                    cost_usd=0.005
+                )
+                self.tracer.end_span(llm_span.span_id, SpanStatus.SUCCESS)
             
             latency_ms = int((time.time() - start_time) * 1000)
             
