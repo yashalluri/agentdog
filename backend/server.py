@@ -877,6 +877,7 @@ async def chat_with_agent(request: ChatRequest):
     if not request.run_id:
         run_id = f"chat-{datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')}"
         
+        # Create workflow with 0 steps - will be updated incrementally as agents complete
         workflow_doc = {
             "run_id": run_id,
             "created_at": current_time,
@@ -886,6 +887,7 @@ async def chat_with_agent(request: ChatRequest):
             "summary": None,
             "coordination_health": None,
             "total_agents": 0,
+            "succeeded_agents": 0,
             "failed_agents": 0,
             "messages": []  # Store chat messages
         }
