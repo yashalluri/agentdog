@@ -289,7 +289,7 @@ class AgentDogAPITester:
         # Find our test workflow
         test_workflow = None
         for workflow in response4:
-            if workflow.get('run_id') == 'test-workflow-001':
+            if workflow.get('run_id') == unique_run_id:
                 test_workflow = workflow
                 break
                 
