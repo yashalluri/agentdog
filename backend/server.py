@@ -631,7 +631,7 @@ async def run_multiagent_demo():
             
             # AGENT 5: Content Analyzer
             start = time.time()
-            await asyncio.sleep(0.9)
+            time.sleep(0.9)
             a_id = agentdog.emit_event(
                 run_id=run_id, agent_name="content_analyzer", status="success",
                 prompt="Analyze search results from web searchers",
