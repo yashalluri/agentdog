@@ -162,6 +162,60 @@ function App() {
     }
   };
 
+  // Handle chat resize
+  const handleMouseDown = (e) => {
+    setIsResizing(true);
+    e.preventDefault();
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isResizing) return;
+      
+      const newWidth = e.clientX - (sidebarOpen ? 280 : 0);
+      if (newWidth > 300 && newWidth < 800) {
+        setChatWidth(newWidth);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing, sidebarOpen]);
+
+  const handleSendMessage = () => {
+    if (!chatInput.trim()) return;
+    
+    // Add user message
+    setChatMessages(prev => [...prev, {
+      role: 'user',
+      content: chatInput,
+      timestamp: new Date().toISOString()
+    }]);
+    
+    // TODO: Send to agent API
+    // For now, add a mock response
+    setTimeout(() => {
+      setChatMessages(prev => [...prev, {
+        role: 'assistant',
+        content: 'I am processing your request...',
+        timestamp: new Date().toISOString()
+      }]);
+    }, 500);
+    
+    setChatInput('');
+  };
+
   const handleStepClick = (step) => {
     setSelectedStep(step);
     setShowFullPrompt(false);
