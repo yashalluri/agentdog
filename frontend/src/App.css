@@ -503,6 +503,23 @@ body {
   word-break: break-word;
 }
 
+.show-more-button {
+  background: none;
+  border: none;
+  color: #2563EB;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 8px;
+  transition: color 0.2s;
+}
+
+.show-more-button:hover {
+  color: #1D4ED8;
+  text-decoration: underline;
+}
+
 .diagnostics-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
