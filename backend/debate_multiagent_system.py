@@ -429,8 +429,9 @@ class DebateMultiAgentSystem:
     def __init__(self, run_id: str, progress_callback=None):
         self.run_id = run_id
         self.agentdog = AgentDog(api_url="http://localhost:8001/api")
-        self.research_agent = ResearchAgent(run_id, self.agentdog)
-        self.debate_agent = DebateAgent(run_id, self.agentdog)
+        self.tracer = ObservabilityTracer(run_id=run_id)
+        self.research_agent = ResearchAgent(run_id, self.agentdog, self.tracer)
+        self.debate_agent = DebateAgent(run_id, self.agentdog, self.tracer)
         self.progress_callback = progress_callback
         
     async def debate_with_user(self, user_position: str) -> Dict:
