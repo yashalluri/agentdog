@@ -23,9 +23,38 @@ function App() {
   const [showFullOutput, setShowFullOutput] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Fetch runs on mount
+  // Fetch runs on mount and setup SSE
   useEffect(() => {
     fetchRuns();
+    
+    // Setup Server-Sent Events for real-time updates
+    const eventSource = new EventSource(`${API}/stream`);
+    
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        
+        if (data.type === 'agent_created') {
+          // Refresh runs when new agent is created
+          fetchRuns();
+          
+          // If this is for the currently selected run, refresh its steps
+          if (selectedRun && data.data.run_id === selectedRun.id) {
+            fetchRunDetails(selectedRun.id);
+          }
+        }
+      } catch (e) {
+        console.error('SSE parse error:', e);
+      }
+    };
+    
+    eventSource.onerror = (error) => {
+      console.error('SSE error:', error);
+    };
+    
+    return () => {
+      eventSource.close();
+    };
   }, []);
 
   // Poll for updates when a run is selected and status is running
