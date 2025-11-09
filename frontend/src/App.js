@@ -1,6 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import Landing from './pages/Landing';
+import Signup from './pages/Signup';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import { authService } from './utils/auth';
 import '@/App.css';
-import axios from 'axios';
 import { Search, Play, Sparkles, Settings, TrendingUp, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
