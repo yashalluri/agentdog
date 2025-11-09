@@ -312,7 +312,7 @@ class AgentDogAPITester:
         success5, response5 = self.run_test(
             "Scenario 5: Verify agent details",
             "GET",
-            f"run/test-workflow-001/steps",
+            f"run/{unique_run_id}/steps",
             200
         )
         
