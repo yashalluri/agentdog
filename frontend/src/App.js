@@ -498,30 +498,17 @@ function App() {
           <div className="chat-panel-split" style={{ width: `${chatPanelWidth}%` }}>
             <div className="chat-panel-header">
               <h3 className="chat-panel-title">Agent Chat</h3>
-              <span className="panel-size-hint">{Math.round(chatPanelWidth)}%</span>
-            </div>
-            
-            {/* Agent Selector and Start New Run Button */}
-            <div className="chat-controls">
-              <select 
-                className="agent-selector-full"
-                value={selectedAgent}
-                onChange={(e) => setSelectedAgent(e.target.value)}
-                title="Select Agent"
-              >
-                {availableAgents.map(agent => (
-                  <option key={agent.id} value={agent.id}>
-                    {agent.name}
-                  </option>
-                ))}
-              </select>
-              <Button
-                onClick={handleStartNewRun}
-                className="start-new-run-btn"
-                variant="outline"
-              >
-                🔄 Start New Run
-              </Button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Button
+                  onClick={handleStartNewRun}
+                  className="start-new-run-btn-header"
+                  variant="outline"
+                  size="sm"
+                >
+                  🔄 Start New Run
+                </Button>
+                <span className="panel-size-hint">{Math.round(chatPanelWidth)}%</span>
+              </div>
             </div>
             
             <div className="chat-messages-area">
