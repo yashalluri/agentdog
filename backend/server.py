@@ -178,15 +178,6 @@ class EventResponse(BaseModel):
     status: str
     agent_id: str
 
-async def broadcast_event(event_type: str, data: dict):
-    """Broadcast event to all connected SSE clients"""
-    event_data = json.dumps({"type": event_type, "data": data})
-    for client_queue in sse_clients:
-        try:
-            await client_queue.put(event_data)
-        except:
-            pass
-
 # Coordination Analysis Functions
 def quick_coordination_check(error_message: str) -> Optional[str]:
     """
