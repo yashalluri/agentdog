@@ -101,3 +101,149 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Test the POST /api/event endpoint for telemetry ingestion with 5 specific scenarios including workflow creation, agent coordination, error handling, and coordination failure detection"
+
+backend:
+  - task: "POST /api/event endpoint - telemetry ingestion"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "All 5 test scenarios passed successfully. Scenario 1: Created new workflow with successful agent (✅). Scenario 2: Added agent with parent relationship (✅). Scenario 3: Added agent with error and coordination failure detection - correctly detected KeyError and set coordination_status='failed' with issue 'Missing expected field validation_schema' (✅). Scenario 4: Verified workflow creation with 3 agents, 1 failed (✅). Scenario 5: Verified agent details and coordination status (✅). Event ingestion, workflow management, and coordination failure detection all working correctly."
+
+  - task: "GET /api/runs endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Successfully retrieves all workflow runs with proper pagination and filtering. Returns correct data structure with both legacy and new field names for frontend compatibility."
+
+  - task: "GET /api/run/{run_id} endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Successfully retrieves specific workflow run by ID. Returns 404 for invalid IDs. Proper data structure with calculated fields like duration and cost."
+
+  - task: "GET /api/run/{run_id}/steps endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Successfully retrieves all agent steps for a workflow run. Returns proper agent details including coordination status and issues."
+
+  - task: "GET /api/step/{step_id} endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Successfully retrieves detailed step information. Handles ObjectId conversion properly. Returns 404 for invalid step IDs."
+
+  - task: "POST /api/step/{step_id}/replay endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Successfully initiates step replay functionality. Updates status to running then success asynchronously."
+
+  - task: "POST /api/summary/{run_id} endpoint - AI summary generation"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 1
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "Initial test failed due to TypeError when handling None values in agent output/prompt fields"
+        - working: true
+          agent: "testing"
+          comment: "Fixed TypeError by properly handling None values in prompt and output fields. AI summary generation now working correctly with Claude Sonnet 4. Generates comprehensive summaries of workflow runs."
+
+  - task: "POST /api/ingest-sample endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Successfully creates sample workflow data for demonstration purposes. Creates workflow with 5 agents including one failed agent."
+
+  - task: "MongoDB database integration"
+    implemented: true
+    working: true
+    file: "/app/backend/database.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "MongoDB connection and collections working properly. Proper indexing on workflows and agent_runs collections. Database operations successful."
+
+  - task: "Coordination failure detection system"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Quick coordination check function working correctly. Successfully detects KeyError patterns and sets appropriate coordination_status and coordination_issue fields. Tested with 'KeyError: validation_schema' scenario."
+
+frontend:
+  # No frontend testing performed as per instructions
+
+metadata:
+  created_by: "testing_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "POST /api/event endpoint - telemetry ingestion"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+    - agent: "testing"
+      message: "Completed comprehensive testing of POST /api/event endpoint with all 5 requested scenarios. All tests passed successfully. The telemetry ingestion system is working correctly including workflow creation, agent coordination, error handling, and coordination failure detection. Fixed minor bug in AI summary generation. Backend API is fully functional."
