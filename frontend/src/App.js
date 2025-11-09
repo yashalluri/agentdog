@@ -321,18 +321,27 @@ function App() {
         {selectedStep && (
           <div className="right-drawer" data-testid="right-drawer">
             <div className="drawer-header" data-testid="drawer-header">
-              <div>
-                <h3 className="drawer-title" data-testid="drawer-title">{selectedStep.name}</h3>
-                <p className="drawer-subtitle" data-testid="drawer-subtitle">
-                  Step ID: {selectedStep.id.substring(0, 8)}
-                </p>
+              <div className="drawer-header-content">
+                <div>
+                  <h3 className="drawer-title" data-testid="drawer-title">{selectedStep.name}</h3>
+                  <p className="drawer-subtitle" data-testid="drawer-subtitle">
+                    {selectedStep.start_time || `Step ID: ${selectedStep.id.substring(0, 8)}`}
+                  </p>
+                </div>
+                <Badge
+                  variant={selectedStep.status === 'success' ? 'success' : selectedStep.status === 'error' ? 'destructive' : 'secondary'}
+                  data-testid="drawer-status-badge"
+                >
+                  {selectedStep.status}
+                </Badge>
               </div>
-              <Badge
-                variant={selectedStep.status === 'success' ? 'success' : selectedStep.status === 'error' ? 'destructive' : 'secondary'}
-                data-testid="drawer-status-badge"
+              <button 
+                className="drawer-close" 
+                onClick={() => setSelectedStep(null)}
+                aria-label="Close drawer"
               >
-                {selectedStep.status}
-              </Badge>
+                ×
+              </button>
             </div>
 
             <div className="drawer-content">
