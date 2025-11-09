@@ -320,6 +320,9 @@ class CoordinationFailureDetector:
         """Detect claims that can't be verified from available data"""
         missing_context = []
         
+        # Track detected references to avoid duplicates
+        detected_references = set()
+        
         for span in self.all_spans:
             span_name = span.get("name", "")
             span_type = span.get("span_type")
@@ -327,7 +330,7 @@ class CoordinationFailureDetector:
             output_data = str(span.get("output", ""))
             parent = span.get("parent_span")
             
-            # Check 1: Agent makes claims not present in parent output
+            # Check 1: Agent makes claims not present in parent output (only for agent spans)
             if span_type == "agent" and parent:
                 parent_output = str(parent.get("output", ""))
                 
@@ -348,12 +351,14 @@ class CoordinationFailureDetector:
                             }
                         })
             
-            # Check 2: References to data not in trace
-            if "based on" in output_data.lower() or "according to" in output_data.lower():
+            # Check 2: References to data not in trace (deduplicated, only check agent spans)
+            if span_type == "agent" and ("based on" in output_data.lower() or "according to" in output_data.lower()):
                 # Agent claiming to use data - verify it exists
                 references = re.findall(r'based on ([^.]+)', output_data, re.IGNORECASE)
                 for ref in references:
-                    if not self._reference_exists_in_trace(ref):
+                    ref_clean = ref.strip().lower()
+                    if not self._reference_exists_in_trace(ref) and ref_clean not in detected_references:
+                        detected_references.add(ref_clean)
                         missing_context.append({
                             "type": "missing_context",
                             "subtype": "missing_reference",
