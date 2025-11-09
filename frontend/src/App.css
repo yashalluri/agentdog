@@ -1067,6 +1067,13 @@ body {
   overflow: hidden;
 }
 
+/* Mobile/Tablet: Stack vertically */
+@media (max-width: 1024px) {
+  .split-panel-container {
+    flex-direction: column;
+  }
+}
+
 /* Chat Panel (Left) */
 .chat-panel-split {
   display: flex;
