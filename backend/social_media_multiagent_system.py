@@ -329,11 +329,12 @@ Create engaging, platform-optimized content that follows these specs exactly."""
 class HashtagGeneratorAgent:
     """Generates platform-specific hashtags"""
     
-    def __init__(self, run_id: str, agentdog: AgentDog):
+    def __init__(self, run_id: str, agentdog: AgentDog, tracer: Optional[ObservabilityTracer] = None):
         self.run_id = run_id
         self.agentdog = agentdog
         self.llm_key = os.environ.get('EMERGENT_LLM_KEY')
         self.agent_id = None
+        self.tracer = tracer
         
     async def generate_hashtags(self, topic: str, platform_contents: List[Dict], parent_step_id: str) -> Dict:
         """Generate hashtags for all platforms"""
