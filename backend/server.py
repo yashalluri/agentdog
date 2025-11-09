@@ -1085,34 +1085,47 @@ async def chat_with_agent(request: ChatRequest):
                 faulty_system = FaultyMultiAgentSystem(run_id)
                 faulty_result = await faulty_system.run_analysis(request.message)
                 
+                logging.info(f"Faulty result type: {type(faulty_result)}")
+                
                 # Extract response and trace
                 if isinstance(faulty_result, dict):
                     response_text = faulty_result.get('response', str(faulty_result))
                     detailed_trace = faulty_result.get('trace', None)
                     
+                    logging.info(f"Faulty detailed trace exists: {detailed_trace is not None}")
+                    
                     # Save detailed trace to workflow
                     if detailed_trace:
-                        await workflows_coll.update_one(
+                        logging.info(f"Saving faulty trace to MongoDB for run_id: {run_id}")
+                        result = await workflows_coll.update_one(
                             {"run_id": run_id},
                             {"$set": {"detailed_trace": detailed_trace}}
                         )
+                        logging.info(f"MongoDB update result: matched={result.matched_count}, modified={result.modified_count}")
                         
                         # Auto-analyze coordination after workflow completes
                         workflow_doc = await workflows_coll.find_one({"run_id": run_id})
                         if workflow_doc:
+                            logging.info("Running coordination analysis for faulty agent...")
                             analysis_result = analyze_workflow_coordination(workflow_doc)
                             if analysis_result:
+                                logging.info(f"Faulty analysis complete: {analysis_result.get('failure_count', 0)} failures")
                                 await workflows_coll.update_one(
                                     {"run_id": run_id},
                                     {"$set": {"coordination_analysis": analysis_result}}
                                 )
+                    else:
+                        logging.warning(f"No detailed trace in faulty result for run_id: {run_id}")
                 else:
                     response_text = str(faulty_result)
+                    logging.warning(f"Faulty result is not a dict for run_id: {run_id}")
                 
                 citations = []
                 
             except Exception as e:
                 logging.error(f"Test faulty multi-agent error: {e}")
+                import traceback
+                logging.error(traceback.format_exc())
                 response_text = f"Test multi-agent error: {str(e)}"
                 citations = []
         
