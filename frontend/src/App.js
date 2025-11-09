@@ -364,6 +364,83 @@ function App() {
         {/* Mobile Overlay */}
         {sidebarOpen && <div className="mobile-overlay" onClick={() => setSidebarOpen(false)}></div>}
         
+        {/* Chat Panel - Left Side */}
+        {chatOpen && (
+          <>
+            <div className="chat-panel" style={{ width: `${chatWidth}px` }}>
+              <div className="chat-panel-header">
+                <h3 className="chat-panel-title">💬 Agent Chat</h3>
+                <button 
+                  className="chat-toggle-btn"
+                  onClick={() => setChatOpen(false)}
+                  title="Hide chat"
+                >
+                  ‹
+                </button>
+              </div>
+              
+              <div className="chat-messages-container">
+                {chatMessages.length === 0 ? (
+                  <div className="chat-empty">
+                    <p>👋 Start a conversation with the agent</p>
+                    <p className="chat-empty-sub">Ask me to analyze data, generate reports, or coordinate tasks</p>
+                  </div>
+                ) : (
+                  chatMessages.map((msg, idx) => (
+                    <div key={idx} className={`chat-msg ${msg.role}`}>
+                      <div className="chat-msg-avatar">
+                        {msg.role === 'user' ? '👤' : '🤖'}
+                      </div>
+                      <div className="chat-msg-content">
+                        <div className="chat-msg-text">{msg.content}</div>
+                        <div className="chat-msg-time">
+                          {new Date(msg.timestamp).toLocaleTimeString()}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+              
+              <div className="chat-input-container">
+                <input
+                  type="text"
+                  className="chat-input"
+                  placeholder="Type your message..."
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                />
+                <button 
+                  className="chat-send-btn"
+                  onClick={handleSendMessage}
+                  disabled={!chatInput.trim()}
+                >
+                  ↑
+                </button>
+              </div>
+            </div>
+            
+            {/* Resize Handle */}
+            <div 
+              className="resize-handle"
+              onMouseDown={handleMouseDown}
+              style={{ cursor: isResizing ? 'col-resize' : 'col-resize' }}
+            />
+          </>
+        )}
+        
+        {/* Chat Toggle Button (when closed) */}
+        {!chatOpen && (
+          <button 
+            className="chat-open-btn"
+            onClick={() => setChatOpen(true)}
+            title="Show chat"
+          >
+            💬
+          </button>
+        )}
+        
         {/* Left Sidebar - Runs List */}
         <div className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`} data-testid="runs-sidebar">
           <div className="sidebar-search">
