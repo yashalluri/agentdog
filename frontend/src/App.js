@@ -37,6 +37,8 @@ function App() {
   const [isSendingMessage, setIsSendingMessage] = useState(false);
   const [debateProgress, setDebateProgress] = useState('Thinking...');
   const [observabilityView, setObservabilityView] = useState('overview'); // 'overview', 'trace', or 'coordination'
+  const [showPerformanceModal, setShowPerformanceModal] = useState(false);
+  const [performanceStats, setPerformanceStats] = useState(null);
   
   // Available agents
   const availableAgents = [
