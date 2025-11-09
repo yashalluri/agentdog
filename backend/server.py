@@ -968,10 +968,18 @@ async def chat_with_agent(request: ChatRequest):
                 debate_system = DebateMultiAgentSystem(run_id=run_id, progress_callback=progress_callback)
                 debate_result = await debate_system.debate_with_user(request.message)
                 
-                # Extract response and citations
+                # Extract response, citations, and trace
                 if isinstance(debate_result, dict):
                     response_text = debate_result.get('response', str(debate_result))
                     citations = debate_result.get('citations', [])
+                    detailed_trace = debate_result.get('trace', None)
+                    
+                    # Save detailed trace to workflow
+                    if detailed_trace:
+                        await workflows_coll.update_one(
+                            {"run_id": run_id},
+                            {"$set": {"detailed_trace": detailed_trace}}
+                        )
                 else:
                     response_text = str(debate_result)
                     citations = []
