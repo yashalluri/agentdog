@@ -642,7 +642,7 @@ async def run_multiagent_demo():
             
             # AGENT 6: Report Writer
             start = time.time()
-            await asyncio.sleep(1.2)
+            time.sleep(1.2)
             agentdog.emit_event(
                 run_id=run_id, agent_name="report_writer", status="success",
                 prompt="Write final research report on AI multi-agent systems",
