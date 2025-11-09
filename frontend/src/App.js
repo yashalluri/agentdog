@@ -378,8 +378,10 @@ function App() {
         setCurrentRunId(run_id);
         fetchRuns(); // Refresh sidebar to show new run
         
-        // Don't auto-select the run - let observability update in real-time
-        // User can click on the run in sidebar to see details
+        // Delay fetching details to allow workflow to be created
+        setTimeout(() => {
+          fetchRunDetails(run_id);
+        }, 1000);
       }
       
       // Add assistant response to chat
