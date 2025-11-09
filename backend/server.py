@@ -321,17 +321,30 @@ async def get_step(step_id: str):
 @api_router.post("/step/{step_id}/replay")
 async def replay_step(step_id: str):
     """Replay a specific agent step"""
-    step = store.get_step(step_id)
-    if not step:
+    from bson import ObjectId
+    agent_runs_coll = get_agent_runs_collection()
+    
+    try:
+        agent = await agent_runs_coll.find_one({"_id": ObjectId(step_id)})
+    except:
+        raise HTTPException(status_code=404, detail="Step not found")
+    
+    if not agent:
         raise HTTPException(status_code=404, detail="Step not found")
     
     # Simulate replay: set to running, then success after a delay
-    store.update_step(step_id, {"status": "running"})
+    await agent_runs_coll.update_one(
+        {"_id": ObjectId(step_id)},
+        {"$set": {"status": "running", "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
     
     # Simulate async processing
     async def process_replay():
         await asyncio.sleep(1)
-        store.update_step(step_id, {"status": "success"})
+        await agent_runs_coll.update_one(
+            {"_id": ObjectId(step_id)},
+            {"$set": {"status": "success", "updated_at": datetime.now(timezone.utc).isoformat()}}
+        )
     
     asyncio.create_task(process_replay())
     
