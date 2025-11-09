@@ -246,7 +246,7 @@ class AgentDogAPITester:
         
         # Test Scenario 3: Add agent with error and coordination failure detection
         scenario3_data = {
-            "run_id": "test-workflow-001",
+            "run_id": unique_run_id,
             "agent_name": "data_validator",
             "parent_step_id": agent_id_2,
             "status": "error",
