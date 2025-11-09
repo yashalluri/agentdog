@@ -133,35 +133,190 @@ class SummaryResponse(BaseModel):
     summary: str
 
 # API Routes
-@api_router.get("/runs", response_model=List[Run])
-async def get_runs():
-    """Get all runs"""
-    runs = store.get_all_runs()
-    # Sort by start_time descending
-    runs.sort(key=lambda x: x['start_time'], reverse=True)
-    return runs
+@api_router.get("/runs")
+async def get_runs(status: Optional[str] = None, limit: int = 100):
+    """Get all workflow runs"""
+    workflows_coll = get_workflows_collection()
+    
+    query = {}
+    if status:
+        query['final_status'] = status
+    
+    # Get workflows sorted by created_at descending
+    cursor = workflows_coll.find(query).sort('created_at', -1).limit(limit)
+    workflows = await cursor.to_list(length=limit)
+    
+    # Convert MongoDB documents to response format
+    result = []
+    for wf in workflows:
+        # Convert _id to string if needed
+        wf['_id'] = str(wf.get('_id', ''))
+        
+        # Create response with both old and new fields for compatibility
+        response_data = {
+            "id": wf['run_id'],
+            "run_id": wf['run_id'],
+            "title": wf['run_id'],
+            "start_time": wf['created_at'],
+            "created_at": wf['created_at'],
+            "updated_at": wf['updated_at'],
+            "status": wf['final_status'],
+            "final_status": wf['final_status'],
+            "num_steps": wf.get('total_agents', 0),
+            "total_agents": wf.get('total_agents', 0),
+            "num_success": wf.get('total_agents', 0) - wf.get('failed_agents', 0),
+            "num_failed": wf.get('failed_agents', 0),
+            "failed_agents": wf.get('failed_agents', 0),
+            "coordination_health": wf.get('coordination_health'),
+            "summary": wf.get('summary'),
+            "initiator": wf.get('initiator')
+        }
+        
+        # Calculate duration
+        try:
+            created = datetime.fromisoformat(wf['created_at'].replace('Z', '+00:00'))
+            updated = datetime.fromisoformat(wf['updated_at'].replace('Z', '+00:00'))
+            response_data['duration'] = (updated - created).total_seconds()
+        except:
+            response_data['duration'] = 0.0
+        
+        # Calculate total cost from agent runs
+        agent_runs_coll = get_agent_runs_collection()
+        agents = await agent_runs_coll.find({"run_id": wf['run_id']}).to_list(length=None)
+        total_cost = sum(agent.get('cost_usd', 0) for agent in agents)
+        response_data['cost'] = total_cost
+        
+        result.append(response_data)
+    
+    return result
 
-@api_router.get("/run/{run_id}", response_model=Run)
+@api_router.get("/run/{run_id}")
 async def get_run(run_id: str):
-    """Get a specific run by ID"""
-    run = store.get_run(run_id)
-    if not run:
+    """Get a specific workflow run by ID"""
+    workflows_coll = get_workflows_collection()
+    
+    workflow = await workflows_coll.find_one({"run_id": run_id})
+    if not workflow:
         raise HTTPException(status_code=404, detail="Run not found")
-    return run
+    
+    # Convert _id to string
+    workflow['_id'] = str(workflow.get('_id', ''))
+    
+    # Create response with both old and new fields for compatibility
+    response_data = {
+        "id": workflow['run_id'],
+        "run_id": workflow['run_id'],
+        "title": workflow['run_id'],
+        "start_time": workflow['created_at'],
+        "created_at": workflow['created_at'],
+        "updated_at": workflow['updated_at'],
+        "status": workflow['final_status'],
+        "final_status": workflow['final_status'],
+        "num_steps": workflow.get('total_agents', 0),
+        "total_agents": workflow.get('total_agents', 0),
+        "num_success": workflow.get('total_agents', 0) - workflow.get('failed_agents', 0),
+        "num_failed": workflow.get('failed_agents', 0),
+        "failed_agents": workflow.get('failed_agents', 0),
+        "coordination_health": workflow.get('coordination_health'),
+        "summary": workflow.get('summary'),
+        "initiator": workflow.get('initiator')
+    }
+    
+    # Calculate duration
+    try:
+        created = datetime.fromisoformat(workflow['created_at'].replace('Z', '+00:00'))
+        updated = datetime.fromisoformat(workflow['updated_at'].replace('Z', '+00:00'))
+        response_data['duration'] = (updated - created).total_seconds()
+    except:
+        response_data['duration'] = 0.0
+    
+    # Calculate total cost
+    agent_runs_coll = get_agent_runs_collection()
+    agents = await agent_runs_coll.find({"run_id": run_id}).to_list(length=None)
+    total_cost = sum(agent.get('cost_usd', 0) for agent in agents)
+    response_data['cost'] = total_cost
+    
+    return response_data
 
-@api_router.get("/run/{run_id}/steps", response_model=List[AgentStep])
+@api_router.get("/run/{run_id}/steps")
 async def get_run_steps(run_id: str):
-    """Get all steps for a specific run"""
-    steps = store.get_steps_by_run(run_id)
-    return steps
+    """Get all agent steps for a specific run"""
+    agent_runs_coll = get_agent_runs_collection()
+    
+    # Get all agents for this run
+    cursor = agent_runs_coll.find({"run_id": run_id}).sort('created_at', 1)
+    agents = await cursor.to_list(length=None)
+    
+    # Convert to frontend format
+    result = []
+    for agent in agents:
+        agent['_id'] = str(agent.get('_id', ''))
+        
+        response_data = {
+            "id": agent['_id'],
+            "run_id": agent['run_id'],
+            "parent_step_id": agent.get('parent_step_id'),
+            "name": agent['agent_name'],
+            "agent_name": agent['agent_name'],
+            "status": agent['status'],
+            "latency_ms": agent.get('latency_ms', 0),
+            "cost": agent.get('cost_usd', 0),
+            "cost_usd": agent.get('cost_usd', 0),
+            "prompt": agent.get('prompt', ''),
+            "output": agent.get('output', ''),
+            "tokens": agent.get('tokens', 0),
+            "start_time": agent.get('start_time'),
+            "end_time": agent.get('end_time'),
+            "error_message": agent.get('error_message'),
+            "coordination_status": agent.get('coordination_status'),
+            "coordination_issue": agent.get('coordination_issue'),
+            "suggested_fix": agent.get('suggested_fix'),
+            "created_at": agent.get('created_at')
+        }
+        result.append(response_data)
+    
+    return result
 
-@api_router.get("/step/{step_id}", response_model=AgentStep)
+@api_router.get("/step/{step_id}")
 async def get_step(step_id: str):
     """Get detailed information about a specific step"""
-    step = store.get_step(step_id)
-    if not step:
+    from bson import ObjectId
+    agent_runs_coll = get_agent_runs_collection()
+    
+    try:
+        agent = await agent_runs_coll.find_one({"_id": ObjectId(step_id)})
+    except:
+        # If not a valid ObjectId, return 404
         raise HTTPException(status_code=404, detail="Step not found")
-    return step
+    
+    if not agent:
+        raise HTTPException(status_code=404, detail="Step not found")
+    
+    agent['_id'] = str(agent.get('_id', ''))
+    
+    response_data = {
+        "id": agent['_id'],
+        "run_id": agent['run_id'],
+        "parent_step_id": agent.get('parent_step_id'),
+        "name": agent['agent_name'],
+        "agent_name": agent['agent_name'],
+        "status": agent['status'],
+        "latency_ms": agent.get('latency_ms', 0),
+        "cost": agent.get('cost_usd', 0),
+        "cost_usd": agent.get('cost_usd', 0),
+        "prompt": agent.get('prompt', ''),
+        "output": agent.get('output', ''),
+        "tokens": agent.get('tokens', 0),
+        "start_time": agent.get('start_time'),
+        "end_time": agent.get('end_time'),
+        "error_message": agent.get('error_message'),
+        "coordination_status": agent.get('coordination_status'),
+        "coordination_issue": agent.get('coordination_issue'),
+        "suggested_fix": agent.get('suggested_fix'),
+        "created_at": agent.get('created_at')
+    }
+    
+    return response_data
 
 @api_router.post("/step/{step_id}/replay")
 async def replay_step(step_id: str):
