@@ -572,27 +572,90 @@ async def run_multiagent_demo():
     Run a live multi-agent workflow demo with real execution
     This creates a workflow with multiple agents that coordinate and send telemetry
     """
-    import subprocess
-    import threading
+    import time
+    from agentdog_sdk import AgentDog
     
+    # Generate unique run ID
     timestamp = datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')
     run_id = f"live-demo-{timestamp}"
     
-    # Run the demo script in background
-    def run_demo():
-        subprocess.run(
-            ["python", "/app/backend/simple_multiagent_demo.py"],
-            capture_output=True,
-            text=True
-        )
+    # Run demo workflow in background task
+    async def run_demo_workflow():
+        agentdog = AgentDog(api_url="http://localhost:8001/api")
+        
+        try:
+            # AGENT 1: Query Generator
+            start = time.time()
+            time.sleep(0.5)
+            q_id = agentdog.emit_event(
+                run_id=run_id, agent_name="query_generator", status="success",
+                prompt="Generate search queries for: AI multi-agent systems",
+                output="Generated 3 queries", tokens=180, cost_usd=0.002,
+                latency_ms=int((time.time() - start) * 1000)
+            )
+            
+            # AGENT 2: Web Searcher 1
+            start = time.time()
+            time.sleep(0.7)
+            s1_id = agentdog.emit_event(
+                run_id=run_id, agent_name="web_searcher_1", status="success",
+                prompt="Search: Latest AI agent frameworks",
+                output="Found: LangChain, AutoGen, CrewAI", tokens=220, cost_usd=0.003,
+                latency_ms=int((time.time() - start) * 1000), parent_step_id=q_id
+            )
+            
+            # AGENT 3: Web Searcher 2  
+            start = time.time()
+            time.sleep(0.6)
+            s2_id = agentdog.emit_event(
+                run_id=run_id, agent_name="web_searcher_2", status="success",
+                prompt="Search: Multi-agent coordination",
+                output="Found: Hierarchical, peer-to-peer patterns", tokens=190, cost_usd=0.0025,
+                latency_ms=int((time.time() - start) * 1000), parent_step_id=q_id
+            )
+            
+            # AGENT 4: Web Searcher 3 (FAILS)
+            start = time.time()
+            time.sleep(0.4)
+            s3_id = agentdog.emit_event(
+                run_id=run_id, agent_name="web_searcher_3", status="error",
+                prompt="Search: Agent protocols",
+                error_message="KeyError: 'search_results' - parent output missing field",
+                tokens=50, cost_usd=0.001,
+                latency_ms=int((time.time() - start) * 1000), parent_step_id=q_id
+            )
+            
+            # AGENT 5: Content Analyzer
+            start = time.time()
+            time.sleep(0.9)
+            a_id = agentdog.emit_event(
+                run_id=run_id, agent_name="content_analyzer", status="success",
+                prompt="Analyze search results",
+                output="Identified 5 themes, 12 concepts", tokens=380, cost_usd=0.004,
+                latency_ms=int((time.time() - start) * 1000), parent_step_id=s2_id
+            )
+            
+            # AGENT 6: Report Writer
+            start = time.time()
+            time.sleep(1.2)
+            agentdog.emit_event(
+                run_id=run_id, agent_name="report_writer", status="success",
+                prompt="Write final report",
+                output="Research report: AI systems evolving rapidly", tokens=520, cost_usd=0.005,
+                latency_ms=int((time.time() - start) * 1000), parent_step_id=a_id
+            )
+            
+            logging.info(f"Demo workflow {run_id} completed successfully")
+        except Exception as e:
+            logging.error(f"Demo workflow failed: {e}")
     
-    thread = threading.Thread(target=run_demo)
-    thread.start()
+    # Start the workflow as a background task
+    asyncio.create_task(run_demo_workflow())
     
     return {
         "message": "Multi-agent demo started", 
         "run_id": run_id,
-        "note": "Watch the agents execute in real-time in the UI"
+        "note": "Watch the agents execute in real-time! Refresh to see updates."
     }
 
 @api_router.post("/ingest-sample")
