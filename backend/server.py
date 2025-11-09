@@ -1227,6 +1227,137 @@ async def trigger_coordination_analysis(run_id: str):
     
     return {"message": "Analysis complete", "result": analysis_result}
 
+@api_router.post("/test/buggy-single-agent")
+async def test_buggy_single_agent():
+    """
+    Test endpoint for single agent with intentional bugs
+    
+    This agent has bugs to test all 4 detection layers:
+    - HALLUCINATION: Invalid model (gpt-5), fake API references
+    - LOGICAL_INCONSISTENCY: Wrong token math, success with error
+    - MISSING_CONTEXT: Claims not backed by input
+    - CONTRACT_VIOLATION: Duration issues
+    """
+    workflows_coll = get_workflows_collection()
+    
+    # Generate run ID
+    run_id = f"test-buggy-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
+    
+    # Create workflow document
+    workflow_doc = {
+        "run_id": run_id,
+        "type": "test_buggy_single",
+        "status": "running",
+        "created_at": datetime.now(timezone.utc),
+        "title": "Test: Buggy Single Agent",
+        "messages": []
+    }
+    await workflows_coll.insert_one(workflow_doc)
+    
+    # Run buggy agent
+    agent = BuggySummarizerAgent(run_id)
+    result = await agent.summarize_text("Analyze quarterly sales performance and provide insights.")
+    
+    # Save trace
+    if result.get('trace'):
+        await workflows_coll.update_one(
+            {"run_id": run_id},
+            {"$set": {
+                "detailed_trace": result['trace'],
+                "status": "success",
+                "end_time": datetime.now(timezone.utc)
+            }}
+        )
+        
+        # Run coordination analysis
+        workflow_doc = await workflows_coll.find_one({"run_id": run_id})
+        analysis_result = analyze_workflow_coordination(workflow_doc)
+        if analysis_result:
+            await workflows_coll.update_one(
+                {"run_id": run_id},
+                {"$set": {"coordination_analysis": analysis_result}}
+            )
+    
+    return {
+        "run_id": run_id,
+        "message": "Buggy agent test completed",
+        "expected_failures": [
+            "HALLUCINATION: Invalid model 'gpt-5'",
+            "HALLUCINATION: References /api/magic-summarize",
+            "LOGICAL_INCONSISTENCY: Token math (50+30≠100)",
+            "LOGICAL_INCONSISTENCY: Success status with error message",
+            "MISSING_CONTEXT: Claims about market research",
+            "MISSING_CONTEXT: References competitor analysis"
+        ],
+        "view_results": f"/api/run/{run_id}/coordination-analysis"
+    }
+
+@api_router.post("/test/faulty-multiagent")
+async def test_faulty_multiagent():
+    """
+    Test endpoint for multi-agent system with coordination failures
+    
+    This system has 3 agents with intentional coordination bugs:
+    - HALLUCINATION: Wrong model for workflow type
+    - LOGICAL_INCONSISTENCY: Child span longer than parent
+    - MISSING_CONTEXT: Agent references data not produced
+    - CONTRACT_VIOLATION: Wrong execution order, wrong hierarchy
+    """
+    workflows_coll = get_workflows_collection()
+    
+    # Generate run ID
+    run_id = f"test-faulty-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
+    
+    # Create workflow document
+    workflow_doc = {
+        "run_id": run_id,
+        "type": "test_faulty_multiagent",
+        "status": "running",
+        "created_at": datetime.now(timezone.utc),
+        "title": "Test: Faulty Multi-Agent System",
+        "messages": []
+    }
+    await workflows_coll.insert_one(workflow_doc)
+    
+    # Run faulty multi-agent system
+    system = FaultyMultiAgentSystem(run_id)
+    result = await system.run_analysis("Analyze our business performance")
+    
+    # Save trace
+    if result.get('trace'):
+        await workflows_coll.update_one(
+            {"run_id": run_id},
+            {"$set": {
+                "detailed_trace": result['trace'],
+                "status": "success",
+                "end_time": datetime.now(timezone.utc)
+            }}
+        )
+        
+        # Run coordination analysis
+        workflow_doc = await workflows_coll.find_one({"run_id": run_id})
+        analysis_result = analyze_workflow_coordination(workflow_doc)
+        if analysis_result:
+            await workflows_coll.update_one(
+                {"run_id": run_id},
+                {"$set": {"coordination_analysis": analysis_result}}
+            )
+    
+    return {
+        "run_id": run_id,
+        "message": "Faulty multi-agent test completed",
+        "expected_failures": [
+            "HALLUCINATION: Sonar model in wrong workflow",
+            "LOGICAL_INCONSISTENCY: Child span duration > parent",
+            "MISSING_CONTEXT: References financial records not provided",
+            "MISSING_CONTEXT: References survey data not provided",
+            "MISSING_CONTEXT: References market research not provided",
+            "CONTRACT_VIOLATION: Wrong execution order",
+            "CONTRACT_VIOLATION: Wrong parent hierarchy"
+        ],
+        "view_results": f"/api/run/{run_id}/coordination-analysis"
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
