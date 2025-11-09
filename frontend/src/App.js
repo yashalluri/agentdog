@@ -161,7 +161,7 @@ function App() {
     }
   };
 
-  // Handle chat resize
+  // Handle panel resize
   const handleMouseDown = (e) => {
     setIsResizing(true);
     e.preventDefault();
@@ -171,9 +171,12 @@ function App() {
     const handleMouseMove = (e) => {
       if (!isResizing) return;
       
-      const newWidth = e.clientX - (sidebarOpen ? 280 : 0);
-      if (newWidth > 300 && newWidth < 800) {
-        setChatWidth(newWidth);
+      const containerWidth = window.innerWidth - (sidebarOpen ? 280 : 0);
+      const newWidth = ((e.clientX - (sidebarOpen ? 280 : 0)) / containerWidth) * 100;
+      
+      // Keep between 20% and 80%
+      if (newWidth > 20 && newWidth < 80) {
+        setChatPanelWidth(newWidth);
       }
     };
 
