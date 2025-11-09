@@ -593,11 +593,18 @@ class SocialMediaMultiAgentSystem:
             optimization_result
         )
         
+        # Complete root span
+        root_span.output_data = response[:1000]
+        self.tracer.end_span(root_span.span_id, SpanStatus.SUCCESS)
+        
         print(f"\n{'='*60}")
         print("Social Media Content Complete!")
         print(f"{'='*60}\n")
         
-        return response
+        return {
+            "response": response,
+            "trace": self.tracer.get_trace()
+        }
     
     def _format_final_output(self, strategy, platforms, hashtags, optimization) -> str:
         """Format all content into a cohesive response"""
