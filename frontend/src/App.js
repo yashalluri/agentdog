@@ -241,18 +241,18 @@ function App() {
           onClick={() => handleStepClick(node)}
           data-testid={`flow-item-${node.id}`}
         >
-          <div className=\"flow-item-left\">
+          <div className="flow-item-left">
             <div className={`status-dot ${getStatusDot(node.status)}`} data-testid={`flow-status-${node.status}`}></div>
             <div>
-              <div className=\"flow-item-name\" data-testid=\"flow-item-name\">{node.agent_name}</div>
+              <div className="flow-item-name" data-testid="flow-item-name">{node.agent_name}</div>
               {node.status === 'error' && node.error_message && (
-                <div className=\"error-text\">{node.error_message}</div>
+                <div className="error-text">{node.error_message}</div>
               )}
             </div>
           </div>
-          <div className=\"flow-item-right\">
-            <span className=\"flow-metric\" data-testid=\"flow-latency\">{node.latency_ms}ms</span>
-            <span className=\"flow-metric\" data-testid=\"flow-cost\">${node.cost.toFixed(3)}</span>
+          <div className="flow-item-right">
+            <span className="flow-metric" data-testid="flow-latency">{node.latency_ms}ms</span>
+            <span className="flow-metric" data-testid="flow-cost">${node.cost.toFixed(3)}</span>
           </div>
         </div>
         {node.children && node.children.length > 0 && renderTree(node.children, depth + 1)}
@@ -281,33 +281,33 @@ function App() {
     }));
 
     return (
-      <div className=\"overview-container\" data-testid=\"overview-tab\">
-        <h2 className=\"overview-title\">System Overview</h2>
+      <div className="overview-container" data-testid="overview-tab">
+        <h2 className="overview-title">System Overview</h2>
         
-        <div className=\"stats-grid\">
-          <div className=\"stat-card\">
-            <div className=\"stat-label\">TOTAL RUNS</div>
-            <div className=\"stat-value\">{runs.length}</div>
+        <div className="stats-grid">
+          <div className="stat-card">
+            <div className="stat-label">TOTAL RUNS</div>
+            <div className="stat-value">{runs.length}</div>
           </div>
-          <div className=\"stat-card\">
-            <div className=\"stat-label\">SUCCESS RATE</div>
-            <div className=\"stat-value\">
+          <div className="stat-card">
+            <div className="stat-label">SUCCESS RATE</div>
+            <div className="stat-value">
               {runs.length > 0 ? Math.round((successCount / runs.length) * 100) : 0}%
             </div>
           </div>
-          <div className=\"stat-card\">
-            <div className=\"stat-label\">AVG DURATION</div>
-            <div className=\"stat-value\">{avgDuration}s</div>
+          <div className="stat-card">
+            <div className="stat-label">AVG DURATION</div>
+            <div className="stat-value">{avgDuration}s</div>
           </div>
-          <div className=\"stat-card\">
-            <div className=\"stat-label\">TOTAL COST</div>
-            <div className=\"stat-value\">${totalCost}</div>
+          <div className="stat-card">
+            <div className="stat-label">TOTAL COST</div>
+            <div className="stat-value">${totalCost}</div>
           </div>
         </div>
 
-        <div className=\"charts-grid\">
-          <div className=\"chart-card\">
-            <h3 className=\"chart-title\">Success vs Error</h3>
+        <div className="charts-grid">
+          <div className="chart-card">
+            <h3 className="chart-title">Success vs Error</h3>
             <ResponsiveContainer width=\"100%\" height={200}>
               <PieChart>
                 <Pie data={statusData} dataKey=\"value\" cx=\"50%\" cy=\"50%\" outerRadius={60}>
@@ -320,8 +320,8 @@ function App() {
             </ResponsiveContainer>
           </div>
 
-          <div className=\"chart-card\">
-            <h3 className=\"chart-title\">Recent Run Durations</h3>
+          <div className="chart-card">
+            <h3 className="chart-title">Recent Run Durations</h3>
             <ResponsiveContainer width=\"100%\" height={200}>
               <BarChart data={runsOverTime}>
                 <CartesianGrid strokeDasharray=\"3 3\" />
@@ -338,38 +338,38 @@ function App() {
   };
 
   return (
-    <div className=\"app-container\" data-testid=\"agentdog-app\">
+    <div className="app-container" data-testid="agentdog-app">
       <Toaster position=\"top-right\" />
       
       {/* Top Navigation */}
-      <div className=\"top-nav\" data-testid=\"top-nav\">
-        <div className=\"nav-logo-container\">
-          <div className=\"nav-logo\" data-testid=\"nav-logo\">AgentDog</div>
-          <div className=\"nav-tagline\" data-testid=\"nav-tagline\">Datadog for AI agents</div>
+      <div className="top-nav" data-testid="top-nav">
+        <div className="nav-logo-container">
+          <div className="nav-logo" data-testid="nav-logo">AgentDog</div>
+          <div className="nav-tagline" data-testid="nav-tagline">Datadog for AI agents</div>
         </div>
-        <div className=\"nav-actions\">
+        <div className="nav-actions">
           <Button
             variant=\"ghost\"
             onClick={() => setShowSettings(true)}
-            className=\"nav-button\"
-            data-testid=\"settings-btn\"
+            className="nav-button"
+            data-testid="settings-btn"
           >
-            <Settings className=\"w-4 h-4\" />
+            <Settings className="w-4 h-4" />
           </Button>
           <Button
             variant=\"ghost\"
             onClick={handleGenerateSummary}
             disabled={!selectedRun || loading}
-            className=\"nav-button\"
-            data-testid=\"generate-summary-btn\"
+            className="nav-button"
+            data-testid="generate-summary-btn"
           >
-            <Sparkles className=\"w-4 h-4 mr-2\" />
+            <Sparkles className="w-4 h-4 mr-2" />
             Generate AI Summary
           </Button>
           <Button
             onClick={handleIngestSample}
-            className=\"nav-button-primary\"
-            data-testid=\"ingest-sample-btn\"
+            className="nav-button-primary"
+            data-testid="ingest-sample-btn"
           >
             Ingest Sample Run
           </Button>
@@ -378,23 +378,23 @@ function App() {
 
       {/* Settings Modal */}
       <Dialog open={showSettings} onOpenChange={setShowSettings}>
-        <DialogContent className=\"settings-modal\">
+        <DialogContent className="settings-modal">
           <DialogHeader>
             <DialogTitle>Agent Ingestion Settings</DialogTitle>
           </DialogHeader>
-          <div className=\"settings-content\">
+          <div className="settings-content">
             <Label htmlFor=\"ingestion-url\">Ingestion URL</Label>
             <Input
               id=\"ingestion-url\"
               value={ingestionUrl}
               onChange={(e) => setIngestionUrl(e.target.value)}
               placeholder=\"/api/agentdog/event\"
-              data-testid=\"ingestion-url-input\"
+              data-testid="ingestion-url-input"
             />
-            <p className=\"settings-hint\">
+            <p className="settings-hint">
               Point your multi-agent system to: <code>{BACKEND_URL}{ingestionUrl}</code>
             </p>
-            <Button onClick={() => setShowSettings(false)} className=\"mt-4\" data-testid=\"settings-save-btn\">
+            <Button onClick={() => setShowSettings(false)} className="mt-4" data-testid="settings-save-btn">
               Save
             </Button>
           </div>
@@ -402,59 +402,59 @@ function App() {
       </Dialog>
 
       {/* Main Layout */}
-      <div className=\"main-layout\">
+      <div className="main-layout">
         {/* Left Sidebar */}
-        <div className=\"sidebar\" data-testid=\"runs-sidebar\">
-          <Tabs value={currentView} onValueChange={setCurrentView} className=\"sidebar-tabs\">
-            <TabsList className=\"tabs-list\">
-              <TabsTrigger value=\"runs\" data-testid=\"tab-runs\">Runs</TabsTrigger>
-              <TabsTrigger value=\"overview\" data-testid=\"tab-overview\">Overview</TabsTrigger>
+        <div className="sidebar" data-testid="runs-sidebar">
+          <Tabs value={currentView} onValueChange={setCurrentView} className="sidebar-tabs">
+            <TabsList className="tabs-list">
+              <TabsTrigger value=\"runs\" data-testid="tab-runs">Runs</TabsTrigger>
+              <TabsTrigger value=\"overview\" data-testid="tab-overview">Overview</TabsTrigger>
             </TabsList>
           </Tabs>
 
           {currentView === 'runs' && (
             <>
-              <div className=\"sidebar-search\">
-                <Search className=\"search-icon\" />
+              <div className="sidebar-search">
+                <Search className="search-icon" />
                 <input
                   type=\"text\"
                   placeholder=\"Search runs...\"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className=\"search-input\"
-                  data-testid=\"search-runs-input\"
+                  className="search-input"
+                  data-testid="search-runs-input"
                 />
               </div>
 
-              <div className=\"filter-pills\">
+              <div className="filter-pills">
                 <button
                   className={`filter-pill ${filterTime === 'today' ? 'active' : ''}`}
                   onClick={() => setFilterTime('today')}
-                  data-testid=\"filter-today\"
+                  data-testid="filter-today"
                 >
                   Today
                 </button>
                 <button
                   className={`filter-pill ${filterTime === '24h' ? 'active' : ''}`}
                   onClick={() => setFilterTime('24h')}
-                  data-testid=\"filter-24h\"
+                  data-testid="filter-24h"
                 >
                   24h
                 </button>
                 <button
                   className={`filter-pill ${filterTime === 'all' ? 'active' : ''}`}
                   onClick={() => setFilterTime('all')}
-                  data-testid=\"filter-all\"
+                  data-testid="filter-all"
                 >
                   All
                 </button>
               </div>
 
-              <ScrollArea className=\"runs-list\">
+              <ScrollArea className="runs-list">
                 {filteredRuns.length === 0 ? (
-                  <div className=\"empty-state\" data-testid=\"empty-state\">
+                  <div className="empty-state" data-testid="empty-state">
                     <p>No runs yet</p>
-                    <p className=\"empty-subtitle\">Ingest sample run to get started</p>
+                    <p className="empty-subtitle">Ingest sample run to get started</p>
                   </div>
                 ) : (
                   filteredRuns.map((run) => (
@@ -464,11 +464,11 @@ function App() {
                       onClick={() => handleRunClick(run)}
                       data-testid={`run-item-${run.run_id}`}
                     >
-                      <div className=\"run-item-header\">
+                      <div className="run-item-header">
                         <div className={`status-dot ${getStatusDot(run.status)}`} data-testid={`status-dot-${run.status}`}></div>
-                        <div className=\"run-item-title\" data-testid=\"run-item-title\">{run.run_id}</div>
+                        <div className="run-item-title" data-testid="run-item-title">{run.run_id}</div>
                       </div>
-                      <div className=\"run-item-meta\" data-testid=\"run-item-meta\">
+                      <div className="run-item-meta" data-testid="run-item-meta">
                         {run.total_steps} steps • {run.failed_steps > 0 ? `${run.failed_steps} error` : 'no errors'}
                       </div>
                     </div>
@@ -480,30 +480,30 @@ function App() {
         </div>
 
         {/* Main Panel */}
-        <div className=\"main-panel\" data-testid=\"main-panel\">
+        <div className="main-panel" data-testid="main-panel">
           {currentView === 'overview' ? (
             <OverviewTab />
           ) : !selectedRun ? (
-            <div className=\"empty-main\" data-testid=\"empty-main\">
+            <div className="empty-main" data-testid="empty-main">
               <p>Select a run to view details</p>
             </div>
           ) : (
-            <div className=\"run-detail\" data-testid=\"run-detail\">
+            <div className="run-detail" data-testid="run-detail">
               {/* Run Header */}
-              <div className=\"run-header-block\">
-                <div className=\"run-header\" data-testid=\"run-header\">
+              <div className="run-header-block">
+                <div className="run-header" data-testid="run-header">
                   <div>
-                    <h2 className=\"run-title\" data-testid=\"run-title\">Run: {selectedRun.run_id}</h2>
+                    <h2 className="run-title" data-testid="run-title">Run: {selectedRun.run_id}</h2>
                   </div>
                   <Badge
                     variant={selectedRun.status === 'success' ? 'success' : selectedRun.status === 'error' ? 'destructive' : 'secondary'}
-                    className=\"status-badge\"
-                    data-testid=\"run-status-badge\"
+                    className="status-badge"
+                    data-testid="run-status-badge"
                   >
                     {selectedRun.status.toUpperCase()}
                   </Badge>
                 </div>
-                <p className=\"run-subtitle\" data-testid=\"run-subtitle\">
+                <p className="run-subtitle" data-testid="run-subtitle">
                   Started {new Date(selectedRun.created_at).toLocaleString()} • {selectedRun.total_steps} agents • 
                   {selectedRun.failed_steps > 0 ? ` ${selectedRun.failed_steps} failed • ` : ' '}
                   ${selectedRun.cost.toFixed(3)}
@@ -511,34 +511,34 @@ function App() {
               </div>
 
               {/* Metrics Row */}
-              <div className=\"metrics-row\" data-testid=\"metrics-row\">
-                <div className=\"metric-card\" data-testid=\"metric-steps\">
-                  <div className=\"metric-label\">STEPS</div>
-                  <div className=\"metric-value\">{selectedRun.total_steps}</div>
+              <div className="metrics-row" data-testid="metrics-row">
+                <div className="metric-card" data-testid="metric-steps">
+                  <div className="metric-label">STEPS</div>
+                  <div className="metric-value">{selectedRun.total_steps}</div>
                 </div>
-                <div className=\"metric-card\" data-testid=\"metric-succeeded\">
-                  <div className=\"metric-label\">SUCCEEDED</div>
-                  <div className=\"metric-value\">{selectedRun.success_steps}</div>
+                <div className="metric-card" data-testid="metric-succeeded">
+                  <div className="metric-label">SUCCEEDED</div>
+                  <div className="metric-value">{selectedRun.success_steps}</div>
                 </div>
-                <div className=\"metric-card\" data-testid=\"metric-failed\">
-                  <div className=\"metric-label\">FAILED</div>
-                  <div className=\"metric-value\">{selectedRun.failed_steps}</div>
+                <div className="metric-card" data-testid="metric-failed">
+                  <div className="metric-label">FAILED</div>
+                  <div className="metric-value">{selectedRun.failed_steps}</div>
                 </div>
-                <div className=\"metric-card\" data-testid=\"metric-duration\">
-                  <div className=\"metric-label\">DURATION</div>
-                  <div className=\"metric-value\">{(selectedRun.duration_ms / 1000).toFixed(2)}s</div>
+                <div className="metric-card" data-testid="metric-duration">
+                  <div className="metric-label">DURATION</div>
+                  <div className="metric-value">{(selectedRun.duration_ms / 1000).toFixed(2)}s</div>
                 </div>
-                <div className=\"metric-card\" data-testid=\"metric-cost\">
-                  <div className=\"metric-label\">COST</div>
-                  <div className=\"metric-value\">${selectedRun.cost.toFixed(3)}</div>
+                <div className="metric-card" data-testid="metric-cost">
+                  <div className="metric-label">COST</div>
+                  <div className="metric-value">${selectedRun.cost.toFixed(3)}</div>
                 </div>
-                <div className=\"metric-card\" data-testid=\"metric-integrity\">
-                  <div className=\"metric-label\">INTEGRITY</div>
-                  <div className=\"metric-value integrity-score\">
+                <div className="metric-card" data-testid="metric-integrity">
+                  <div className="metric-label">INTEGRITY</div>
+                  <div className="metric-value integrity-score">
                     {selectedRun.integrity_score.toFixed(2)}
                     <Badge 
                       variant={getIntegrityBadge(selectedRun.integrity_score).variant}
-                      className=\"integrity-badge\"
+                      className="integrity-badge"
                     >
                       {getIntegrityBadge(selectedRun.integrity_score).text}
                     </Badge>
@@ -547,18 +547,18 @@ function App() {
               </div>
 
               {/* Agent Flow Tree */}
-              <div className=\"agent-flow\" data-testid=\"agent-flow\">
-                <h3 className=\"section-title\">AGENT FLOW</h3>
-                <div className=\"flow-tree\">
+              <div className="agent-flow" data-testid="agent-flow">
+                <h3 className="section-title">AGENT FLOW</h3>
+                <div className="flow-tree">
                   {runSteps.length > 0 ? renderTree(buildTree(runSteps)) : <p>No steps yet</p>}
                 </div>
               </div>
 
               {/* AI Summary */}
               {summary && (
-                <div className=\"summary-section\" data-testid=\"summary-section\">
-                  <h3 className=\"section-title\">AI SUMMARY (CLAUDE SONNET 4)</h3>
-                  <div className=\"summary-content\" data-testid=\"summary-content\">
+                <div className="summary-section" data-testid="summary-section">
+                  <h3 className="section-title">AI SUMMARY (CLAUDE SONNET 4)</h3>
+                  <div className="summary-content" data-testid="summary-content">
                     {summary}
                   </div>
                 </div>
@@ -569,44 +569,44 @@ function App() {
 
         {/* Right Drawer */}
         {selectedStep && currentView === 'runs' && (
-          <div className=\"right-drawer\" data-testid=\"right-drawer\">
-            <div className=\"drawer-header\" data-testid=\"drawer-header\">
+          <div className="right-drawer" data-testid="right-drawer">
+            <div className="drawer-header" data-testid="drawer-header">
               <div>
-                <h3 className=\"drawer-title\" data-testid=\"drawer-title\">{selectedStep.agent_name}</h3>
-                <p className=\"drawer-subtitle\" data-testid=\"drawer-subtitle\">
+                <h3 className="drawer-title" data-testid="drawer-title">{selectedStep.agent_name}</h3>
+                <p className="drawer-subtitle" data-testid="drawer-subtitle">
                   Step ID: {selectedStep.id.substring(0, 8)}
                 </p>
               </div>
               <Badge
                 variant={selectedStep.status === 'success' ? 'success' : selectedStep.status === 'error' ? 'destructive' : 'secondary'}
-                data-testid=\"drawer-status-badge\"
+                data-testid="drawer-status-badge"
               >
                 {selectedStep.status}
               </Badge>
             </div>
 
-            <div className=\"drawer-content\">
-              <div className=\"drawer-section\">
-                <div className=\"drawer-section-label\" data-testid=\"prompt-label\">PROMPT</div>
-                <div className=\"code-block\" data-testid=\"prompt-content\">
+            <div className="drawer-content">
+              <div className="drawer-section">
+                <div className="drawer-section-label" data-testid="prompt-label">PROMPT</div>
+                <div className="code-block" data-testid="prompt-content">
                   {selectedStep.prompt}
                 </div>
               </div>
 
-              <div className=\"drawer-section\">
-                <div className=\"drawer-section-label\" data-testid=\"output-label\">OUTPUT</div>
-                <div className=\"code-block\" data-testid=\"output-content\">
+              <div className="drawer-section">
+                <div className="drawer-section-label" data-testid="output-label">OUTPUT</div>
+                <div className="code-block" data-testid="output-content">
                   {selectedStep.output}
                 </div>
               </div>
 
               {selectedStep.hallucination_flags && selectedStep.hallucination_flags.length > 0 && (
-                <div className=\"drawer-section\">
-                  <div className=\"drawer-section-label\">HALLUCINATION FLAGS</div>
-                  <div className=\"hallucination-flags\">
+                <div className="drawer-section">
+                  <div className="drawer-section-label">HALLUCINATION FLAGS</div>
+                  <div className="hallucination-flags">
                     {selectedStep.hallucination_flags.map((flag, i) => (
-                      <Badge key={i} variant=\"destructive\" className=\"hallucination-badge\">
-                        <AlertTriangle className=\"w-3 h-3 mr-1\" />
+                      <Badge key={i} variant=\"destructive\" className="hallucination-badge">
+                        <AlertTriangle className="w-3 h-3 mr-1" />
                         {flag}
                       </Badge>
                     ))}
@@ -614,24 +614,24 @@ function App() {
                 </div>
               )}
 
-              <div className=\"drawer-section\">
-                <div className=\"drawer-section-label\" data-testid=\"diagnostics-label\">DIAGNOSTICS</div>
-                <div className=\"diagnostics-grid\">
-                  <div className=\"diagnostic-item\">
-                    <div className=\"diagnostic-label\">Tokens</div>
-                    <div className=\"diagnostic-value\" data-testid=\"diagnostic-tokens\">{selectedStep.tokens}</div>
+              <div className="drawer-section">
+                <div className="drawer-section-label" data-testid="diagnostics-label">DIAGNOSTICS</div>
+                <div className="diagnostics-grid">
+                  <div className="diagnostic-item">
+                    <div className="diagnostic-label">Tokens</div>
+                    <div className="diagnostic-value" data-testid="diagnostic-tokens">{selectedStep.tokens}</div>
                   </div>
-                  <div className=\"diagnostic-item\">
-                    <div className=\"diagnostic-label\">Cost</div>
-                    <div className=\"diagnostic-value\" data-testid=\"diagnostic-cost\">${selectedStep.cost.toFixed(3)}</div>
+                  <div className="diagnostic-item">
+                    <div className="diagnostic-label">Cost</div>
+                    <div className="diagnostic-value" data-testid="diagnostic-cost">${selectedStep.cost.toFixed(3)}</div>
                   </div>
-                  <div className=\"diagnostic-item\">
-                    <div className=\"diagnostic-label\">Latency</div>
-                    <div className=\"diagnostic-value\" data-testid=\"diagnostic-latency\">{selectedStep.latency_ms}ms</div>
+                  <div className="diagnostic-item">
+                    <div className="diagnostic-label">Latency</div>
+                    <div className="diagnostic-value" data-testid="diagnostic-latency">{selectedStep.latency_ms}ms</div>
                   </div>
-                  <div className=\"diagnostic-item\">
-                    <div className=\"diagnostic-label\">Step ID</div>
-                    <div className=\"diagnostic-value\" data-testid=\"diagnostic-stepid\">{selectedStep.id.substring(0, 12)}...</div>
+                  <div className="diagnostic-item">
+                    <div className="diagnostic-label">Step ID</div>
+                    <div className="diagnostic-value" data-testid="diagnostic-stepid">{selectedStep.id.substring(0, 12)}...</div>
                   </div>
                 </div>
               </div>
