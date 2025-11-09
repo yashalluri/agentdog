@@ -133,11 +133,14 @@ const TraceTimeline = ({ runId, api }) => {
     const isExpanded = expandedSpans.has(span.span_id);
     const hasChildren = span.children && span.children.length > 0;
     const isSelected = selectedSpan?.span_id === span.span_id;
+    const failures = coordinationFailures.get(span.span_id) || [];
+    const hasFailures = failures.length > 0;
+    const criticalFailures = failures.filter(f => f.severity === 'high').length;
 
     return (
       <div key={span.span_id} className="trace-span-container">
         <div
-          className={`trace-span ${isSelected ? 'selected' : ''}`}
+          className={`trace-span ${isSelected ? 'selected' : ''} ${hasFailures ? 'has-failures' : ''}`}
           style={{ paddingLeft: `${depth * 20 + 8}px` }}
           onClick={() => handleSpanClick(span)}
         >
