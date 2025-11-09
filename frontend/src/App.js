@@ -42,8 +42,8 @@ function App() {
   const availableAgents = [
     { id: 'debate', name: 'Debate Agent (Multi-Agent)' },
     { id: 'social_media', name: 'Social Media Creator (7 Agents)' },
-    { id: 'test_buggy', name: '🧪 Test: Buggy Single Agent', description: 'Single agent with 7 intentional bugs' },
-    { id: 'test_faulty', name: '🧪 Test: Faulty Multi-Agent', description: '3 agents with 8 coordination failures' }
+    { id: 'test_buggy', name: 'Test: Buggy Single Agent', description: 'Single agent with 7 intentional bugs' },
+    { id: 'test_faulty', name: 'Test: Faulty Multi-Agent', description: '3 agents with 8 coordination failures' }
   ];
 
   // Fetch runs on mount and setup WebSocket
