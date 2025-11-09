@@ -655,8 +655,9 @@ async def run_multiagent_demo():
         except Exception as e:
             logging.error(f"❌ Demo workflow {run_id} failed: {e}")
     
-    # Start the workflow as a background task
-    asyncio.create_task(run_demo_workflow())
+    # Start the workflow in a background thread
+    thread = threading.Thread(target=run_demo_workflow, daemon=True)
+    thread.start()
     
     return {
         "message": "Multi-agent demo started", 
