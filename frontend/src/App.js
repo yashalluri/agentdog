@@ -443,20 +443,7 @@ function App() {
           {/* Left Panel - Chat */}
           <div className="chat-panel-split" style={{ width: `${chatPanelWidth}%` }}>
             <div className="chat-panel-header">
-              <div className="chat-header-content">
-                <h3 className="chat-panel-title">💬 Agent Chat</h3>
-                <select 
-                  className="agent-selector"
-                  value={selectedAgent}
-                  onChange={(e) => setSelectedAgent(e.target.value)}
-                >
-                  {availableAgents.map(agent => (
-                    <option key={agent.id} value={agent.id}>
-                      {agent.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <h3 className="chat-panel-title">💬 Agent Chat</h3>
               <span className="panel-size-hint">{Math.round(chatPanelWidth)}%</span>
             </div>
             
@@ -476,22 +463,39 @@ function App() {
               ))}
             </div>
             
-            <div className="chat-input-area">
-              <input
-                type="text"
-                className="chat-input"
-                placeholder="Type your message..."
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              />
-              <button 
-                className="chat-send-btn"
-                onClick={handleSendMessage}
-                disabled={!chatInput.trim()}
-              >
-                ↑
-              </button>
+            <div className="chat-input-container-new">
+              <div className="chat-input-wrapper">
+                <select 
+                  className="agent-selector-inline"
+                  value={selectedAgent}
+                  onChange={(e) => setSelectedAgent(e.target.value)}
+                  title="Select Agent"
+                >
+                  {availableAgents.map(agent => (
+                    <option key={agent.id} value={agent.id}>
+                      {agent.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="input-divider"></div>
+                <input
+                  type="text"
+                  className="chat-input-new"
+                  placeholder="Type your message..."
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                />
+                <button 
+                  className="chat-send-btn-new"
+                  onClick={handleSendMessage}
+                  disabled={!chatInput.trim()}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
           
