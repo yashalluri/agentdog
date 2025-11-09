@@ -87,10 +87,28 @@ body {
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .nav-button-primary:hover {
   background: #1D4ED8;
+}
+
+.nav-button-secondary {
+  background: #6B7280;
+  color: white;
+  border: none;
+  font-size: 14px;
+  padding: 6px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.nav-button-secondary:hover {
+  background: #4B5563;
 }
 
 /* Main Layout */
