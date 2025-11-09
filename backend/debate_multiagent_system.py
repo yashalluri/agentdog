@@ -544,7 +544,8 @@ class DebateMultiAgentSystem:
         
         return {
             "response": formatted_response,
-            "citations": citations
+            "citations": citations,
+            "trace": self.tracer.get_trace()
         }
     
     def _format_with_citations(self, response: str, citations: List[Dict]) -> str:
