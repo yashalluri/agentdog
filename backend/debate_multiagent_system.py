@@ -507,6 +507,10 @@ class DebateMultiAgentSystem:
         
         await asyncio.sleep(0.5)  # Brief pause
         
+        # Complete root span
+        root_span.output_data = debate_response[:1000]
+        self.tracer.end_span(root_span.span_id, SpanStatus.SUCCESS)
+        
         print(f"\n{'='*60}")
         print("Debate Complete!")
         print(f"{'='*60}\n")
