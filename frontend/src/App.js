@@ -76,6 +76,8 @@ function App() {
 
   const handleStepClick = (step) => {
     setSelectedStep(step);
+    setShowFullPrompt(false);
+    setShowFullOutput(false);
     fetchStepDetail(step.id);
   };
 
