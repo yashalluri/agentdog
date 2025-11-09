@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '@/App.css';
 import axios from 'axios';
-import { Search, Play, Sparkles } from 'lucide-react';
+import { Search, Play, Sparkles, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
