@@ -380,8 +380,8 @@ class CoordinationFailureDetector:
         """Detect violations of coordination contracts"""
         violations = []
         
-        # Define coordination contracts
-        contracts = {
+        # Define coordination contracts per workflow type
+        social_media_contracts = {
             "content_strategist": {
                 "must_run_first": True,
                 "required_output_fields": ["strategy", "target_audience", "tone"],
@@ -397,6 +397,31 @@ class CoordinationFailureDetector:
                 "max_duration_ms": 15000
             }
         }
+        
+        test_faulty_contracts = {
+            "analyzer": {
+                "must_run_first": True,  # Should run first but doesn't
+                "must_have_parent": "faulty_analysis_workflow",
+                "max_duration_ms": 5000
+            },
+            "data_collector": {
+                "must_have_parent": "faulty_analysis_workflow",
+                "max_duration_ms": 10000
+            },
+            "reporter": {
+                "must_have_parent": "faulty_analysis_workflow",
+                "must_run_after": ["analyzer", "data_collector"],
+                "max_duration_ms": 3000
+            }
+        }
+        
+        # Select contracts based on workflow type
+        if self.workflow_type == "social_media":
+            contracts = social_media_contracts
+        elif self.workflow_type == "test_faulty_multiagent":
+            contracts = test_faulty_contracts
+        else:
+            contracts = {}
         
         # Check Contract 1: Content Strategist runs first
         strategist_span = next((s for s in self.all_spans if s.get("name") == "content_strategist"), None)
