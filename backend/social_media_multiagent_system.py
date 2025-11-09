@@ -656,7 +656,7 @@ class SocialMediaMultiAgentSystem:
         hashtag_result = await self.hashtag_generator.generate_hashtags(
             user_topic,
             platform_results,
-            strategist_id
+            root_span.span_id
         )
         
         # Step 4: Engagement Optimization
@@ -668,7 +668,7 @@ class SocialMediaMultiAgentSystem:
         optimization_result = await self.engagement_optimizer.optimize(
             user_topic,
             {"platforms": platform_results, "hashtags": hashtag_result},
-            strategist_id
+            root_span.span_id
         )
         
         # Compile final response
