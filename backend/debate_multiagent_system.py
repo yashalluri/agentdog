@@ -298,11 +298,28 @@ class DebateMultiAgentSystem:
         print(f"User Position: {user_position}")
         print(f"{'='*60}\n")
         
+        # Update progress: Searching the web
+        if self.progress_callback:
+            await self.progress_callback("🔍 Searching the web...")
+        
         # Step 1: Research Agent searches for counter-arguments
         research_results = await self.research_agent.research_topic(user_position)
         
         if not research_results['success']:
-            return "I apologize, but I couldn't complete the research needed for this debate."
+            return {
+                "response": "I apologize, but I couldn't complete the research needed for this debate.",
+                "citations": []
+            }
+        
+        # Update progress: Analyzing findings
+        if self.progress_callback:
+            await self.progress_callback("📊 Analyzing findings...")
+        
+        await asyncio.sleep(1)  # Brief pause for UI feedback
+        
+        # Update progress: Making points
+        if self.progress_callback:
+            await self.progress_callback("💡 Making points...")
         
         # Step 2: Debate Agent constructs argument using research
         debate_response = await self.debate_agent.construct_argument(
@@ -311,11 +328,47 @@ class DebateMultiAgentSystem:
             parent_step_id=research_results['agent_id']
         )
         
+        # Update progress: Final argument draft
+        if self.progress_callback:
+            await self.progress_callback("✍️ Final argument draft...")
+        
+        await asyncio.sleep(0.5)  # Brief pause
+        
         print(f"\n{'='*60}")
         print("Debate Complete!")
         print(f"{'='*60}\n")
         
-        return debate_response
+        # Extract citations from research results
+        citations = []
+        citation_id = 1
+        for result in research_results.get('results', []):
+            for citation_url in result.get('citations', []):
+                citations.append({
+                    "id": citation_id,
+                    "url": citation_url,
+                    "title": f"Source {citation_id}"
+                })
+                citation_id += 1
+        
+        # Format response with citations
+        formatted_response = self._format_with_citations(debate_response, citations)
+        
+        return {
+            "response": formatted_response,
+            "citations": citations
+        }
+    
+    def _format_with_citations(self, response: str, citations: List[Dict]) -> str:
+        """Format the response with inline citations and sources section"""
+        if not citations:
+            return response
+        
+        # Add sources section
+        sources_section = "\n\n---\n\n**Sources:**\n"
+        for citation in citations[:10]:  # Limit to first 10 sources
+            sources_section += f"\n[{citation['id']}] {citation['url']}"
+        
+        return response + sources_section
 
 
 async def main():
