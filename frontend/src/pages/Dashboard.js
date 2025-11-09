@@ -282,7 +282,15 @@ function Dashboard() {
           <div className="flow-item-left">
             <div className={`status-dot ${getStatusDot(node.status)}`}></div>
             <div>
-              <div className="flow-item-name">{node.agent_name}</div>
+              <div className="flow-item-name">
+                {node.agent_name}
+                {node.hallucination_flags && node.hallucination_flags.length > 0 && (
+                  <Badge variant="destructive" className="ml-2" style={{ fontSize: '10px', padding: '2px 6px' }}>
+                    <AlertTriangle className="w-3 h-3 mr-1" />
+                    Integrity Issue
+                  </Badge>
+                )}
+              </div>
               {node.status === 'error' && node.error_message && (
                 <div className="error-text">{node.error_message}</div>
               )}
