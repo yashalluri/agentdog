@@ -75,6 +75,10 @@ class CoordinationFailureDetector:
             "summary": {}
         }
         
+        # Determine workflow type and valid models
+        self.workflow_type = self._detect_workflow_type()
+        self.valid_models = self._get_valid_models_for_workflow()
+        
         # Flatten trace for easier analysis
         self._flatten_spans(self.trace.get("trace"))
         
