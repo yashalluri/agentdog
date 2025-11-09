@@ -174,7 +174,8 @@ Create engaging, platform-optimized content that follows these specs exactly."""
         try:
             chat = LlmChat(
                 api_key=self.llm_key,
-                session_id=f"{self.run_id}-{agent_name}"
+                session_id=f"{self.run_id}-{agent_name}",
+                system_message=f"You are an expert {self.platform} content writer."
             ).with_model("anthropic", "claude-4-sonnet-20250514")
             
             user_msg = UserMessage(text=prompt)
