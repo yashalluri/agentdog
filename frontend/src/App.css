@@ -418,7 +418,7 @@ body {
 }
 
 .drawer-header {
-  padding: 20px;
+  padding: 20px 24px;
   border-bottom: 1px solid #E5E7EB;
   display: flex;
   justify-content: space-between;
@@ -426,15 +426,15 @@ body {
 }
 
 .drawer-title {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   color: #0F172A;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .drawer-subtitle {
-  font-size: 12px;
-  color: #6B7280;
+  font-size: 11px;
+  color: #9CA3AF;
 }
 
 .drawer-content {
