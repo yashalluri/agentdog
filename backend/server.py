@@ -586,68 +586,73 @@ async def run_multiagent_demo():
         try:
             # AGENT 1: Query Generator
             start = time.time()
-            time.sleep(0.5)
+            await asyncio.sleep(0.5)
             q_id = agentdog.emit_event(
                 run_id=run_id, agent_name="query_generator", status="success",
                 prompt="Generate search queries for: AI multi-agent systems",
-                output="Generated 3 queries", tokens=180, cost_usd=0.002,
+                output="Generated 3 queries: 1) Latest AI frameworks, 2) Coordination patterns, 3) Agent protocols", 
+                tokens=180, cost_usd=0.002,
                 latency_ms=int((time.time() - start) * 1000)
             )
             
             # AGENT 2: Web Searcher 1
             start = time.time()
-            time.sleep(0.7)
+            await asyncio.sleep(0.7)
             s1_id = agentdog.emit_event(
                 run_id=run_id, agent_name="web_searcher_1", status="success",
                 prompt="Search: Latest AI agent frameworks",
-                output="Found: LangChain, AutoGen, CrewAI", tokens=220, cost_usd=0.003,
+                output="Found: LangChain (70k stars), AutoGen, CrewAI are popular frameworks", 
+                tokens=220, cost_usd=0.003,
                 latency_ms=int((time.time() - start) * 1000), parent_step_id=q_id
             )
             
             # AGENT 3: Web Searcher 2  
             start = time.time()
-            time.sleep(0.6)
+            await asyncio.sleep(0.6)
             s2_id = agentdog.emit_event(
                 run_id=run_id, agent_name="web_searcher_2", status="success",
-                prompt="Search: Multi-agent coordination",
-                output="Found: Hierarchical, peer-to-peer patterns", tokens=190, cost_usd=0.0025,
+                prompt="Search: Multi-agent coordination patterns",
+                output="Found: Hierarchical, peer-to-peer, and blackboard architectures", 
+                tokens=190, cost_usd=0.0025,
                 latency_ms=int((time.time() - start) * 1000), parent_step_id=q_id
             )
             
-            # AGENT 4: Web Searcher 3 (FAILS)
+            # AGENT 4: Web Searcher 3 (FAILS - Coordination Error)
             start = time.time()
-            time.sleep(0.4)
+            await asyncio.sleep(0.4)
             s3_id = agentdog.emit_event(
                 run_id=run_id, agent_name="web_searcher_3", status="error",
-                prompt="Search: Agent protocols",
-                error_message="KeyError: 'search_results' - parent output missing field",
+                prompt="Search: Agent communication protocols",
+                error_message="KeyError: 'search_results' - parent output missing expected field",
                 tokens=50, cost_usd=0.001,
                 latency_ms=int((time.time() - start) * 1000), parent_step_id=q_id
             )
             
             # AGENT 5: Content Analyzer
             start = time.time()
-            time.sleep(0.9)
+            await asyncio.sleep(0.9)
             a_id = agentdog.emit_event(
                 run_id=run_id, agent_name="content_analyzer", status="success",
-                prompt="Analyze search results",
-                output="Identified 5 themes, 12 concepts", tokens=380, cost_usd=0.004,
+                prompt="Analyze search results from web searchers",
+                output="Analysis complete: Identified 5 key themes, 12 concepts, 3 emerging trends", 
+                tokens=380, cost_usd=0.004,
                 latency_ms=int((time.time() - start) * 1000), parent_step_id=s2_id
             )
             
             # AGENT 6: Report Writer
             start = time.time()
-            time.sleep(1.2)
+            await asyncio.sleep(1.2)
             agentdog.emit_event(
                 run_id=run_id, agent_name="report_writer", status="success",
-                prompt="Write final report",
-                output="Research report: AI systems evolving rapidly", tokens=520, cost_usd=0.005,
+                prompt="Write final research report on AI multi-agent systems",
+                output="Research Report: AI multi-agent systems are rapidly evolving. Frameworks like LangChain enable complex coordination. Future trends include sophisticated protocols.", 
+                tokens=520, cost_usd=0.005,
                 latency_ms=int((time.time() - start) * 1000), parent_step_id=a_id
             )
             
-            logging.info(f"Demo workflow {run_id} completed successfully")
+            logging.info(f"✅ Demo workflow {run_id} completed - 6 agents, 1 failure")
         except Exception as e:
-            logging.error(f"Demo workflow failed: {e}")
+            logging.error(f"❌ Demo workflow {run_id} failed: {e}")
     
     # Start the workflow as a background task
     asyncio.create_task(run_demo_workflow())
