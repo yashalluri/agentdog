@@ -30,7 +30,7 @@ function App() {
   const [chatInput, setChatInput] = useState('');
   const [chatPanelWidth, setChatPanelWidth] = useState(40); // percentage
   const [isResizing, setIsResizing] = useState(false);
-  const [selectedAgent, setSelectedAgent] = useState('default');
+  const [selectedAgent, setSelectedAgent] = useState('debate');
   const [currentRunId, setCurrentRunId] = useState(null); // Track active chat run
   const [isSendingMessage, setIsSendingMessage] = useState(false);
   
