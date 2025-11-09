@@ -116,6 +116,8 @@ function App() {
 
   const handleRunClick = (run) => {
     setSelectedRun(run);
+    setLiveExecution(null); // Clear live execution view
+    setExecutionLog([]); // Clear execution log
     setSummary(null);
     fetchRunDetails(run.id);
     // Close sidebar on mobile after selection
