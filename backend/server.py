@@ -370,9 +370,6 @@ async def replay_step(step_id: str):
     
     return {"message": "Replay initiated", "step_id": step_id}
 
-class SummaryResponse(BaseModel):
-    summary: str
-
 @api_router.post("/summary/{run_id}", response_model=SummaryResponse)
 async def generate_summary(run_id: str):
     """Generate AI summary for a run using Anthropic Claude Sonnet 4"""
