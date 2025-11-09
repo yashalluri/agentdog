@@ -423,61 +423,66 @@ class CoordinationFailureDetector:
         else:
             contracts = {}
         
-        # Check Contract 1: Content Strategist runs first
-        strategist_span = next((s for s in self.all_spans if s.get("name") == "content_strategist"), None)
-        if strategist_span:
-            # Find all agent spans (exclude LLM calls)
-            agent_spans = [s for s in self.all_spans if s.get("span_type") == "agent"]
-            if agent_spans:
+        # Check contracts dynamically
+        agent_spans = [s for s in self.all_spans if s.get("span_type") == "agent"]
+        
+        for agent_name, contract in contracts.items():
+            agent_span = next((s for s in self.all_spans if s.get("name") == agent_name), None)
+            
+            if not agent_span:
+                continue
+            
+            # Check 1: must_run_first
+            if contract.get("must_run_first") and agent_spans:
                 first_agent = min(agent_spans, key=lambda s: s.get("start_time", ""))
-                if first_agent.get("name") != "content_strategist":
+                if first_agent.get("name") != agent_name:
                     violations.append({
                         "type": "contract_violation",
                         "subtype": "execution_order",
                         "severity": "high",
-                        "span_id": strategist_span.get("span_id"),
-                        "span_name": "content_strategist",
-                        "message": "Content Strategist must run first but didn't",
+                        "span_id": agent_span.get("span_id"),
+                        "span_name": agent_name,
+                        "message": f"{agent_name} must run first but {first_agent.get('name')} ran first",
                         "evidence": {
                             "first_agent": first_agent.get("name"),
-                            "contract": "content_strategist.must_run_first"
+                            "expected_first": agent_name,
+                            "contract": f"{agent_name}.must_run_first"
                         }
                     })
-        
-        # Check Contract 2: Platform writers have correct parent
-        for writer_name in contracts["platform_writers"]["agent_names"]:
-            writer_span = next((s for s in self.all_spans if s.get("name") == writer_name), None)
-            if writer_span:
-                parent = writer_span.get("parent_span")
-                if not parent or parent.get("name") != "social_media_workflow":
+            
+            # Check 2: must_have_parent
+            if contract.get("must_have_parent"):
+                parent = agent_span.get("parent_span")
+                expected_parent = contract["must_have_parent"]
+                if not parent or parent.get("name") != expected_parent:
                     violations.append({
                         "type": "contract_violation",
                         "subtype": "wrong_parent",
                         "severity": "high",
-                        "span_id": writer_span.get("span_id"),
-                        "span_name": writer_name,
-                        "message": "Platform writer must be child of social_media_workflow",
+                        "span_id": agent_span.get("span_id"),
+                        "span_name": agent_name,
+                        "message": f"{agent_name} must be child of {expected_parent}",
                         "evidence": {
                             "actual_parent": parent.get("name") if parent else "none",
-                            "expected_parent": "social_media_workflow"
+                            "expected_parent": expected_parent,
+                            "contract": f"{agent_name}.must_have_parent"
                         }
                     })
-        
-        # Check Contract 3: Duration limits
-        for span in self.all_spans:
-            span_name = span.get("name", "")
-            duration = span.get("duration_ms", 0)
             
-            if span_name == "content_strategist" and duration > contracts["content_strategist"]["max_duration_ms"]:
-                violations.append({
-                    "type": "contract_violation",
-                    "subtype": "duration_exceeded",
-                    "severity": "low",
-                    "span_id": span.get("span_id"),
-                    "span_name": span_name,
-                    "message": "Agent exceeded maximum allowed duration",
-                    "evidence": {
-                        "duration_ms": duration,
+            # Check 3: max_duration_ms
+            if contract.get("max_duration_ms"):
+                duration = agent_span.get("duration_ms", 0)
+                max_duration = contract["max_duration_ms"]
+                if duration > max_duration:
+                    violations.append({
+                        "type": "contract_violation",
+                        "subtype": "duration_exceeded",
+                        "severity": "low",
+                        "span_id": agent_span.get("span_id"),
+                        "span_name": agent_name,
+                        "message": f"{agent_name} exceeded maximum allowed duration",
+                        "evidence": {
+                            "duration_ms": duration,
                         "max_allowed_ms": contracts["content_strategist"]["max_duration_ms"]
                     }
                 })
