@@ -578,7 +578,7 @@ body {
 
 /* Settings Modal */
 .settings-modal {
-  max-width: 500px;
+  max-width: 650px;
 }
 
 .settings-content {
@@ -589,6 +589,7 @@ body {
   font-size: 12px;
   color: #6B7280;
   margin-top: 8px;
+  margin-bottom: 16px;
 }
 
 .settings-hint code {
@@ -597,6 +598,37 @@ body {
   border-radius: 4px;
   font-family: 'SF Mono', monospace;
   font-size: 11px;
+}
+
+.usage-examples {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #E5E7EB;
+}
+
+.usage-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0F172A;
+  margin-bottom: 8px;
+  margin-top: 16px;
+}
+
+.usage-title:first-child {
+  margin-top: 0;
+}
+
+.code-example {
+  background: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 12px;
+  font-family: 'SF Mono', 'Courier New', monospace;
+  color: #374151;
+  line-height: 1.5;
+  overflow-x: auto;
+  margin-bottom: 16px;
 }
 
 /* Tabs */
