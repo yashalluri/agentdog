@@ -152,19 +152,13 @@ function App() {
 
   const handleRunMultiAgentDemo = async () => {
     try {
-      toast.info('Starting multi-agent workflow...');
-      await axios.post(`${API}/run-multiagent-demo`);
-      toast.success('Multi-agent demo started! Watch agents execute in real-time.');
+      toast.info('🚀 Starting multi-agent workflow...');
+      const response = await axios.post(`${API}/run-multiagent-demo`);
+      toast.success('✨ Watch agents execute in real-time below!');
       
-      // Poll for new runs to show live updates
-      const pollInterval = setInterval(() => {
-        fetchRuns();
-      }, 1000);
-      
-      // Stop polling after 10 seconds
-      setTimeout(() => {
-        clearInterval(pollInterval);
-      }, 10000);
+      // SSE will handle real-time updates automatically
+      // Just fetch immediately to show the new workflow
+      setTimeout(() => fetchRuns(), 500);
       
     } catch (error) {
       toast.error('Failed to start multi-agent demo');
