@@ -6,19 +6,10 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import { authService } from './utils/auth';
 import '@/App.css';
-import { Search, Play, Sparkles, Settings, TrendingUp, AlertTriangle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Toaster, toast } from 'sonner';
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+// Protected Route wrapper
+function ProtectedRoute({ children }) {
+  return authService.isAuthenticated() ? children : <Navigate to="/login" />;
+}
 
 function App() {
   const [runs, setRuns] = useState([]);
