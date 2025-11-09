@@ -575,3 +575,138 @@ body {
   background: #FEF3C7;
   color: #92400E;
 }
+
+/* Settings Modal */
+.settings-modal {
+  max-width: 500px;
+}
+
+.settings-content {
+  padding: 16px 0;
+}
+
+.settings-hint {
+  font-size: 12px;
+  color: #6B7280;
+  margin-top: 8px;
+}
+
+.settings-hint code {
+  background: #F3F4F6;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', monospace;
+  font-size: 11px;
+}
+
+/* Tabs */
+.sidebar-tabs {
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.tabs-list {
+  display: flex;
+  width: 100%;
+  background: #F9FAFB;
+  padding: 4px;
+}
+
+/* Run Header Block */
+.run-header-block {
+  margin-bottom: 16px;
+}
+
+/* Metrics - Integrity */
+.integrity-score {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+}
+
+.integrity-badge {
+  font-size: 10px;
+  padding: 2px 6px;
+}
+
+/* Hallucination Flags */
+.hallucination-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hallucination-badge {
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  padding: 4px 8px;
+}
+
+/* Error Text */
+.error-text {
+  font-size: 11px;
+  color: #EF4444;
+  margin-top: 2px;
+}
+
+/* Overview Container */
+.overview-container {
+  padding: 24px 32px;
+}
+
+.overview-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #0F172A;
+  margin-bottom: 24px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6B7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 600;
+  color: #0F172A;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.chart-card {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.chart-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0F172A;
+  margin-bottom: 16px;
+}
