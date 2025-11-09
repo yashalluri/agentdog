@@ -1305,44 +1305,69 @@ async def get_run_messages(run_id: str):
 
 @api_router.get("/run/{run_id}/trace")
 async def get_run_trace(run_id: str):
-    """Get detailed trace/spans for a specific run"""
+    """Get detailed trace/spans for a specific run (returns all traces)"""
     workflows_coll = get_workflows_collection()
     
     workflow = await workflows_coll.find_one({"run_id": run_id})
     if not workflow:
         raise HTTPException(status_code=404, detail="Run not found")
     
-    # Get detailed trace if available
-    trace = workflow.get('detailed_trace', None)
+    # Get all traces if available
+    traces = workflow.get('traces', [])
     
-    if not trace:
-        # Fallback: build basic trace from agent_runs
-        agent_runs_coll = get_agent_runs_collection()
-        agents = []
-        async for agent in agent_runs_coll.find({"workflow_id": run_id}).sort("created_at", 1):
-            agents.append({
-                "span_id": str(agent['_id']),
-                "name": agent['agent_name'],
-                "span_type": "agent",
-                "status": agent['status'],
-                "start_time": agent['created_at'],
-                "end_time": agent.get('updated_at'),
-                "duration_ms": agent.get('latency_ms'),
-                "input": agent.get('prompt', '')[:500],
-                "output": agent.get('output', '')[:500],
-                "tokens_total": agent.get('tokens'),
-                "cost_usd": agent.get('cost_usd'),
-                "model": "claude-4-sonnet-20250514",
-                "parent_span_id": agent.get('parent_step_id')
-            })
-        
-        trace = {
+    if traces:
+        # Return all traces with metadata
+        return {
+            "run_id": run_id,
+            "traces": traces,
+            "total_traces": len(traces),
+            "latest_trace": traces[-1] if traces else None
+        }
+    
+    # Fallback to single trace for backward compatibility
+    single_trace = workflow.get('detailed_trace', None)
+    if single_trace:
+        return {
+            "run_id": run_id,
+            "traces": [single_trace],
+            "total_traces": 1,
+            "latest_trace": single_trace
+        }
+    
+    # Final fallback: build basic trace from agent_runs
+    agent_runs_coll = get_agent_runs_collection()
+    agents = []
+    async for agent in agent_runs_coll.find({"workflow_id": run_id}).sort("created_at", 1):
+        agents.append({
+            "span_id": str(agent['_id']),
+            "name": agent['agent_name'],
+            "span_type": "agent",
+            "status": agent['status'],
+            "start_time": agent['created_at'],
+            "end_time": agent.get('updated_at'),
+            "duration_ms": agent.get('latency_ms'),
+            "input": agent.get('prompt', '')[:500],
+            "output": agent.get('output', '')[:500],
+            "tokens_total": agent.get('tokens'),
+            "cost_usd": agent.get('cost_usd'),
+            "model": "claude-4-sonnet-20250514",
+            "parent_span_id": agent.get('parent_step_id')
+        })
+    
+    return {
+        "run_id": run_id,
+        "traces": [{
             "run_id": run_id,
             "spans": agents,
             "total_spans": len(agents)
-        }
-    
-    return trace
+        }],
+        "total_traces": 1 if agents else 0,
+        "latest_trace": {
+            "run_id": run_id,
+            "spans": agents,
+            "total_spans": len(agents)
+        } if agents else None
+    }
 
 @api_router.get("/run/{run_id}/coordination-analysis")
 async def get_coordination_analysis(run_id: str):
