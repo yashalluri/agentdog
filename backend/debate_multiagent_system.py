@@ -303,7 +303,10 @@ Provide a well-reasoned argument that:
             
             print(f"[{agent_name}] ❌ Argument construction failed: {e}")
             
-            return f"I apologize, but I encountered an error constructing my argument: {str(e)}"
+            return {
+                "response": f"I apologize, but I encountered an error constructing my argument: {str(e)}",
+                "agent_id": self.agent_id
+            }
 
 
 class DebateMultiAgentSystem:
