@@ -178,8 +178,11 @@ function App() {
 
       {/* Main Layout */}
       <div className="main-layout">
+        {/* Mobile Overlay */}
+        {sidebarOpen && <div className="mobile-overlay" onClick={() => setSidebarOpen(false)}></div>}
+        
         {/* Left Sidebar - Runs List */}
-        <div className="sidebar" data-testid="runs-sidebar">
+        <div className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`} data-testid="runs-sidebar">
           <div className="sidebar-search">
             <Search className="search-icon" />
             <input
