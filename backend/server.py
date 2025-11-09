@@ -951,6 +951,16 @@ async def chat_with_agent(request: ChatRequest):
                             {"run_id": run_id},
                             {"$set": {"detailed_trace": detailed_trace}}
                         )
+                        
+                        # Auto-analyze coordination after workflow completes
+                        workflow_doc = await workflows_coll.find_one({"run_id": run_id})
+                        if workflow_doc:
+                            analysis_result = analyze_workflow_coordination(workflow_doc)
+                            if analysis_result:
+                                await workflows_coll.update_one(
+                                    {"run_id": run_id},
+                                    {"$set": {"coordination_analysis": analysis_result}}
+                                )
                 else:
                     response_text = str(social_media_result)
                 
