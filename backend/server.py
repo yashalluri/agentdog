@@ -40,59 +40,94 @@ async def shutdown_db_client():
     await close_mongo_connection()
     logging.info("AgentDog backend shutdown - MongoDB disconnected")
 
-# In-memory storage (easily swappable to MongoDB)
-class InMemoryStore:
-    def __init__(self):
-        self.runs: Dict[str, Dict[str, Any]] = {}
-        self.steps: Dict[str, Dict[str, Any]] = {}
-    
-    def add_run(self, run_data: Dict[str, Any]):
-        self.runs[run_data['id']] = run_data
-    
-    def get_run(self, run_id: str) -> Optional[Dict[str, Any]]:
-        return self.runs.get(run_id)
-    
-    def get_all_runs(self) -> List[Dict[str, Any]]:
-        return list(self.runs.values())
-    
-    def add_step(self, step_data: Dict[str, Any]):
-        self.steps[step_data['id']] = step_data
-    
-    def get_step(self, step_id: str) -> Optional[Dict[str, Any]]:
-        return self.steps.get(step_id)
-    
-    def get_steps_by_run(self, run_id: str) -> List[Dict[str, Any]]:
-        return [step for step in self.steps.values() if step['run_id'] == run_id]
-    
-    def update_step(self, step_id: str, updates: Dict[str, Any]):
-        if step_id in self.steps:
-            self.steps[step_id].update(updates)
-
-store = InMemoryStore()
-
-# Models
-class Run(BaseModel):
-    id: str
-    title: str
-    start_time: str
-    status: str  # "running" | "success" | "error"
-    num_steps: int
-    num_success: int
-    num_failed: int
-    duration: float
-    cost: float
-
-class AgentStep(BaseModel):
-    id: str
+# Pydantic Models for API
+class Workflow(BaseModel):
+    """Workflow (Run) model matching MongoDB schema"""
     run_id: str
+    created_at: str
+    updated_at: str
+    final_status: str  # "running" | "success" | "error"
+    initiator: Optional[str] = None
+    summary: Optional[str] = None
+    coordination_health: Optional[int] = None
+    total_agents: int = 0
+    failed_agents: int = 0
+    
+    # For backwards compatibility with frontend
+    @property
+    def id(self):
+        return self.run_id
+    
+    @property
+    def title(self):
+        return self.run_id
+    
+    @property
+    def start_time(self):
+        return self.created_at
+    
+    @property
+    def status(self):
+        return self.final_status
+    
+    @property
+    def num_steps(self):
+        return self.total_agents
+    
+    @property
+    def num_success(self):
+        return self.total_agents - self.failed_agents
+    
+    @property
+    def num_failed(self):
+        return self.failed_agents
+    
+    @property
+    def duration(self):
+        # Calculate from created_at and updated_at
+        try:
+            created = datetime.fromisoformat(self.created_at.replace('Z', '+00:00'))
+            updated = datetime.fromisoformat(self.updated_at.replace('Z', '+00:00'))
+            return (updated - created).total_seconds()
+        except:
+            return 0.0
+    
+    @property
+    def cost(self):
+        # Will be calculated from agent runs
+        return 0.0
+
+class AgentRun(BaseModel):
+    """Agent Run model matching MongoDB schema"""
+    run_id: str
+    agent_name: str
     parent_step_id: Optional[str] = None
-    name: str
-    status: str  # "running" | "success" | "error"
-    latency_ms: int
-    cost: float
-    prompt: str
-    output: str
-    tokens: int
+    status: str  # "started" | "success" | "error"
+    start_time: Optional[str] = None
+    end_time: Optional[str] = None
+    latency_ms: Optional[int] = None
+    prompt: Optional[str] = None
+    output: Optional[str] = None
+    tokens: Optional[int] = None
+    cost_usd: Optional[float] = None
+    error_message: Optional[str] = None
+    coordination_status: Optional[str] = None  # "passed" | "failed" | "warning" | null
+    coordination_issue: Optional[str] = None
+    suggested_fix: Optional[str] = None
+    created_at: Optional[str] = None
+    
+    # For backwards compatibility with frontend
+    @property
+    def id(self):
+        return str(getattr(self, '_id', ''))
+    
+    @property
+    def name(self):
+        return self.agent_name
+    
+    @property
+    def cost(self):
+        return self.cost_usd or 0.0
 
 class SummaryResponse(BaseModel):
     summary: str
