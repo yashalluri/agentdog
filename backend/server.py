@@ -380,7 +380,7 @@ Provide a brief 2-3 sentence summary."""
         raise HTTPException(status_code=500, detail=f"Failed to generate summary: {str(e)}")
 
 # MongoDB Viewer Route
-@app.get("/mongo-viewer", response_class=HTMLResponse)
+@api_router.get("/mongo-viewer", response_class=HTMLResponse)
 async def mongo_viewer():
     from fastapi.responses import HTMLResponse
     import json
