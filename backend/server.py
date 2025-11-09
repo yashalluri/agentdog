@@ -587,7 +587,7 @@ async def run_multiagent_demo():
         try:
             # AGENT 1: Query Generator
             start = time.time()
-            await asyncio.sleep(0.5)
+            time.sleep(0.5)
             q_id = agentdog.emit_event(
                 run_id=run_id, agent_name="query_generator", status="success",
                 prompt="Generate search queries for: AI multi-agent systems",
