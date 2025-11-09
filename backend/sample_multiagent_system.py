@@ -127,7 +127,8 @@ class ResearchAssistant:
             # Simulate web search with LLM
             chat = LlmChat(
                 api_key=self.llm_key,
-                session_id=f"{self.run_id}-{agent_name}"
+                session_id=f"{self.run_id}-{agent_name}",
+                system_message="You are a web search assistant providing factual information."
             ).with_model("openai", "gpt-4o-mini")
             
             search_prompt = f"Provide 2-3 key facts about: {query}"
