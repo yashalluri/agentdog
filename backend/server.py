@@ -17,6 +17,7 @@ from database import (
     get_workflows_collection,
     get_agent_runs_collection
 )
+from debate_multiagent_system import DebateMultiAgentSystem
 
 # WebSocket connection manager
 class ConnectionManager:
