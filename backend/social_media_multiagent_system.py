@@ -285,13 +285,19 @@ Create engaging, platform-optimized content that follows these specs exactly."""
             
             print(f"[{agent_name}] ✅ Content created")
             
+            # Complete agent span
+            if agent_span:
+                agent_span.output_data = response[:1000]
+                self.tracer.end_span(agent_span.span_id, SpanStatus.SUCCESS)
+            
             await asyncio.sleep(0.3)  # Ensure persistence
             
             return {
                 "success": True,
                 "platform": self.platform,
                 "content": response,
-                "agent_id": self.agent_id
+                "agent_id": self.agent_id,
+                "span_id": agent_span.span_id if agent_span else None
             }
             
         except Exception as e:
