@@ -240,38 +240,101 @@ function App() {
     
     if (parts.length === 1) {
       // No citations, return as-is
-      return content;
+      return <div style={{ whiteSpace: 'pre-wrap' }}>{content}</div>;
     }
     
-    const mainContent = parts[0];
+    let mainContent = parts[0];
     const sourcesSection = parts[1];
     
-    // Parse sources section and create clickable links
+    // Parse sources section to build citation map
     const sourceLines = sourcesSection.split('\n').filter(line => line.trim().startsWith('['));
+    const citationMap = {};
+    
+    sourceLines.forEach((line) => {
+      const match = line.match(/\[(\d+)\]\s+(.+)/);
+      if (match) {
+        const [, num, url] = match;
+        citationMap[num] = url.trim();
+      }
+    });
+    
+    // Replace inline citations [1], [2] etc with clickable superscripts
+    const renderContentWithInlineCitations = () => {
+      const citationRegex = /\[(\d+)\]/g;
+      const parts = [];
+      let lastIndex = 0;
+      let match;
+      
+      while ((match = citationRegex.exec(mainContent)) !== null) {
+        // Add text before citation
+        if (match.index > lastIndex) {
+          parts.push(mainContent.substring(lastIndex, match.index));
+        }
+        
+        // Add clickable citation
+        const citNum = match[1];
+        const citUrl = citationMap[citNum];
+        
+        if (citUrl) {
+          parts.push(
+            <a
+              key={`cit-${match.index}`}
+              href={citUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                color: '#2563EB',
+                textDecoration: 'none',
+                fontSize: '0.8em',
+                verticalAlign: 'super',
+                fontWeight: '600',
+                marginLeft: '1px',
+                marginRight: '1px'
+              }}
+              title={`Source ${citNum}: ${citUrl}`}
+            >
+              [{citNum}]
+            </a>
+          );
+        } else {
+          parts.push(`[${citNum}]`);
+        }
+        
+        lastIndex = match.index + match[0].length;
+      }
+      
+      // Add remaining text
+      if (lastIndex < mainContent.length) {
+        parts.push(mainContent.substring(lastIndex));
+      }
+      
+      return parts;
+    };
     
     return (
       <div>
-        <div style={{ whiteSpace: 'pre-wrap' }}>{mainContent}</div>
+        <div style={{ whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>
+          {renderContentWithInlineCitations()}
+        </div>
         {sourceLines.length > 0 && (
           <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #E5E7EB' }}>
             <div style={{ fontSize: '12px', fontWeight: '600', color: '#6B7280', marginBottom: '8px' }}>
               SOURCES:
             </div>
             {sourceLines.map((line, idx) => {
-              // Extract [number] and URL
               const match = line.match(/\[(\d+)\]\s+(.+)/);
               if (match) {
                 const [, num, url] = match;
                 return (
-                  <div key={idx} style={{ fontSize: '12px', marginBottom: '4px' }}>
-                    <span style={{ color: '#6B7280', marginRight: '4px' }}>[{num}]</span>
+                  <div key={idx} style={{ fontSize: '12px', marginBottom: '4px' }} id={`source-${num}`}>
+                    <span style={{ color: '#6B7280', marginRight: '4px', fontWeight: '600' }}>[{num}]</span>
                     <a 
                       href={url.trim()} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       style={{ color: '#2563EB', textDecoration: 'underline' }}
                     >
-                      {url.trim().substring(0, 60)}{url.trim().length > 60 ? '...' : ''}
+                      {url.trim().substring(0, 70)}{url.trim().length > 70 ? '...' : ''}
                     </a>
                   </div>
                 );
