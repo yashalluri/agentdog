@@ -495,7 +495,8 @@ class DebateMultiAgentSystem:
         debate_result = await self.debate_agent.construct_argument(
             user_position=user_position,
             research_findings=research_results,
-            parent_step_id=research_results['agent_id']
+            parent_step_id=research_results['agent_id'],
+            parent_span_id=root_span.span_id
         )
         
         debate_response = debate_result.get('response', str(debate_result))
