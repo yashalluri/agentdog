@@ -352,15 +352,35 @@ function App() {
               <div className="drawer-section">
                 <div className="drawer-section-label" data-testid="prompt-label">Prompt</div>
                 <div className="code-block" data-testid="prompt-content">
-                  {selectedStep.prompt}
+                  {showFullPrompt || (selectedStep.prompt && selectedStep.prompt.length <= 150)
+                    ? selectedStep.prompt
+                    : `${selectedStep.prompt?.substring(0, 150)}...`}
                 </div>
+                {selectedStep.prompt && selectedStep.prompt.length > 150 && (
+                  <button 
+                    className="show-more-button"
+                    onClick={() => setShowFullPrompt(!showFullPrompt)}
+                  >
+                    {showFullPrompt ? 'Show less' : 'Show more'}
+                  </button>
+                )}
               </div>
 
               <div className="drawer-section">
                 <div className="drawer-section-label" data-testid="output-label">Output</div>
                 <div className="code-block" data-testid="output-content">
-                  {selectedStep.output}
+                  {showFullOutput || (selectedStep.output && selectedStep.output.length <= 150)
+                    ? selectedStep.output
+                    : `${selectedStep.output?.substring(0, 150)}...`}
                 </div>
+                {selectedStep.output && selectedStep.output.length > 150 && (
+                  <button 
+                    className="show-more-button"
+                    onClick={() => setShowFullOutput(!showFullOutput)}
+                  >
+                    {showFullOutput ? 'Show less' : 'Show more'}
+                  </button>
+                )}
               </div>
 
               <div className="drawer-section">
