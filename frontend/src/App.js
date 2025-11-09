@@ -521,7 +521,15 @@ function App() {
                 chatMessages.map((msg, idx) => (
                   <div key={idx} className={`chat-msg ${msg.role}`}>
                     <div className="chat-msg-avatar">
-                      {msg.role === 'user' ? '👤' : '✨'}
+                      {msg.role === 'user' ? (
+                        <img 
+                          src="https://customer-assets.emergentagent.com/job_smart-canine/artifacts/gmjgkpri_Screenshot%202568-11-09%20at%2000.27.06.png" 
+                          alt="User" 
+                          className="chat-avatar-img"
+                        />
+                      ) : (
+                        '✨'
+                      )}
                     </div>
                     <div className="chat-msg-content">
                       <div className="chat-msg-text">{msg.content}</div>
