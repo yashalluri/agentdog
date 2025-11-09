@@ -257,7 +257,7 @@ body {
 .main-panel {
   flex: 1;
   background: #F9FAFB;
-  overflow-y: auto;
+  overflow: hidden;
   padding: 24px 32px;
 }
 
