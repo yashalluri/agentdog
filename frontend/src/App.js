@@ -308,9 +308,9 @@ function App() {
         <div className="charts-grid">
           <div className="chart-card">
             <h3 className="chart-title">Success vs Error</h3>
-            <ResponsiveContainer width=\"100%\" height={200}>
+            <ResponsiveContainer width="100%" height={200}>
               <PieChart>
-                <Pie data={statusData} dataKey=\"value\" cx=\"50%\" cy=\"50%\" outerRadius={60}>
+                <Pie data={statusData} dataKey="value" cx="50%" cy="50%" outerRadius={60}>
                   {statusData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
@@ -322,13 +322,13 @@ function App() {
 
           <div className="chart-card">
             <h3 className="chart-title">Recent Run Durations</h3>
-            <ResponsiveContainer width=\"100%\" height={200}>
+            <ResponsiveContainer width="100%" height={200}>
               <BarChart data={runsOverTime}>
                 <CartesianGrid strokeDasharray=\"3 3\" />
-                <XAxis dataKey=\"name\" />
+                <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey=\"duration\" fill=\"#2563EB\" />
+                <Bar dataKey="duration" fill="#2563EB" />
               </BarChart>
             </ResponsiveContainer>
           </div>
