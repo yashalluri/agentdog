@@ -272,10 +272,11 @@
 .failure-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   padding: 16px;
   cursor: pointer;
   user-select: none;
+  gap: 16px;
 }
 
 .failure-header-left {
@@ -283,6 +284,7 @@
   align-items: flex-start;
   gap: 12px;
   flex: 1;
+  min-width: 0;
 }
 
 .failure-icon {
@@ -301,38 +303,52 @@
 
 .failure-title-group {
   flex: 1;
+  min-width: 0;
+  margin-right: 12px;
 }
 
 .failure-title {
   font-size: 14px;
   font-weight: 500;
   color: #111827;
-  margin-bottom: 6px;
-  line-height: 1.4;
+  margin-bottom: 8px;
+  line-height: 1.5;
+  word-wrap: break-word;
 }
 
 .failure-meta {
   display: flex;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
   font-size: 12px;
   color: #6B7280;
+  align-items: center;
 }
 
 .failure-span {
   font-family: 'SF Mono', monospace;
   background: #F3F4F6;
-  padding: 2px 8px;
+  padding: 3px 8px;
   border-radius: 4px;
+  white-space: nowrap;
 }
 
 .failure-subtype {
   font-style: italic;
+  padding: 2px 6px;
+  background: #FEF2F2;
+  color: #DC2626;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
 }
 
 .failure-header-right {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .expand-icon {
