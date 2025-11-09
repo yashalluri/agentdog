@@ -449,6 +449,13 @@ class DebateMultiAgentSystem:
         print(f"User Position: {user_position}")
         print(f"{'='*60}\n")
         
+        # Start root span
+        root_span = self.tracer.start_root_span(
+            name="debate_workflow",
+            metadata={"user_position": user_position, "workflow_type": "debate"}
+        )
+        root_span.input_data = user_position
+        
         # Update progress: Searching the web (send immediately)
         if self.progress_callback:
             await self.progress_callback("🔍 Searching the web...")
@@ -457,7 +464,10 @@ class DebateMultiAgentSystem:
         await asyncio.sleep(0.2)
         
         # Step 1: Research Agent searches for counter-arguments
-        research_results = await self.research_agent.research_topic(user_position)
+        research_results = await self.research_agent.research_topic(
+            user_position,
+            parent_span_id=root_span.span_id
+        )
         
         if not research_results['success']:
             return {
