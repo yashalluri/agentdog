@@ -56,12 +56,12 @@ const CoordinationAnalysis = ({ runId, api }) => {
 
   const getTypeIcon = (type) => {
     const icons = {
-      hallucination: '🎭',
-      logical_inconsistency: '🧩',
-      missing_context: '📋',
-      contract_violation: '⚖️'
+      hallucination: 'H',
+      logical_inconsistency: 'L',
+      missing_context: 'M',
+      contract_violation: 'C'
     };
-    return icons[type] || '⚠️';
+    return icons[type] || '!';
   };
 
   const getTypeLabel = (type) => {
