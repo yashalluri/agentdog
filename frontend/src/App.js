@@ -324,7 +324,7 @@ function App() {
             <h3 className="chart-title">Recent Run Durations</h3>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={runsOverTime}>
-                <CartesianGrid strokeDasharray=\"3 3\" />
+                <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
@@ -339,7 +339,7 @@ function App() {
 
   return (
     <div className="app-container" data-testid="agentdog-app">
-      <Toaster position=\"top-right\" />
+      <Toaster position="top-right" />
       
       {/* Top Navigation */}
       <div className="top-nav" data-testid="top-nav">
@@ -349,7 +349,7 @@ function App() {
         </div>
         <div className="nav-actions">
           <Button
-            variant=\"ghost\"
+            variant="ghost"
             onClick={() => setShowSettings(true)}
             className="nav-button"
             data-testid="settings-btn"
@@ -357,7 +357,7 @@ function App() {
             <Settings className="w-4 h-4" />
           </Button>
           <Button
-            variant=\"ghost\"
+            variant="ghost"
             onClick={handleGenerateSummary}
             disabled={!selectedRun || loading}
             className="nav-button"
@@ -383,12 +383,12 @@ function App() {
             <DialogTitle>Agent Ingestion Settings</DialogTitle>
           </DialogHeader>
           <div className="settings-content">
-            <Label htmlFor=\"ingestion-url\">Ingestion URL</Label>
+            <Label htmlFor="ingestion-url">Ingestion URL</Label>
             <Input
-              id=\"ingestion-url\"
+              id="ingestion-url"
               value={ingestionUrl}
               onChange={(e) => setIngestionUrl(e.target.value)}
-              placeholder=\"/api/agentdog/event\"
+              placeholder="/api/agentdog/event"
               data-testid="ingestion-url-input"
             />
             <p className="settings-hint">
@@ -407,8 +407,8 @@ function App() {
         <div className="sidebar" data-testid="runs-sidebar">
           <Tabs value={currentView} onValueChange={setCurrentView} className="sidebar-tabs">
             <TabsList className="tabs-list">
-              <TabsTrigger value=\"runs\" data-testid="tab-runs">Runs</TabsTrigger>
-              <TabsTrigger value=\"overview\" data-testid="tab-overview">Overview</TabsTrigger>
+              <TabsTrigger value="runs" data-testid="tab-runs">Runs</TabsTrigger>
+              <TabsTrigger value="overview" data-testid="tab-overview">Overview</TabsTrigger>
             </TabsList>
           </Tabs>
 
@@ -417,8 +417,8 @@ function App() {
               <div className="sidebar-search">
                 <Search className="search-icon" />
                 <input
-                  type=\"text\"
-                  placeholder=\"Search runs...\"
+                  type="text"
+                  placeholder="Search runs..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="search-input"
@@ -605,7 +605,7 @@ function App() {
                   <div className="drawer-section-label">HALLUCINATION FLAGS</div>
                   <div className="hallucination-flags">
                     {selectedStep.hallucination_flags.map((flag, i) => (
-                      <Badge key={i} variant=\"destructive\" className="hallucination-badge">
+                      <Badge key={i} variant="destructive" className="hallucination-badge">
                         <AlertTriangle className="w-3 h-3 mr-1" />
                         {flag}
                       </Badge>
