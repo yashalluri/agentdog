@@ -39,7 +39,9 @@ function App() {
       const interval = setInterval(() => {
         fetchRunDetails(selectedRun.run_id);
       }, 2000);
-      return () => clearInterval(interval);\n    }\n  }, [selectedRun]);
+      return () => clearInterval(interval);
+    }
+  }, [selectedRun]);
 
   const fetchRuns = async () => {
     try {
