@@ -1446,6 +1446,23 @@ body {
   border-radius: 12px;
   padding: 4px;
   transition: all 0.2s;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .chat-input-wrapper {
+    flex-wrap: nowrap;
+  }
+  
+  .agent-selector-inline {
+    min-width: 110px;
+    max-width: 130px;
+  }
+  
+  .chat-input-new {
+    flex: 1;
+    min-width: 0;
+  }
 }
 
 .chat-input-wrapper:focus-within {
