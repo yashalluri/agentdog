@@ -417,91 +417,125 @@ Provide a concise summary explaining what the agents collectively did, any failu
 @api_router.post("/ingest-sample")
 async def ingest_sample_data():
     """Ingest sample data for demonstration"""
-    # Clear existing data
-    store.runs.clear()
-    store.steps.clear()
+    workflows_coll = get_workflows_collection()
+    agent_runs_coll = get_agent_runs_collection()
     
-    # Create sample run
-    run_id = str(uuid.uuid4())
-    run = {
-        "id": run_id,
-        "title": "data-sync-2025-11-08-02",
-        "start_time": datetime.now(timezone.utc).isoformat(),
-        "status": "error",
-        "num_steps": 5,
-        "num_success": 4,
-        "num_failed": 1,
-        "duration": 1.38,
-        "cost": 0.013
+    # Generate unique run_id
+    run_id = f"data-sync-{datetime.now(timezone.utc).strftime('%Y-%m-%d-%H%M%S')}"
+    current_time = datetime.now(timezone.utc).isoformat()
+    
+    # Create sample workflow
+    workflow = {
+        "run_id": run_id,
+        "created_at": current_time,
+        "updated_at": current_time,
+        "final_status": "error",
+        "initiator": "sample_ingestion",
+        "summary": None,
+        "coordination_health": None,
+        "total_agents": 5,
+        "failed_agents": 1
     }
-    store.add_run(run)
     
-    # Create sample steps
-    steps = [
+    # Insert workflow
+    await workflows_coll.insert_one(workflow)
+    
+    # Create sample agent runs
+    agents = [
         {
-            "id": str(uuid.uuid4()),
             "run_id": run_id,
+            "agent_name": "collector",
             "parent_step_id": None,
-            "name": "collector",
             "status": "success",
+            "start_time": current_time,
+            "end_time": current_time,
             "latency_ms": 210,
-            "cost": 0.002,
+            "cost_usd": 0.002,
             "prompt": "Collect data from sources A, B, and C. Ensure data integrity and validate format.",
             "output": "Successfully collected 3 documents. Total size: 2.4MB. All validations passed.",
-            "tokens": 150
+            "tokens": 150,
+            "error_message": None,
+            "coordination_status": None,
+            "coordination_issue": None,
+            "suggested_fix": None,
+            "created_at": current_time
         },
         {
-            "id": str(uuid.uuid4()),
             "run_id": run_id,
+            "agent_name": "summarizer-1",
             "parent_step_id": None,
-            "name": "summarizer-1",
             "status": "success",
+            "start_time": current_time,
+            "end_time": current_time,
             "latency_ms": 320,
-            "cost": 0.003,
+            "cost_usd": 0.003,
             "prompt": "Summarize the collected documents focusing on key metrics and insights.",
             "output": "Generated summary with 5 key insights and 12 metrics. Confidence: 0.94",
-            "tokens": 420
+            "tokens": 420,
+            "error_message": None,
+            "coordination_status": None,
+            "coordination_issue": None,
+            "suggested_fix": None,
+            "created_at": current_time
         },
         {
-            "id": str(uuid.uuid4()),
             "run_id": run_id,
+            "agent_name": "summarizer-2",
             "parent_step_id": None,
-            "name": "summarizer-2",
             "status": "error",
+            "start_time": current_time,
+            "end_time": current_time,
             "latency_ms": 190,
-            "cost": 0.001,
+            "cost_usd": 0.001,
             "prompt": "Analyze secondary data sources and extract trends.",
-            "output": "Error: Context length exceeded. Unable to process document.",
-            "tokens": 80
+            "output": None,
+            "tokens": 80,
+            "error_message": "Context length exceeded. Unable to process document.",
+            "coordination_status": None,
+            "coordination_issue": None,
+            "suggested_fix": None,
+            "created_at": current_time
         },
         {
-            "id": str(uuid.uuid4()),
             "run_id": run_id,
+            "agent_name": "summarizer-2-retry",
             "parent_step_id": None,
-            "name": "summarizer-2-retry",
             "status": "success",
+            "start_time": current_time,
+            "end_time": current_time,
             "latency_ms": 180,
-            "cost": 0.003,
+            "cost_usd": 0.003,
             "prompt": "Analyze secondary data sources with chunking strategy.",
             "output": "Successfully processed with chunking. Identified 8 trends across 3 categories.",
-            "tokens": 380
+            "tokens": 380,
+            "error_message": None,
+            "coordination_status": None,
+            "coordination_issue": None,
+            "suggested_fix": None,
+            "created_at": current_time
         },
         {
-            "id": str(uuid.uuid4()),
             "run_id": run_id,
+            "agent_name": "synthesizer",
             "parent_step_id": None,
-            "name": "synthesizer",
             "status": "success",
+            "start_time": current_time,
+            "end_time": current_time,
             "latency_ms": 480,
-            "cost": 0.004,
+            "cost_usd": 0.004,
             "prompt": "Synthesize all summaries into a cohesive final report.",
             "output": "Final report generated with executive summary, detailed findings, and recommendations.",
-            "tokens": 680
+            "tokens": 680,
+            "error_message": None,
+            "coordination_status": None,
+            "coordination_issue": None,
+            "suggested_fix": None,
+            "created_at": current_time
         }
     ]
     
-    for step in steps:
-        store.add_step(step)
+    # Insert all agents
+    await agent_runs_coll.insert_many(agents)
     
     return {"message": "Sample data ingested successfully", "run_id": run_id}
 
