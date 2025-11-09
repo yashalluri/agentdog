@@ -21,7 +21,11 @@ class CoordinationFailureDetector:
         "claude-4-sonnet-20250514",
         "claude-sonnet-4", 
         "gpt-4",
-        "gpt-3.5-turbo"
+        "gpt-3.5-turbo",
+        "sonar",  # Perplexity search model
+        "sonar-small-chat",
+        "sonar-medium-chat",
+        "sonar-pro"
     }
     
     VALID_AGENT_TYPES = {
