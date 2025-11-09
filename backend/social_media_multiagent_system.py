@@ -505,16 +505,17 @@ class SocialMediaMultiAgentSystem:
     def __init__(self, run_id: str, progress_callback=None):
         self.run_id = run_id
         self.agentdog = AgentDog(api_url="http://localhost:8001/api")
+        self.tracer = ObservabilityTracer(run_id=run_id)
         self.progress_callback = progress_callback
         
-        # Initialize agents
-        self.strategist = ContentStrategistAgent(run_id, self.agentdog)
-        self.twitter_writer = PlatformWriterAgent(run_id, self.agentdog, "Twitter")
-        self.linkedin_writer = PlatformWriterAgent(run_id, self.agentdog, "LinkedIn")
-        self.instagram_writer = PlatformWriterAgent(run_id, self.agentdog, "Instagram")
-        self.facebook_writer = PlatformWriterAgent(run_id, self.agentdog, "Facebook")
-        self.hashtag_generator = HashtagGeneratorAgent(run_id, self.agentdog)
-        self.engagement_optimizer = EngagementOptimizerAgent(run_id, self.agentdog)
+        # Initialize agents with tracer
+        self.strategist = ContentStrategistAgent(run_id, self.agentdog, self.tracer)
+        self.twitter_writer = PlatformWriterAgent(run_id, self.agentdog, "Twitter", self.tracer)
+        self.linkedin_writer = PlatformWriterAgent(run_id, self.agentdog, "LinkedIn", self.tracer)
+        self.instagram_writer = PlatformWriterAgent(run_id, self.agentdog, "Instagram", self.tracer)
+        self.facebook_writer = PlatformWriterAgent(run_id, self.agentdog, "Facebook", self.tracer)
+        self.hashtag_generator = HashtagGeneratorAgent(run_id, self.agentdog, self.tracer)
+        self.engagement_optimizer = EngagementOptimizerAgent(run_id, self.agentdog, self.tracer)
         
     async def create_content(self, user_topic: str) -> str:
         """Complete social media content creation workflow"""
