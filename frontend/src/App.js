@@ -392,10 +392,37 @@ function App() {
               data-testid="ingestion-url-input"
             />
             <p className="settings-hint">
-              Point your multi-agent system to: <code>{BACKEND_URL}{ingestionUrl}</code>
+              Full URL: <code>{BACKEND_URL}{ingestionUrl}</code>
             </p>
+            
+            <div className="usage-examples">
+              <h4 className="usage-title">Quick Start - LangGraph</h4>
+              <pre className="code-example">{`from agentdog_client import AgentDogClient
+from agentdog_langgraph import agentdog_node
+
+agentdog = AgentDogClient(
+    "${BACKEND_URL}${ingestionUrl}",
+    run_id="my-run-1"
+)
+
+@agentdog_node(agentdog, "collector")
+def collector(state):
+    return {"docs": ["doc1", "doc2"]}
+
+# Run your graph - telemetry auto-sent!`}</pre>
+
+              <h4 className="usage-title">Manual Integration</h4>
+              <pre className="code-example">{`agentdog.log_step(
+    agent_name="my_agent",
+    status="success",
+    prompt="User query",
+    output="Response text",
+    latency_ms=150
+)`}</pre>
+            </div>
+            
             <Button onClick={() => setShowSettings(false)} className="mt-4" data-testid="settings-save-btn">
-              Save
+              Close
             </Button>
           </div>
         </DialogContent>
