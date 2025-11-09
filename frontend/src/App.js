@@ -174,12 +174,29 @@ function App() {
       const response = await axios.post(`${API}/run-multiagent-demo`);
       const runId = response.data.run_id;
       
-      // Set up live execution view
+      // Create a placeholder run object to show immediately
+      const placeholderRun = {
+        id: runId,
+        run_id: runId,
+        title: runId,
+        start_time: new Date().toISOString(),
+        status: 'running',
+        num_steps: 0,
+        num_success: 0,
+        num_failed: 0,
+        duration: 0,
+        cost: 0
+      };
+      
+      // Select this run immediately
+      setSelectedRun(placeholderRun);
+      setRunSteps([]); // Clear steps initially
       setLiveExecution({ run_id: runId, started: Date.now() });
-      setExecutionLog([]);
-      setSelectedRun(null); // Clear selected run to show live view
       
       toast.success('✨ Watch agents execute in real-time!');
+      
+      // Refresh runs list to show new run
+      setTimeout(() => fetchRuns(), 500);
       
     } catch (error) {
       toast.error('Failed to start multi-agent demo');
