@@ -34,10 +34,9 @@ function App() {
   const [currentRunId, setCurrentRunId] = useState(null); // Track active chat run
   const [isSendingMessage, setIsSendingMessage] = useState(false);
   
-  // Available agents (default + custom agents)
+  // Available agents
   const availableAgents = [
-    { id: 'default', name: 'Default Agent', description: 'General purpose multi-agent coordinator' },
-    // Add custom agents here as users create them
+    { id: 'debate', name: 'Debate Agent (Multi-Agent)' }
   ];
 
   // Fetch runs on mount and setup WebSocket
