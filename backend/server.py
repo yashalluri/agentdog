@@ -385,10 +385,13 @@ async def mongo_viewer():
     from fastapi.responses import HTMLResponse
     import json
     
+    # Get database
+    database = get_db()
+    
     # Get all data
-    users = await db.users.find({}, {"password_hash": 0}).to_list(100)
-    runs = await db.runs.find({}).to_list(100)
-    steps = await db.steps.find({}).to_list(100)
+    users = await database.users.find({}, {"password_hash": 0}).to_list(100)
+    runs = await database.runs.find({}).to_list(100)
+    steps = await database.steps.find({}).to_list(100)
     
     def json_serial(obj):
         if isinstance(obj, datetime):
