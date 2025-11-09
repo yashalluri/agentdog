@@ -1040,11 +1040,40 @@ body {
   flex-shrink: 0;
 }
 
+.chat-header-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
 .chat-panel-title {
   font-size: 16px;
   font-weight: 600;
   color: #0F172A;
   margin: 0;
+}
+
+.agent-selector {
+  padding: 6px 12px;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  background: #FFFFFF;
+  font-size: 13px;
+  color: #374151;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s;
+  min-width: 150px;
+}
+
+.agent-selector:hover {
+  border-color: #9CA3AF;
+}
+
+.agent-selector:focus {
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .chat-panel-actions {
