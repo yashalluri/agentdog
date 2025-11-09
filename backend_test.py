@@ -375,20 +375,23 @@ def main():
     # Test sequence
     test_results = []
     
-    # 1. Ingest sample data first
+    # 1. Test event ingestion scenarios first (as requested)
+    test_results.append(("Event Ingestion Scenarios", tester.test_event_ingestion_scenarios()))
+    
+    # 2. Ingest sample data 
     test_results.append(("Ingest Sample Data", tester.test_ingest_sample_data()))
     
-    # 2. Test basic CRUD operations
+    # 3. Test basic CRUD operations
     test_results.append(("Get All Runs", tester.test_get_runs()))
     test_results.append(("Get Specific Run", tester.test_get_specific_run()))
     test_results.append(("Get Run Steps", tester.test_get_run_steps()))
     test_results.append(("Get Step Detail", tester.test_get_step_detail()))
     
-    # 3. Test advanced features
+    # 4. Test advanced features
     test_results.append(("Replay Step", tester.test_replay_step()))
     test_results.append(("Generate AI Summary", tester.test_generate_summary()))
     
-    # 4. Test error handling
+    # 5. Test error handling
     test_results.append(("Error Handling", tester.test_error_handling()))
     
     # Print results summary
