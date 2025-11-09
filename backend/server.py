@@ -489,30 +489,19 @@ Provide a concise summary explaining what the agents collectively did, any failu
         logging.error(f"Error generating summary: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to generate summary: {str(e)}")
 
-@api_router.get("/stream")
-async def stream_events():
-    """Server-Sent Events endpoint for real-time updates"""
-    async def event_generator():
-        # Create an async queue for this client
-        client_queue = asyncio.Queue()
-        sse_clients.append(client_queue)
-        
-        try:
-            while True:
-                # Wait for new events with timeout
-                try:
-                    event = await asyncio.wait_for(client_queue.get(), timeout=30.0)
-                    yield f"data: {event}\n\n"
-                except asyncio.TimeoutError:
-                    # Send keepalive
-                    yield f": keepalive\n\n"
-        except Exception as e:
-            logging.error(f"SSE client disconnected: {e}")
-        finally:
-            if client_queue in sse_clients:
-                sse_clients.remove(client_queue)
-    
-    return StreamingResponse(event_generator(), media_type="text/event-stream")
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    """WebSocket endpoint for real-time agent execution updates"""
+    await manager.connect(websocket)
+    try:
+        while True:
+            # Keep connection alive
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+    except Exception as e:
+        logging.error(f"WebSocket error: {e}")
+        manager.disconnect(websocket)
 
 @api_router.post("/event", response_model=EventResponse)
 async def receive_event(event: EventRequest):
