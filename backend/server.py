@@ -569,6 +569,17 @@ async def receive_event(event: EventRequest):
     result = await agent_runs_coll.insert_one(agent_doc)
     agent_id = str(result.inserted_id)
     
+    # Broadcast agent creation event via SSE
+    broadcast_event("agent_created", {
+        "run_id": event.run_id,
+        "agent_id": agent_id,
+        "agent_name": event.agent_name,
+        "status": event.status,
+        "parent_step_id": event.parent_step_id,
+        "coordination_status": agent_doc.get("coordination_status"),
+        "coordination_issue": agent_doc.get("coordination_issue")
+    })
+    
     # Update workflow statistics
     update_ops = {
         "$set": {
