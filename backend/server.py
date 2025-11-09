@@ -152,6 +152,38 @@ class EventResponse(BaseModel):
     status: str
     agent_id: str
 
+# Coordination Analysis Functions
+def quick_coordination_check(error_message: str) -> Optional[str]:
+    """
+    Phase 1: Quick rule-based coordination check (< 50ms)
+    Instantly flags obvious coordination issues without AI
+    """
+    if not error_message:
+        return None
+    
+    error_lower = error_message.lower()
+    
+    # Rule 1: KeyError Detection
+    if 'keyerror' in error_lower:
+        # Try to extract field name
+        import re
+        match = re.search(r"keyerror[:\s]+['\"]([^'\"]+)['\"]", error_lower)
+        if match:
+            field_name = match.group(1)
+            return f"Missing expected field '{field_name}'"
+        return "Missing expected field in data handoff"
+    
+    # Rule 2: TypeError Detection
+    if 'typeerror' in error_lower:
+        return "Data type mismatch between agents"
+    
+    # Rule 3: Timeout Detection
+    if 'timeout' in error_lower:
+        return "Handoff timeout - agent took too long to respond"
+    
+    # Rule 4: Default for errors with parent
+    return "Coordination failure detected"
+
 # API Routes
 @api_router.get("/runs")
 async def get_runs(status: Optional[str] = None, limit: int = 100):
