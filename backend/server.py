@@ -620,7 +620,7 @@ async def run_multiagent_demo():
             
             # AGENT 4: Web Searcher 3 (FAILS - Coordination Error)
             start = time.time()
-            await asyncio.sleep(0.4)
+            time.sleep(0.4)
             s3_id = agentdog.emit_event(
                 run_id=run_id, agent_name="web_searcher_3", status="error",
                 prompt="Search: Agent communication protocols",
