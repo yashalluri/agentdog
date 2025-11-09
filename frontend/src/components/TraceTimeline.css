@@ -71,6 +71,20 @@
   border-left-color: #3B82F6;
 }
 
+.trace-span.has-failures {
+  background: #FEF2F2;
+  border-left-color: #EF4444;
+}
+
+.trace-span.has-failures.selected {
+  background: #FEE2E2;
+  border-left-color: #DC2626;
+}
+
+.trace-span.has-failures:hover {
+  background: #FEE2E2;
+}
+
 .expand-icon {
   width: 16px;
   text-align: center;
