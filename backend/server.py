@@ -1386,35 +1386,63 @@ async def get_coordination_analysis(run_id: str):
     if not workflow:
         raise HTTPException(status_code=404, detail="Run not found")
     
-    # Check if analysis already exists and is recent (< 5 minutes old)
-    existing_analysis = workflow.get("coordination_analysis")
-    if existing_analysis:
-        detected_at = existing_analysis.get("detected_at")
-        if detected_at:
-            from datetime import datetime, timezone, timedelta
-            detected_time = datetime.fromisoformat(detected_at.replace('Z', '+00:00'))
-            age = datetime.now(timezone.utc) - detected_time
-            if age < timedelta(minutes=5):
-                return existing_analysis
+    # Get all analyses if available
+    analyses = workflow.get('coordination_analyses', [])
     
-    # Run fresh analysis
-    analysis_result = analyze_workflow_coordination(workflow)
+    if analyses:
+        # Return all analyses
+        return {
+            "run_id": run_id,
+            "analyses": analyses,
+            "total_analyses": len(analyses),
+            "latest_analysis": analyses[-1] if analyses else None
+        }
     
-    if not analysis_result:
+    # Fallback to single analysis for backward compatibility
+    single_analysis = workflow.get("coordination_analysis")
+    if single_analysis:
+        return {
+            "run_id": run_id,
+            "analyses": [single_analysis],
+            "total_analyses": 1,
+            "latest_analysis": single_analysis
+        }
+    
+    # No analysis exists - run fresh analysis on latest trace
+    detailed_trace = workflow.get('detailed_trace')
+    if not detailed_trace:
         return {
             "run_id": run_id,
             "error": "No trace data available for analysis",
-            "has_failures": False,
-            "failure_count": 0
+            "analyses": [],
+            "total_analyses": 0,
+            "latest_analysis": None
         }
     
-    # Store analysis results in workflow document
-    await workflows_coll.update_one(
-        {"run_id": run_id},
-        {"$set": {"coordination_analysis": analysis_result}}
-    )
+    # Run analysis
+    analysis_result = analyze_workflow_coordination({"detailed_trace": detailed_trace, "run_id": run_id})
     
-    return analysis_result
+    if analysis_result:
+        # Store analysis
+        await workflows_coll.update_one(
+            {"run_id": run_id},
+            {"$set": {"coordination_analysis": analysis_result}}
+        )
+        
+        return {
+            "run_id": run_id,
+            "analyses": [analysis_result],
+            "total_analyses": 1,
+            "latest_analysis": analysis_result
+        }
+    
+    return {
+        "run_id": run_id,
+        "error": "Analysis failed",
+        "analyses": [],
+        "total_analyses": 0,
+        "latest_analysis": None
+    }
 
 @api_router.post("/run/{run_id}/analyze-coordination")
 async def trigger_coordination_analysis(run_id: str):
