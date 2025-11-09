@@ -135,7 +135,7 @@ class AnalyzerAgent:
         )
         llm_span.input_data = data
         
-        await asyncio.sleep(3.0)  # Takes 3 seconds
+        await asyncio.sleep(3.5)  # Takes 3.5 seconds
         
         analysis = "Analysis complete: Patterns detected in the comprehensive database."
         
@@ -149,10 +149,13 @@ class AnalyzerAgent:
         self.tracer.end_span(llm_span.span_id, SpanStatus.SUCCESS)
         
         # BUG: Manually set duration to less than child (LOGICAL_INCONSISTENCY)
-        agent_span.duration_ms = 2000  # Parent only 2 seconds
-        agent_span.end_time = start_time + 2.0  # But child took 3!
+        # Child took 3.5s, we'll say parent only took 2s (impossible!)
         agent_span.output_data = analysis
         self.tracer.end_span(agent_span.span_id, SpanStatus.SUCCESS)
+        
+        # Force override the duration after end_span
+        agent_span.duration_ms = 2000  # Parent only 2 seconds
+        agent_span.end_time = agent_span.start_time + 2.0  # But child took 3.5!
         
         agent_id = self.agentdog.emit_event(
             run_id=self.run_id,
