@@ -725,7 +725,24 @@ function App() {
           <div className="observability-panel-split" style={{ width: `${100 - chatPanelWidth}%` }}>
             <div className="observability-panel-header">
               <h3 className="observability-panel-title">Agent Observability</h3>
-              <div className="panel-size-hint">{Math.round(100 - chatPanelWidth)}%</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div className="view-toggle">
+                  <button
+                    className={`view-toggle-btn ${observabilityView === 'overview' ? 'active' : ''}`}
+                    onClick={() => setObservabilityView('overview')}
+                  >
+                    Overview
+                  </button>
+                  <button
+                    className={`view-toggle-btn ${observabilityView === 'trace' ? 'active' : ''}`}
+                    onClick={() => setObservabilityView('trace')}
+                    disabled={!selectedRun}
+                  >
+                    Trace
+                  </button>
+                </div>
+                <div className="panel-size-hint">{Math.round(100 - chatPanelWidth)}%</div>
+              </div>
             </div>
             
             <div className="observability-content">
