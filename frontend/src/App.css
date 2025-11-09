@@ -1388,6 +1388,20 @@ body {
   padding: 0 4px;
 }
 
+.typing-indicator {
+  display: inline-block;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
 /* New Chat Input Container */
 .chat-input-container-new {
   padding: 16px 20px;
