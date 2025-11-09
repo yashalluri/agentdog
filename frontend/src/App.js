@@ -431,70 +431,75 @@ function App() {
           </ScrollArea>
         </div>
 
-        {/* Main Panel - Chat + Run Detail */}
-        <div className="main-panel" data-testid="main-panel">
-          {/* Chat Interface - Top Section */}
-          <div className={`chat-section ${chatOpen ? 'chat-expanded' : 'chat-collapsed'}`}>
-            <div className="chat-section-header" onClick={() => setChatOpen(!chatOpen)}>
-              <div className="chat-section-title">
-                💬 Agent Chat
-                {!chatOpen && chatMessages.length > 0 && (
-                  <span className="chat-badge">{chatMessages.length}</span>
-                )}
+        {/* Split Panel Layout */}
+        <div className="split-panel-container">
+          {/* Left Panel - Chat */}
+          <div className="chat-panel-split" style={{ width: `${chatPanelWidth}%` }}>
+            <div className="chat-panel-header">
+              <h3 className="chat-panel-title">💬 Agent Chat</h3>
+              <div className="chat-panel-actions">
+                <span className="panel-size-hint">{Math.round(chatPanelWidth)}%</span>
               </div>
-              <button className="chat-expand-btn">
-                {chatOpen ? '▼' : '▲'}
-              </button>
             </div>
             
-            {chatOpen && (
-              <div className="chat-section-content">
-                <div className="chat-messages-area">
-                  {chatMessages.length === 0 ? (
-                    <div className="chat-empty">
-                      <p>👋 Start a conversation with the agent</p>
-                      <p className="chat-empty-sub">Ask me to analyze data, generate reports, or coordinate tasks</p>
+            <div className="chat-messages-area">
+              {chatMessages.length === 0 ? (
+                <div className="chat-empty">
+                  <p>👋 Start a conversation with the agent</p>
+                  <p className="chat-empty-sub">Type a message to begin coordinating multi-agent tasks</p>
+                </div>
+              ) : (
+                chatMessages.map((msg, idx) => (
+                  <div key={idx} className={`chat-msg ${msg.role}`}>
+                    <div className="chat-msg-avatar">
+                      {msg.role === 'user' ? '👤' : '🤖'}
                     </div>
-                  ) : (
-                    chatMessages.map((msg, idx) => (
-                      <div key={idx} className={`chat-msg ${msg.role}`}>
-                        <div className="chat-msg-avatar">
-                          {msg.role === 'user' ? '👤' : '🤖'}
-                        </div>
-                        <div className="chat-msg-content">
-                          <div className="chat-msg-text">{msg.content}</div>
-                          <div className="chat-msg-time">
-                            {new Date(msg.timestamp).toLocaleTimeString()}
-                          </div>
-                        </div>
+                    <div className="chat-msg-content">
+                      <div className="chat-msg-text">{msg.content}</div>
+                      <div className="chat-msg-time">
+                        {new Date(msg.timestamp).toLocaleTimeString()}
                       </div>
-                    ))
-                  )}
-                </div>
-                
-                <div className="chat-input-area">
-                  <input
-                    type="text"
-                    className="chat-input"
-                    placeholder="Type your message..."
-                    value={chatInput}
-                    onChange={(e) => setChatInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                  />
-                  <button 
-                    className="chat-send-btn"
-                    onClick={handleSendMessage}
-                    disabled={!chatInput.trim()}
-                  >
-                    ↑
-                  </button>
-                </div>
-              </div>
-            )}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+            
+            <div className="chat-input-area">
+              <input
+                type="text"
+                className="chat-input"
+                placeholder="Ask agents to analyze, research, or coordinate..."
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              />
+              <button 
+                className="chat-send-btn"
+                onClick={handleSendMessage}
+                disabled={!chatInput.trim()}
+              >
+                ↑
+              </button>
+            </div>
           </div>
           
-          {/* Observability Section - Below Chat */}
-          <div className="observability-section">
+          {/* Resize Divider */}
+          <div 
+            className="panel-divider"
+            onMouseDown={handleMouseDown}
+          >
+            <div className="divider-handle">⋮</div>
+          </div>
+          
+          {/* Right Panel - Observability */}
+          <div className="observability-panel-split" style={{ width: `${100 - chatPanelWidth}%` }}>
+            <div className="observability-panel-header">
+              <h3 className="observability-panel-title">📊 Agent Observability</h3>
+              <div className="panel-size-hint">{Math.round(100 - chatPanelWidth)}%</div>
+            </div>
+            
+            <div className="observability-content">
             {!selectedRun ? (
               <div className="empty-main" data-testid="empty-main">
                 <p>Select a run to view details or click "Run Multi-Agent Demo" to watch live execution</p>
