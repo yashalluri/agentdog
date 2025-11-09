@@ -510,7 +510,7 @@ function App() {
           {/* Right Panel - Observability */}
           <div className="observability-panel-split" style={{ width: `${100 - chatPanelWidth}%` }}>
             <div className="observability-panel-header">
-              <h3 className="observability-panel-title">📊 Agent Observability</h3>
+              <h3 className="observability-panel-title">Agent Observability</h3>
               <div className="panel-size-hint">{Math.round(100 - chatPanelWidth)}%</div>
             </div>
             
