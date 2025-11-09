@@ -46,7 +46,7 @@ class ContentStrategistAgent:
         self.agent_id = None
         self.tracer = tracer
         
-    async def analyze_topic(self, user_topic: str) -> Dict:
+    async def analyze_topic(self, user_topic: str, parent_span_id: Optional[str] = None) -> Dict:
         """Analyze the topic and create content strategy"""
         agent_name = "content_strategist"
         
