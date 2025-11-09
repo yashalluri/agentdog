@@ -909,30 +909,36 @@ async def chat_with_agent(request: ChatRequest):
         }
     )
     
-    # Process message with agent (using Anthropic Claude via Emergent LLM key)
+    # Process message with selected agent
     try:
-        chat = LlmChat(
-            api_key=os.environ.get('EMERGENT_LLM_KEY'),
-            session_id=run_id,
-            system_message="You are a helpful AI assistant. Provide clear, concise, and helpful responses to user queries."
-        ).with_model("anthropic", "claude-4-sonnet-20250514")
-        
-        # Get conversation history for context
-        workflow = await workflows_coll.find_one({"run_id": run_id})
-        messages = workflow.get('messages', [])
-        
-        # Build context from recent messages (last 10)
-        context = ""
-        if len(messages) > 1:  # More than just the current message
-            recent_messages = messages[-11:-1]  # Exclude the current message
-            for msg in recent_messages:
-                role = msg['role'].capitalize()
-                context += f"{role}: {msg['content']}\n\n"
-        
-        # Generate response
-        prompt = f"{context}User: {request.message}" if context else request.message
-        user_msg = UserMessage(text=prompt)
-        response_text = await chat.send_message(user_msg)
+        if request.agent_type == 'debate':
+            # Use debate multi-agent system
+            debate_system = DebateMultiAgentSystem(run_id=run_id)
+            response_text = await debate_system.debate_with_user(request.message)
+        else:
+            # Use default single agent (Claude)
+            chat = LlmChat(
+                api_key=os.environ.get('EMERGENT_LLM_KEY'),
+                session_id=run_id,
+                system_message="You are a helpful AI assistant. Provide clear, concise, and helpful responses to user queries."
+            ).with_model("anthropic", "claude-4-sonnet-20250514")
+            
+            # Get conversation history for context
+            workflow = await workflows_coll.find_one({"run_id": run_id})
+            messages = workflow.get('messages', [])
+            
+            # Build context from recent messages (last 10)
+            context = ""
+            if len(messages) > 1:  # More than just the current message
+                recent_messages = messages[-11:-1]  # Exclude the current message
+                for msg in recent_messages:
+                    role = msg['role'].capitalize()
+                    context += f"{role}: {msg['content']}\n\n"
+            
+            # Generate response
+            prompt = f"{context}User: {request.message}" if context else request.message
+            user_msg = UserMessage(text=prompt)
+            response_text = await chat.send_message(user_msg)
         
         # Store assistant response
         assistant_message = {
