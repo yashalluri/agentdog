@@ -385,12 +385,18 @@ Provide a well-reasoned argument that:
             
             print(f"[{agent_name}] ✅ Argument constructed")
             
+            # Complete agent span
+            if agent_span:
+                agent_span.output_data = response[:1000]
+                self.tracer.end_span(agent_span.span_id, SpanStatus.SUCCESS)
+            
             # Small delay to ensure event is persisted before broadcasting
             await asyncio.sleep(0.3)
             
             return {
                 "response": response,
-                "agent_id": self.agent_id
+                "agent_id": self.agent_id,
+                "span_id": agent_span.span_id if agent_span else None
             }
             
         except Exception as e:
