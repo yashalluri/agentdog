@@ -501,49 +501,77 @@ function App() {
               <span className="panel-size-hint">{Math.round(chatPanelWidth)}%</span>
             </div>
             
+            {/* Agent Selector and Start New Run Button */}
+            <div className="chat-controls">
+              <select 
+                className="agent-selector-full"
+                value={selectedAgent}
+                onChange={(e) => setSelectedAgent(e.target.value)}
+                title="Select Agent"
+              >
+                {availableAgents.map(agent => (
+                  <option key={agent.id} value={agent.id}>
+                    {agent.name}
+                  </option>
+                ))}
+              </select>
+              <Button
+                onClick={handleStartNewRun}
+                className="start-new-run-btn"
+                variant="outline"
+              >
+                🔄 Start New Run
+              </Button>
+            </div>
+            
             <div className="chat-messages-area">
-              {chatMessages.map((msg, idx) => (
-                <div key={idx} className={`chat-msg ${msg.role}`}>
-                  <div className="chat-msg-avatar">
-                    {msg.role === 'user' ? '👤' : '🤖'}
+              {chatMessages.length === 0 ? (
+                <div className="chat-empty">
+                  <p>No messages yet</p>
+                  <p className="chat-empty-sub">Start chatting with your agent</p>
+                </div>
+              ) : (
+                chatMessages.map((msg, idx) => (
+                  <div key={idx} className={`chat-msg ${msg.role}`}>
+                    <div className="chat-msg-avatar">
+                      {msg.role === 'user' ? '👤' : '🤖'}
+                    </div>
+                    <div className="chat-msg-content">
+                      <div className="chat-msg-text">{msg.content}</div>
+                      <div className="chat-msg-time">
+                        {new Date(msg.timestamp).toLocaleTimeString()}
+                      </div>
+                    </div>
                   </div>
+                ))
+              )}
+              {isSendingMessage && (
+                <div className="chat-msg assistant">
+                  <div className="chat-msg-avatar">🤖</div>
                   <div className="chat-msg-content">
-                    <div className="chat-msg-text">{msg.content}</div>
-                    <div className="chat-msg-time">
-                      {new Date(msg.timestamp).toLocaleTimeString()}
+                    <div className="chat-msg-text">
+                      <span className="typing-indicator">Thinking...</span>
                     </div>
                   </div>
                 </div>
-              ))}
+              )}
             </div>
             
             <div className="chat-input-container-new">
               <div className="chat-input-wrapper">
-                <select 
-                  className="agent-selector-inline"
-                  value={selectedAgent}
-                  onChange={(e) => setSelectedAgent(e.target.value)}
-                  title="Select Agent"
-                >
-                  {availableAgents.map(agent => (
-                    <option key={agent.id} value={agent.id}>
-                      {agent.name}
-                    </option>
-                  ))}
-                </select>
-                <div className="input-divider"></div>
                 <input
                   type="text"
                   className="chat-input-new"
                   placeholder="Type your message..."
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                  onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
+                  disabled={isSendingMessage}
                 />
                 <button 
                   className="chat-send-btn-new"
                   onClick={handleSendMessage}
-                  disabled={!chatInput.trim()}
+                  disabled={!chatInput.trim() || isSendingMessage}
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M5 12h14M12 5l7 7-7 7"/>
