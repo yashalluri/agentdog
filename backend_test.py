@@ -216,7 +216,7 @@ class AgentDogAPITester:
         
         # Test Scenario 2: Add agent with parent (success)
         scenario2_data = {
-            "run_id": "test-workflow-001",
+            "run_id": unique_run_id,
             "agent_name": "data_processor",
             "parent_step_id": agent_id_1,
             "status": "success",
