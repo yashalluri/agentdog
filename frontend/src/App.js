@@ -73,6 +73,10 @@ function App() {
     setSelectedRun(run);
     setSummary(null);
     fetchRunDetails(run.id);
+    // Close sidebar on mobile after selection
+    if (window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
   };
 
   const handleStepClick = (step) => {
