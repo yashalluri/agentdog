@@ -544,16 +544,31 @@
 
   .failure-header {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     gap: 12px;
+  }
+
+  .failure-header-left {
+    width: 100%;
+  }
+
+  .failure-title-group {
+    margin-right: 0;
   }
 
   .failure-header-right {
     width: 100%;
+    flex-direction: row;
     justify-content: space-between;
+    align-items: center;
   }
 
   .failure-details {
     padding-left: 16px;
+  }
+
+  .failure-meta {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
