@@ -357,14 +357,26 @@ class DebateMultiAgentSystem:
         # Extract citations from research results
         citations = []
         citation_id = 1
+        seen_urls = set()  # Avoid duplicate citations
+        
         for result in research_results.get('results', []):
-            for citation_url in result.get('citations', []):
-                citations.append({
-                    "id": citation_id,
-                    "url": citation_url,
-                    "title": f"Source {citation_id}"
-                })
-                citation_id += 1
+            for citation_data in result.get('citations', []):
+                if isinstance(citation_data, dict):
+                    url = citation_data.get('url', '')
+                    title = citation_data.get('title', f'Source {citation_id}')
+                else:
+                    url = citation_data
+                    title = f'Source {citation_id}'
+                
+                # Skip duplicates
+                if url and url not in seen_urls:
+                    citations.append({
+                        "id": citation_id,
+                        "url": url,
+                        "title": title
+                    })
+                    seen_urls.add(url)
+                    citation_id += 1
         
         # Format response with citations
         formatted_response = self._format_with_citations(debate_response, citations)
