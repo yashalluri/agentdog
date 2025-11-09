@@ -443,7 +443,7 @@ function App() {
           {/* Left Panel - Chat */}
           <div className="chat-panel-split" style={{ width: `${chatPanelWidth}%` }}>
             <div className="chat-panel-header">
-              <h3 className="chat-panel-title">💬 Agent Chat</h3>
+              <h3 className="chat-panel-title">Agent Chat</h3>
               <span className="panel-size-hint">{Math.round(chatPanelWidth)}%</span>
             </div>
             
