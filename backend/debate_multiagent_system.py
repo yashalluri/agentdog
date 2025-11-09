@@ -257,11 +257,12 @@ class ResearchAgent:
 class DebateAgent:
     """Agent responsible for constructing debate arguments using research"""
     
-    def __init__(self, run_id: str, agentdog: AgentDog):
+    def __init__(self, run_id: str, agentdog: AgentDog, tracer: Optional[ObservabilityTracer] = None):
         self.run_id = run_id
         self.agentdog = agentdog
         self.llm_key = os.environ.get('EMERGENT_LLM_KEY')
         self.agent_id = None
+        self.tracer = tracer
         
     async def construct_argument(
         self, 
