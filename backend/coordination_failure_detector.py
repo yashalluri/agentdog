@@ -282,7 +282,7 @@ class CoordinationFailureDetector:
                             "severity": "medium",
                             "span_id": span.get("span_id"),
                             "span_name": span_name,
-                            "message": f"Agent makes claim that can't be verified from parent context",
+                            "message": "Agent makes claim that can't be verified from parent context",
                             "evidence": {
                                 "claim": claim,
                                 "parent_span": parent.get("span_id")
@@ -301,7 +301,7 @@ class CoordinationFailureDetector:
                             "severity": "high",
                             "span_id": span.get("span_id"),
                             "span_name": span_name,
-                            "message": f"Agent references data not found in trace",
+                            "message": "Agent references data not found in trace",
                             "evidence": {
                                 "reference": ref
                             }
@@ -367,7 +367,7 @@ class CoordinationFailureDetector:
                         "severity": "high",
                         "span_id": writer_span.get("span_id"),
                         "span_name": writer_name,
-                        "message": f"Platform writer must be child of social_media_workflow",
+                        "message": "Platform writer must be child of social_media_workflow",
                         "evidence": {
                             "actual_parent": parent.get("name") if parent else "none",
                             "expected_parent": "social_media_workflow"
@@ -386,7 +386,7 @@ class CoordinationFailureDetector:
                     "severity": "low",
                     "span_id": span.get("span_id"),
                     "span_name": span_name,
-                    "message": f"Agent exceeded maximum allowed duration",
+                    "message": "Agent exceeded maximum allowed duration",
                     "evidence": {
                         "duration_ms": duration,
                         "max_allowed_ms": contracts["content_strategist"]["max_duration_ms"]
