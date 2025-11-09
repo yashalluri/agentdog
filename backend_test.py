@@ -181,9 +181,13 @@ class AgentDogAPITester:
         """Test the POST /api/event endpoint with specific scenarios"""
         print("\n🔍 Testing Event Ingestion Scenarios...")
         
+        # Generate unique run_id for this test
+        import time
+        unique_run_id = f"test-workflow-{int(time.time())}"
+        
         # Test Scenario 1: Create a new workflow with successful agent
         scenario1_data = {
-            "run_id": "test-workflow-001",
+            "run_id": unique_run_id,
             "agent_name": "data_collector",
             "status": "success",
             "start_time": "2025-11-09T00:55:00Z",
