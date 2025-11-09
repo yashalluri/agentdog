@@ -285,7 +285,10 @@ Provide a well-reasoned argument that:
             
             print(f"[{agent_name}] ✅ Argument constructed")
             
-            return response
+            return {
+                "response": response,
+                "agent_id": self.agent_id
+            }
             
         except Exception as e:
             latency_ms = int((time.time() - start_time) * 1000)
