@@ -31,6 +31,8 @@ function App() {
   const [chatPanelWidth, setChatPanelWidth] = useState(40); // percentage
   const [isResizing, setIsResizing] = useState(false);
   const [selectedAgent, setSelectedAgent] = useState('default');
+  const [currentRunId, setCurrentRunId] = useState(null); // Track active chat run
+  const [isSendingMessage, setIsSendingMessage] = useState(false);
   
   // Available agents (default + custom agents)
   const availableAgents = [
