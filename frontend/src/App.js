@@ -546,6 +546,19 @@ function App() {
             
             <div className="chat-input-container-new">
               <div className="chat-input-wrapper">
+                <select 
+                  className="agent-selector-inline"
+                  value={selectedAgent}
+                  onChange={(e) => setSelectedAgent(e.target.value)}
+                  title="Select Agent"
+                >
+                  {availableAgents.map(agent => (
+                    <option key={agent.id} value={agent.id}>
+                      {agent.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="input-divider"></div>
                 <input
                   type="text"
                   className="chat-input-new"
