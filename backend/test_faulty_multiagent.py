@@ -124,8 +124,6 @@ class AnalyzerAgent:
         )
         agent_span.input_data = data
         
-        start_time = time.time()
-        
         # BUG: Child span takes longer than parent will (LOGICAL_INCONSISTENCY)
         # We'll make this take 3 seconds, but parent will be marked as 2 seconds
         llm_span = self.tracer.start_span(
