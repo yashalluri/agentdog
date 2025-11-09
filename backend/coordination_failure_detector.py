@@ -177,7 +177,6 @@ class CoordinationFailureDetector:
             span_name = span.get("name", "")
             status = span.get("status")
             error = span.get("error")
-            output_data = str(span.get("output", ""))
             
             # Check 1: Success status but has error message
             if status == "success" and error:
