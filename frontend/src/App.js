@@ -158,12 +158,26 @@ function App() {
     }
   };
 
-  const handleRunClick = (run) => {
+  const handleRunClick = async (run) => {
     setSelectedRun(run);
     setLiveExecution(null); // Clear live execution view
     setExecutionLog([]); // Clear execution log
     setSummary(null);
+    setCurrentRunId(run.id);
+    
+    // Fetch run details for observability
     fetchRunDetails(run.id);
+    
+    // Load chat messages for this run
+    try {
+      const response = await axios.get(`${API}/run/${run.id}/messages`);
+      setChatMessages(response.data.messages || []);
+    } catch (error) {
+      console.error('Error loading chat messages:', error);
+      // If no messages endpoint, clear chat
+      setChatMessages([]);
+    }
+    
     // Close sidebar on mobile after selection
     if (window.innerWidth < 768) {
       setSidebarOpen(false);
