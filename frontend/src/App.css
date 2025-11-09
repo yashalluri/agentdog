@@ -266,8 +266,11 @@ body {
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: #6B7280;
+  width: 100%;
+  color: #9CA3AF;
   font-size: 15px;
+  text-align: center;
+  padding: 40px;
 }
 
 .run-detail {
