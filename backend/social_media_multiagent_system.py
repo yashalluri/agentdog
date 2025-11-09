@@ -391,6 +391,17 @@ FACEBOOK: #hashtag1 #hashtag2 #hashtag3"""
             if asyncio.iscoroutine(response):
                 response = await response
             
+            # Complete LLM span
+            if llm_span:
+                llm_span.output_data = response[:1000]
+                llm_span.add_llm_details(
+                    model="claude-4-sonnet-20250514",
+                    tokens_input=len(prompt.split()),
+                    tokens_output=len(response.split()),
+                    cost_usd=0.002
+                )
+                self.tracer.end_span(llm_span.span_id, SpanStatus.SUCCESS)
+            
             latency_ms = int((time.time() - start_time) * 1000)
             
             self.agent_id = self.agentdog.emit_event(
@@ -407,12 +418,18 @@ FACEBOOK: #hashtag1 #hashtag2 #hashtag3"""
             
             print(f"[{agent_name}] ✅ Hashtags generated")
             
+            # Complete agent span
+            if agent_span:
+                agent_span.output_data = response[:1000]
+                self.tracer.end_span(agent_span.span_id, SpanStatus.SUCCESS)
+            
             await asyncio.sleep(0.3)  # Ensure persistence
             
             return {
                 "success": True,
                 "hashtags": response,
-                "agent_id": self.agent_id
+                "agent_id": self.agent_id,
+                "span_id": agent_span.span_id if agent_span else None
             }
             
         except Exception as e:
