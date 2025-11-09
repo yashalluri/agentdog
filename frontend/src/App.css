@@ -742,3 +742,31 @@ body {
   color: #0F172A;
   margin-bottom: 16px;
 }
+
+/* User Avatar & Dropdown */
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.user-info {
+  padding: 12px 16px;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0F172A;
+}
+
+.user-email {
+  font-size: 12px;
+  color: #6B7280;
+  margin-top: 2px;
+}
