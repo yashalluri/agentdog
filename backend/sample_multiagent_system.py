@@ -241,7 +241,7 @@ class ResearchAssistant:
             chat = LlmChat(
                 api_key=self.llm_key,
                 session_id=f"{self.run_id}-{agent_name}",
-                system_message="You are a content analysis assistant."
+                system_message="You are a research report writer."
             ).with_model("openai", "gpt-4o-mini")
             
             user_message = UserMessage(text=prompt)
