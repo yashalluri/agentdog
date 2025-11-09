@@ -196,21 +196,6 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
-  .trace-timeline-container {
-    flex-direction: column;
-  }
-
-  .trace-timeline-tree {
-    border-right: none;
-    border-bottom: 1px solid #E5E7EB;
-    max-height: 40vh;
-  }
-
-  .trace-details-panel {
-    width: 100%;
-    flex: 1;
-  }
-
   .span-name {
     flex: 0 0 150px;
   }
