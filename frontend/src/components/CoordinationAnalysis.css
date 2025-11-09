@@ -1,0 +1,498 @@
+.coordination-analysis-container {
+  padding: 24px;
+  background: #FFFFFF;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.coordination-loading,
+.coordination-error,
+.coordination-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #6B7280;
+  gap: 12px;
+}
+
+.retry-button {
+  padding: 8px 16px;
+  background: #3B82F6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.retry-button:hover {
+  background: #2563EB;
+}
+
+.error-detail {
+  font-size: 13px;
+  color: #EF4444;
+  margin-top: 8px;
+}
+
+/* Health Score Card */
+.health-score-card {
+  background: linear-gradient(135deg, #F9FAFB 0%, #FFFFFF 100%);
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.health-score-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.health-score-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.health-score-display {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-bottom: 24px;
+}
+
+.health-score-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 8px solid;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.health-score-value {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.health-score-max {
+  font-size: 16px;
+  color: #9CA3AF;
+  font-weight: 500;
+}
+
+.health-score-details {
+  flex: 1;
+  display: flex;
+  gap: 24px;
+}
+
+.health-detail-item {
+  flex: 1;
+  padding: 16px;
+  background: white;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+}
+
+.health-detail-item.critical {
+  border-color: #FCA5A5;
+  background: #FEF2F2;
+}
+
+.health-detail-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6B7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.health-detail-value {
+  display: block;
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.health-detail-item.critical .health-detail-value {
+  color: #DC2626;
+}
+
+/* Summary Stats */
+.summary-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid #E5E7EB;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: white;
+  border: 1px solid #E5E7EB;
+  border-radius: 6px;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #6B7280;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.stat-value.severity-high {
+  color: #DC2626;
+}
+
+.stat-value.severity-medium {
+  color: #F59E0B;
+}
+
+.stat-value.severity-low {
+  color: #6B7280;
+}
+
+/* Failures by Type */
+.failures-by-type {
+  margin-bottom: 24px;
+}
+
+.failures-by-type h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.type-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.type-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: white;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.type-card:hover {
+  border-color: #3B82F6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+.type-icon {
+  font-size: 28px;
+}
+
+.type-info {
+  flex: 1;
+}
+
+.type-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.type-count {
+  font-size: 12px;
+  color: #6B7280;
+}
+
+/* Failures List */
+.failures-list {
+  margin-bottom: 24px;
+}
+
+.failures-list h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.failure-item {
+  background: white;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.failure-item:hover {
+  border-color: #3B82F6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+.failure-item.expanded {
+  border-color: #3B82F6;
+}
+
+.failure-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.failure-header-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+}
+
+.failure-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.failure-title-group {
+  flex: 1;
+}
+
+.failure-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.failure-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: #6B7280;
+}
+
+.failure-span {
+  font-family: 'SF Mono', monospace;
+  background: #F3F4F6;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.failure-subtype {
+  font-style: italic;
+}
+
+.failure-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.expand-icon {
+  color: #9CA3AF;
+  font-size: 12px;
+  transition: transform 0.2s;
+}
+
+.failure-item.expanded .expand-icon {
+  transform: rotate(0deg);
+}
+
+/* Failure Details */
+.failure-details {
+  padding: 0 16px 16px 64px;
+  border-top: 1px solid #F3F4F6;
+  padding-top: 16px;
+}
+
+.failure-section {
+  margin-bottom: 16px;
+}
+
+.failure-section:last-child {
+  margin-bottom: 0;
+}
+
+.failure-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6B7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.failure-section-value {
+  font-size: 14px;
+  color: #111827;
+}
+
+.failure-section-value.code {
+  font-family: 'SF Mono', monospace;
+  background: #F3F4F6;
+  padding: 6px 10px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.evidence-box {
+  background: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  border-radius: 6px;
+  padding: 12px;
+  overflow-x: auto;
+}
+
+.evidence-box pre {
+  margin: 0;
+  font-size: 12px;
+  font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+  color: #374151;
+  line-height: 1.6;
+}
+
+/* No Failures */
+.no-failures {
+  text-align: center;
+  padding: 60px 20px;
+  background: linear-gradient(135deg, #F0FDF4 0%, #FFFFFF 100%);
+  border: 1px solid #D1FAE5;
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.success-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.no-failures h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #059669;
+}
+
+.no-failures p {
+  margin: 0;
+  font-size: 14px;
+  color: #6B7280;
+}
+
+/* Footer */
+.coordination-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 24px;
+  border-top: 1px solid #E5E7EB;
+}
+
+.refresh-button {
+  padding: 10px 20px;
+  background: #F3F4F6;
+  color: #374151;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.refresh-button:hover {
+  background: #E5E7EB;
+  border-color: #9CA3AF;
+}
+
+.analysis-timestamp {
+  font-size: 12px;
+  color: #9CA3AF;
+}
+
+/* Scrollbar Styling */
+.coordination-analysis-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.coordination-analysis-container::-webkit-scrollbar-track {
+  background: #F3F4F6;
+}
+
+.coordination-analysis-container::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 4px;
+}
+
+.coordination-analysis-container::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .coordination-analysis-container {
+    padding: 16px;
+  }
+
+  .health-score-display {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .health-score-details {
+    width: 100%;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .summary-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .type-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .failure-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .failure-header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .failure-details {
+    padding-left: 16px;
+  }
+}
