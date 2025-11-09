@@ -121,6 +121,27 @@ function App() {
     }
   };
 
+  const handleRunMultiAgentDemo = async () => {
+    try {
+      toast.info('Starting multi-agent workflow...');
+      await axios.post(`${API}/run-multiagent-demo`);
+      toast.success('Multi-agent demo started! Watch agents execute in real-time.');
+      
+      // Poll for new runs to show live updates
+      const pollInterval = setInterval(() => {
+        fetchRuns();
+      }, 1000);
+      
+      // Stop polling after 10 seconds
+      setTimeout(() => {
+        clearInterval(pollInterval);
+      }, 10000);
+      
+    } catch (error) {
+      toast.error('Failed to start multi-agent demo');
+    }
+  };
+
   const filteredRuns = runs.filter(run => {
     const matchesSearch = run.title.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSearch;
