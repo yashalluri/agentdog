@@ -320,11 +320,65 @@ function App() {
           </ScrollArea>
         </div>
 
-        {/* Main Panel - Run Detail */}
+        {/* Main Panel - Live Execution or Run Detail */}
         <div className="main-panel" data-testid="main-panel">
-          {!selectedRun ? (
+          {liveExecution ? (
+            /* Live Execution Chat View */
+            <div className="execution-chat" data-testid="execution-chat">
+              <div className="chat-header">
+                <div>
+                  <h2 className="chat-title">🤖 Multi-Agent Execution</h2>
+                  <p className="chat-subtitle">Run ID: {liveExecution.run_id}</p>
+                </div>
+                <button 
+                  className="chat-close"
+                  onClick={() => {
+                    setLiveExecution(null);
+                    setExecutionLog([]);
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="chat-messages">
+                {executionLog.length === 0 && (
+                  <div className="chat-message system">
+                    <div className="message-icon">⚡</div>
+                    <div className="message-content">
+                      <div className="message-text">Initializing agents...</div>
+                    </div>
+                  </div>
+                )}
+                
+                {executionLog.map((log, index) => (
+                  <div key={index} className={`chat-message ${log.status}`}>
+                    <div className="message-icon">
+                      {log.status === 'success' ? '✅' : log.status === 'error' ? '❌' : '🔄'}
+                    </div>
+                    <div className="message-content">
+                      <div className="message-agent-name">{log.agent_name}</div>
+                      <div className="message-text">
+                        {log.status === 'started' && `Starting ${log.agent_name}...`}
+                        {log.status === 'success' && `Completed in ${log.latency_ms}ms`}
+                        {log.status === 'error' && `Failed: ${log.error_message}`}
+                        {log.coordination_issue && (
+                          <div className="coordination-alert">
+                            ⚠️ Coordination Issue: {log.coordination_issue}
+                          </div>
+                        )}
+                      </div>
+                      <div className="message-time">
+                        {new Date(log.timestamp).toLocaleTimeString()}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : !selectedRun ? (
             <div className="empty-main" data-testid="empty-main">
-              <p>Select a run to view details</p>
+              <p>Select a run to view details or click "Run Multi-Agent Demo" to watch live execution</p>
             </div>
           ) : (
             <div className="run-detail" data-testid="run-detail">
