@@ -841,7 +841,78 @@ body {
 
   /* Run detail adjustments */
   .run-title {
-    font-size: 18px;
+    font-size: 16px;
+  }
+  
+  .run-subtitle {
+    font-size: 12px;
+  }
+  
+  /* Make run header stack on mobile */
+  .run-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  /* Metrics row - 2 columns on mobile */
+  .metrics-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  
+  .metric-card {
+    padding: 12px;
+  }
+  
+  .metric-label {
+    font-size: 9px;
+    margin-bottom: 6px;
+  }
+  
+  .metric-value {
+    font-size: 16px;
+  }
+  
+  /* Agent flow adjustments */
+  .agent-flow {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .flow-item {
+    padding: 10px 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .flow-item-left {
+    gap: 8px;
+  }
+  
+  .flow-item-name {
+    font-size: 13px;
+  }
+  
+  .flow-item-right {
+    align-self: flex-end;
+    gap: 12px;
+  }
+  
+  .flow-metric {
+    font-size: 12px;
+  }
+  
+  /* Summary section */
+  .summary-section {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .summary-content {
+    font-size: 13px;
   }
 
   .run-subtitle {
