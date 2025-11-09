@@ -957,13 +957,15 @@ async def chat_with_agent(request: ChatRequest):
             prompt = f"{context}User: {request.message}" if context else request.message
             user_msg = UserMessage(text=prompt)
             response_text = await chat.send_message(user_msg)
+            citations = []  # No citations for default agent
         
         # Store assistant response
         assistant_message = {
             "role": "assistant",
             "content": response_text,
             "timestamp": datetime.now(timezone.utc).isoformat(),
-            "agent_name": f"{request.agent_type}_agent"
+            "agent_name": f"{request.agent_type}_agent",
+            "citations": citations
         }
         
         await workflows_coll.update_one(
