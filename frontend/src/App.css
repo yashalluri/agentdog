@@ -2036,4 +2036,180 @@ body {
   .timeline-duration {
     font-size: 11px;
   }
+
+
+/* Performance Modal */
+.performance-modal {
+  width: 500px;
+}
+
+.performance-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.perf-stat-card {
+  padding: 20px;
+  background: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+}
+
+.perf-stat-card.success {
+  background: #F0FDF4;
+  border-color: #BBF7D0;
+}
+
+.perf-stat-card.error {
+  background: #FEF2F2;
+  border-color: #FECACA;
+}
+
+.perf-stat-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6B7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.perf-stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.perf-stat-sublabel {
+  font-size: 13px;
+  color: #6B7280;
+  margin-top: 4px;
+}
+
+.performance-section {
+  margin-bottom: 24px;
+}
+
+.performance-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 12px;
+}
+
+.status-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.status-bar-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.status-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.status-bar {
+  height: 24px;
+  background: #F3F4F6;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.status-bar-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+}
+
+.status-bar-fill.success {
+  background: linear-gradient(90deg, #10B981 0%, #059669 100%);
+}
+
+.status-bar-fill.error {
+  background: linear-gradient(90deg, #EF4444 0%, #DC2626 100%);
+}
+
+.status-bar-fill.running {
+  background: linear-gradient(90deg, #F59E0B 0%, #D97706 100%);
+}
+
+.health-indicator {
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #E5E7EB;
+}
+
+.health-status {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.health-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.health-status.excellent .health-icon {
+  background: #D1FAE5;
+  color: #059669;
+}
+
+.health-status.good .health-icon {
+  background: #FEF3C7;
+  color: #D97706;
+}
+
+.health-status.poor .health-icon {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+
+.health-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 2px;
+}
+
+.health-description {
+  font-size: 13px;
+  color: #6B7280;
+}
+
+.performance-footer {
+  padding-top: 16px;
+  border-top: 1px solid #E5E7EB;
+}
+
+.performance-note {
+  font-size: 12px;
+  color: #9CA3AF;
+  text-align: center;
+  font-style: italic;
+}
+
 }
