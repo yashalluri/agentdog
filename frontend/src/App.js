@@ -520,7 +520,7 @@ function App() {
             <Menu className="w-5 h-5" />
           </button>
           <div className="nav-logo-container">
-            <div className="nav-logo" data-testid="nav-logo">AgentLens</div>
+            <div className="nav-logo" data-testid="nav-logo">AgentDog</div>
             <div className="nav-tagline" data-testid="nav-tagline">Datadog for AI agents</div>
           </div>
         </div>
