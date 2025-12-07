@@ -20,7 +20,7 @@ import time
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
 from dotenv import load_dotenv
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+from llm_client import LlmClient
 
 # Load environment variables
 load_dotenv()
@@ -42,7 +42,7 @@ class ContentStrategistAgent:
     def __init__(self, run_id: str, agentdog: AgentDog, tracer: Optional[ObservabilityTracer] = None):
         self.run_id = run_id
         self.agentdog = agentdog
-        self.llm_key = os.environ.get('EMERGENT_LLM_KEY')
+        self.llm_key = os.environ.get('OPENAI_API_KEY')
         self.agent_id = None
         self.tracer = tracer
         
@@ -87,17 +87,12 @@ Be concise and strategic."""
                 )
                 llm_span.input_data = prompt
             
-            chat = LlmChat(
+            llm_client = LlmClient(
                 api_key=self.llm_key,
-                session_id=f"{self.run_id}-{agent_name}",
                 system_message="You are a professional content strategist."
-            ).with_model("anthropic", "claude-4-sonnet-20250514")
+            )
             
-            user_msg = UserMessage(text=prompt)
-            response = chat.send_message(user_msg)
-            
-            if asyncio.iscoroutine(response):
-                response = await response
+            response = await llm_client.send_message_async(prompt)
             
             # Complete LLM span
             if llm_span:
@@ -170,7 +165,7 @@ class PlatformWriterAgent:
         self.run_id = run_id
         self.agentdog = agentdog
         self.platform = platform
-        self.llm_key = os.environ.get('EMERGENT_LLM_KEY')
+        self.llm_key = os.environ.get('OPENAI_API_KEY')
         self.agent_id = None
         self.tracer = tracer
         
@@ -246,17 +241,12 @@ Create engaging, platform-optimized content that follows these specs exactly."""
                 )
                 llm_span.input_data = prompt[:500]
             
-            chat = LlmChat(
+            llm_client = LlmClient(
                 api_key=self.llm_key,
-                session_id=f"{self.run_id}-{agent_name}",
                 system_message=f"You are an expert {self.platform} content writer."
-            ).with_model("anthropic", "claude-4-sonnet-20250514")
+            )
             
-            user_msg = UserMessage(text=prompt)
-            response = chat.send_message(user_msg)
-            
-            if asyncio.iscoroutine(response):
-                response = await response
+            response = await llm_client.send_message_async(prompt)
             
             # Complete LLM span
             if llm_span:
@@ -332,7 +322,7 @@ class HashtagGeneratorAgent:
     def __init__(self, run_id: str, agentdog: AgentDog, tracer: Optional[ObservabilityTracer] = None):
         self.run_id = run_id
         self.agentdog = agentdog
-        self.llm_key = os.environ.get('EMERGENT_LLM_KEY')
+        self.llm_key = os.environ.get('OPENAI_API_KEY')
         self.agent_id = None
         self.tracer = tracer
         
@@ -379,17 +369,12 @@ FACEBOOK: #hashtag1 #hashtag2 #hashtag3"""
                     parent_span_id=agent_span.span_id
                 )
                 llm_span.input_data = prompt
-            chat = LlmChat(
+            llm_client = LlmClient(
                 api_key=self.llm_key,
-                session_id=f"{self.run_id}-{agent_name}",
                 system_message="You are an expert social media hashtag strategist."
-            ).with_model("anthropic", "claude-4-sonnet-20250514")
+            )
             
-            user_msg = UserMessage(text=prompt)
-            response = chat.send_message(user_msg)
-            
-            if asyncio.iscoroutine(response):
-                response = await response
+            response = await llm_client.send_message_async(prompt)
             
             # Complete LLM span
             if llm_span:
@@ -463,7 +448,7 @@ class EngagementOptimizerAgent:
     def __init__(self, run_id: str, agentdog: AgentDog, tracer: Optional[ObservabilityTracer] = None):
         self.run_id = run_id
         self.agentdog = agentdog
-        self.llm_key = os.environ.get('EMERGENT_LLM_KEY')
+        self.llm_key = os.environ.get('OPENAI_API_KEY')
         self.agent_id = None
         self.tracer = tracer
         
@@ -507,17 +492,12 @@ Be specific and actionable."""
                     parent_span_id=agent_span.span_id
                 )
                 llm_span.input_data = prompt
-            chat = LlmChat(
+            llm_client = LlmClient(
                 api_key=self.llm_key,
-                session_id=f"{self.run_id}-{agent_name}",
                 system_message="You are an expert social media engagement strategist."
-            ).with_model("anthropic", "claude-4-sonnet-20250514")
+            )
             
-            user_msg = UserMessage(text=prompt)
-            response = chat.send_message(user_msg)
-            
-            if asyncio.iscoroutine(response):
-                response = await response
+            response = await llm_client.send_message_async(prompt)
             
             # Complete LLM span
             if llm_span:

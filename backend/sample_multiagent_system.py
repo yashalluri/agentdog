@@ -15,7 +15,7 @@ import os
 import sys
 import time
 from datetime import datetime, timezone
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+from llm_client import LlmClient
 
 # Add backend to path to import SDK
 sys.path.insert(0, '/app/backend')
@@ -28,7 +28,7 @@ class ResearchAssistant:
     def __init__(self, run_id: str):
         self.run_id = run_id
         self.agentdog = AgentDog(api_url="http://localhost:8001/api")
-        self.llm_key = os.environ.get('EMERGENT_LLM_KEY')
+        self.llm_key = os.environ.get('OPENAI_API_KEY')
         
         # Store agent IDs for parent relationships
         self.agent_ids = {}
@@ -71,19 +71,13 @@ class ResearchAssistant:
         start_time = time.time()
         
         try:
-            # Use Emergent LLM key with GPT-4o-mini
-            chat = LlmChat(
+            # Use Anthropic Claude
+            llm_client = LlmClient(
                 api_key=self.llm_key,
-                session_id=f"{self.run_id}-{agent_name}",
                 system_message="You are a helpful research assistant. Generate exactly 3 search queries."
-            ).with_model("openai", "gpt-4o-mini")
+            )
             
-            user_message = UserMessage(text=prompt)
-            response = chat.send_message(user_message)
-            
-            # Handle async if needed
-            if asyncio.iscoroutine(response):
-                response = await response
+            response = await llm_client.send_message_async(prompt)
             
             # Parse queries from response
             queries = [line.strip('- ').strip() for line in response.split('\n') if line.strip()][:3]
@@ -129,19 +123,13 @@ class ResearchAssistant:
         
         try:
             # Simulate web search with LLM
-            chat = LlmChat(
+            llm_client = LlmClient(
                 api_key=self.llm_key,
-                session_id=f"{self.run_id}-{agent_name}",
                 system_message="You are a web search assistant providing factual information."
-            ).with_model("openai", "gpt-4o-mini")
+            )
             
             search_prompt = f"Provide 2-3 key facts about: {query}"
-            user_message = UserMessage(text=search_prompt)
-            response = chat.send_message(user_message)
-            
-            # Handle async if needed
-            if asyncio.iscoroutine(response):
-                response = await response
+            response = await llm_client.send_message_async(search_prompt)
             
             latency_ms = int((time.time() - start_time) * 1000)
             
@@ -194,18 +182,12 @@ class ResearchAssistant:
         start_time = time.time()
         
         try:
-            chat = LlmChat(
+            llm_client = LlmClient(
                 api_key=self.llm_key,
-                session_id=f"{self.run_id}-{agent_name}",
                 system_message="You are a content analysis assistant."
-            ).with_model("openai", "gpt-4o-mini")
+            )
             
-            user_message = UserMessage(text=prompt)
-            response = chat.send_message(user_message)
-            
-            # Handle async if needed
-            if asyncio.iscoroutine(response):
-                response = await response
+            response = await llm_client.send_message_async(prompt)
             
             latency_ms = int((time.time() - start_time) * 1000)
             
@@ -250,18 +232,12 @@ class ResearchAssistant:
         start_time = time.time()
         
         try:
-            chat = LlmChat(
+            llm_client = LlmClient(
                 api_key=self.llm_key,
-                session_id=f"{self.run_id}-{agent_name}",
                 system_message="You are a research report writer."
-            ).with_model("openai", "gpt-4o-mini")
+            )
             
-            user_message = UserMessage(text=prompt)
-            response = chat.send_message(user_message)
-            
-            # Handle async if needed
-            if asyncio.iscoroutine(response):
-                response = await response
+            response = await llm_client.send_message_async(prompt)
             
             latency_ms = int((time.time() - start_time) * 1000)
             

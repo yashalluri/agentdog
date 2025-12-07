@@ -293,10 +293,11 @@ class CoordinationFailureDetector:
             # Check 4: Duration inconsistencies (child longer than parent)
             parent = span.get("parent_span")
             if parent:
-                child_duration = span.get("duration_ms", 0)
-                parent_duration = parent.get("duration_ms", 0)
+                child_duration = span.get("duration_ms") or 0
+                parent_duration = parent.get("duration_ms") or 0
                 
-                if child_duration > parent_duration:
+                # Only compare if both durations are valid (non-zero)
+                if child_duration > 0 and parent_duration > 0 and child_duration > parent_duration:
                     inconsistencies.append({
                         "type": "logical_inconsistency",
                         "subtype": "duration_inconsistency",

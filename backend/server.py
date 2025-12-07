@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any, Set
 import uuid
 from datetime import datetime, timezone
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+from llm_client import LlmClient, get_completion_async
 import asyncio
 import json
 from database import (
@@ -456,14 +456,8 @@ async def generate_summary(run_id: str):
             "cost": agent.get('cost_usd', 0)
         })
     
-    # Use Anthropic Claude Sonnet 4 via Emergent LLM key
+    # Use Anthropic Claude Sonnet 4 directly
     try:
-        chat = LlmChat(
-            api_key=os.environ.get('EMERGENT_LLM_KEY'),
-            session_id=f"summary-{run_id}",
-            system_message="You are AgentDog, a reasoning observability assistant. Your job is to analyze multi-agent runs and provide clear, concise summaries."
-        ).with_model("anthropic", "claude-4-sonnet-20250514")
-        
         summary_prompt = f"""You are AgentDog, a reasoning observability assistant.
 Summarize the following multi-agent run concisely.
 
@@ -478,9 +472,10 @@ Steps:
 
 Provide a concise summary explaining what the agents collectively did, any failures or retries, and the overall outcome."""
         
-        user_message = UserMessage(text=summary_prompt)
-        
-        response = await chat.send_message(user_message)
+        response = await get_completion_async(
+            prompt=summary_prompt,
+            system_message="You are AgentDog, a reasoning observability assistant. Your job is to analyze multi-agent runs and provide clear, concise summaries."
+        )
         
         # Update workflow with summary
         await workflows_coll.update_one(
@@ -1213,13 +1208,7 @@ async def chat_with_agent(request: ChatRequest):
                 citations = []
         
         else:
-            # Use default single agent (Claude)
-            chat = LlmChat(
-                api_key=os.environ.get('EMERGENT_LLM_KEY'),
-                session_id=run_id,
-                system_message="You are a helpful AI assistant. Provide clear, concise, and helpful responses to user queries."
-            ).with_model("anthropic", "claude-4-sonnet-20250514")
-            
+            # Use default single agent (Claude) directly via Anthropic SDK
             # Get conversation history for context
             workflow = await workflows_coll.find_one({"run_id": run_id})
             messages = workflow.get('messages', [])
@@ -1234,8 +1223,10 @@ async def chat_with_agent(request: ChatRequest):
             
             # Generate response
             prompt = f"{context}User: {request.message}" if context else request.message
-            user_msg = UserMessage(text=prompt)
-            response_text = await chat.send_message(user_msg)
+            response_text = await get_completion_async(
+                prompt=prompt,
+                system_message="You are a helpful AI assistant. Provide clear, concise, and helpful responses to user queries."
+            )
             citations = []  # No citations for default agent
         
         # Store assistant response
