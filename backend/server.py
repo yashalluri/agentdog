@@ -1,6 +1,12 @@
 from fastapi import FastAPI, APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
+from compliance_checker import extract_requirements, naive_check
+
+
+from compliance_checker import extract_requirements, naive_check
+
+
 import os
 import logging
 from pathlib import Path
@@ -126,6 +132,12 @@ class Workflow(BaseModel):
     def cost(self):
         # Will be calculated from agent runs
         return 0.0
+    
+class ComplianceCheckRequest(BaseModel):
+    policy_text: str = Field(..., description="Compliance policy document text")
+    target_text: str = Field(..., description="Text/code/doc to evaluate against policy")
+    mode: str = Field("good", description="good | bad (bad intentionally misses some reqs for demo)")
+
 
 class AgentRun(BaseModel):
     """Agent Run model matching MongoDB schema"""
@@ -177,6 +189,11 @@ class EventRequest(BaseModel):
     cost_usd: Optional[float] = None
     error_message: Optional[str] = None
 
+class ComplianceCheckRequest(BaseModel):
+    policy_text: str = Field(..., description="Compliance policy document text")
+    target_text: str = Field(..., description="Text/code/doc to evaluate against policy")
+    mode: str = Field("good", description="good | bad (bad intentionally misses some reqs for demo)")
+
 class EventResponse(BaseModel):
     """Response model for event ingestion"""
     status: str
@@ -215,6 +232,55 @@ def quick_coordination_check(error_message: str) -> Optional[str]:
     return "Coordination failure detected"
 
 # API Routes
+@api_router.post("/docs/check")
+async def check_docs_compliance(payload: ComplianceCheckRequest):
+    """
+    Compliance checking endpoint.
+    Uses an agent to evaluate whether a document/code follows a policy.
+    Supports demo mode where an agent intentionally misses requirements.
+    """
+    policy_text = payload.policy_text.strip()
+    target_text = payload.target_text.strip()
+    mode = payload.mode.lower()
+
+    if not policy_text or not target_text:
+        raise HTTPException(
+            status_code=400,
+            detail="policy_text and target_text are required"
+        )
+
+    # Extract structured requirements from policy
+    requirements = extract_requirements(policy_text)
+
+    # Run compliance check
+    report = naive_check(requirements, target_text)
+
+    # DEMO: simulate a faulty agent that misses compliance
+    if mode == "bad" and report.get("results"):
+        flipped = 0
+        for r in report["results"]:
+            if r["status"] == "met":
+                r["status"] = "missing"
+                r["matched_keywords"] = []
+                flipped += 1
+            if flipped >= 2:
+                break
+
+        total = len(report["results"])
+        met = sum(1 for r in report["results"] if r["status"] == "met")
+        score = round((met / max(1, total)) * 100)
+
+        report.update({
+            "total": total,
+            "met": met,
+            "missing_count": total - met,
+            "score": score,
+            "missing": [r for r in report["results"] if r["status"] == "missing"],
+            "mode_note": "Bad agent demo: intentionally missed some compliance checks."
+        })
+
+    return report
+
 @api_router.get("/runs")
 async def get_runs(status: Optional[str] = None, limit: int = 100):
     """Get all workflow runs"""
@@ -1597,13 +1663,63 @@ async def test_faulty_multiagent():
         "view_results": f"/api/run/{run_id}/coordination-analysis"
     }
 
+@api_router.post("/docs/check")
+async def check_docs_compliance(payload: ComplianceCheckRequest):
+    """
+    Compliance checking endpoint.
+    Uses an agent to evaluate whether a document/code follows a policy.
+    Supports demo mode where an agent intentionally misses requirements.
+    """
+    policy_text = payload.policy_text.strip()
+    target_text = payload.target_text.strip()
+    mode = payload.mode.lower()
+
+    if not policy_text or not target_text:
+        raise HTTPException(
+            status_code=400,
+            detail="policy_text and target_text are required"
+        )
+
+    # Extract structured requirements from policy
+    requirements = extract_requirements(policy_text)
+
+    # Run compliance check
+    report = naive_check(requirements, target_text)
+
+    # DEMO: simulate a faulty agent that misses compliance
+    if mode == "bad":
+        if report.get("results"):
+            flipped = 0
+            for r in report["results"]:
+                if r["status"] == "met":
+                    r["status"] = "missing"
+                    r["matched_keywords"] = []
+                    flipped += 1
+                if flipped >= 2:
+                    break
+
+            total = len(report["results"])
+            met = sum(1 for r in report["results"] if r["status"] == "met")
+            score = round((met / max(1, total)) * 100)
+
+            report.update({
+                "total": total,
+                "met": met,
+                "missing_count": total - met,
+                "score": score,
+                "missing": [r for r in report["results"] if r["status"] == "missing"],
+                "mode_note": "Bad agent demo: intentionally missed some compliance checks."
+            })
+
+    return report
+
 # Include the router in the main app
 app.include_router(api_router)
 
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
     allow_methods=["*"],
     allow_headers=["*"],
 )

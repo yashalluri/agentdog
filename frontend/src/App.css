@@ -2212,4 +2212,41 @@ body {
   font-style: italic;
 }
 
+/* Tab Navigation */
+.tab-navigation {
+  display: flex;
+  gap: 8px;
+  padding: 16px 24px 0 24px;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tab-button {
+  padding: 12px 24px;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #6b7280;
+  font-weight: 500;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-button:hover {
+  color: #111827;
+  background: #f9fafb;
+}
+
+.tab-button.active {
+  color: #3b82f6;
+  border-bottom-color: #3b82f6;
+}
+
+.chat-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
 }

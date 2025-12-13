@@ -9,8 +9,259 @@ import { Toaster, toast } from 'sonner';
 import TraceTimeline from './components/TraceTimeline';
 import CoordinationAnalysis from './components/CoordinationAnalysis';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+const API =
+  process.env.NODE_ENV === "development"
+    ? "/api"
+    : `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+
+// Compliance View Component
+const ComplianceView = ({ compliancePolicyText, chatMessages, selectedAgent }) => {
+  const [results, setResults] = useState(null);
+  const [isChecking, setIsChecking] = useState(false);
+  const [error, setError] = useState(null);
+
+  const checkCompliance = async () => {
+    if (!compliancePolicyText) {
+      setError('Please upload a compliance policy first');
+      return;
+    }
+
+    if (chatMessages.length === 0) {
+      setError('No agent messages to check');
+      return;
+    }
+
+    setIsChecking(true);
+    setError(null);
+
+    try {
+      const agentResponses = chatMessages
+        .filter(msg => msg.role === 'assistant')
+        .map(msg => msg.content)
+        .join('\n\n');
+
+      const response = await fetch(`${API}/docs/check`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          policy_text: compliancePolicyText,
+          target_text: agentResponses,
+          mode: 'good'
+        })
+      });
+
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+      const data = await response.json();
+      setResults(data);
+    } catch (err) {
+      setError(`Failed to check compliance: ${err.message}`);
+    } finally {
+      setIsChecking(false);
+    }
+  };
+
+  useEffect(() => {
+    if (compliancePolicyText && chatMessages.length > 0) {
+      checkCompliance();
+    }
+  }, [compliancePolicyText, chatMessages]);
+
+  const scoreColor = results ? 
+    (results.score >= 80 ? '#10b981' : results.score >= 50 ? '#f59e0b' : '#ef4444') : 
+    '#6b7280';
+
+  if (!compliancePolicyText) {
+    return (
+      <div style={{ padding: '40px', textAlign: 'center', color: '#6b7280' }}>
+        <p>Upload a compliance policy to check agent responses</p>
+      </div>
+    );
+  }
+
+  if (isChecking) {
+    return (
+      <div style={{ padding: '40px', textAlign: 'center' }}>
+        <div style={{ 
+          width: '40px', 
+          height: '40px', 
+          border: '4px solid #e5e7eb',
+          borderTopColor: '#3b82f6',
+          borderRadius: '50%',
+          margin: '0 auto 16px',
+          animation: 'spin 0.8s linear infinite'
+        }}></div>
+        <p style={{ color: '#6b7280' }}>Analyzing compliance...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ padding: '20px' }}>
+        <div style={{ 
+          background: '#fef2f2', 
+          border: '1px solid #fecaca', 
+          borderRadius: '8px',
+          padding: '16px',
+          color: '#dc2626'
+        }}>
+          {error}
+        </div>
+      </div>
+    );
+  }
+
+  if (!results) return null;
+
+  return (
+    <div style={{ padding: '20px' }}>
+      <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '20px' }}>
+        Compliance Analysis: {selectedAgent}
+      </h3>
+
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '24px',
+        padding: '20px',
+        background: '#f9fafb',
+        borderRadius: '8px',
+        marginBottom: '20px'
+      }}>
+        <div style={{
+          width: '100px',
+          height: '100px',
+          border: `5px solid ${scoreColor}`,
+          borderRadius: '50%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'white'
+        }}>
+          <span style={{ fontSize: '28px', fontWeight: '700', color: scoreColor }}>
+            {results.score}%
+          </span>
+        </div>
+
+        <div style={{ display: 'flex', gap: '20px', flex: 1 }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '24px', fontWeight: '700' }}>{results.total}</div>
+            <div style={{ fontSize: '11px', color: '#6b7280', textTransform: 'uppercase' }}>Total</div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '24px', fontWeight: '700', color: '#10b981' }}>{results.met}</div>
+            <div style={{ fontSize: '11px', color: '#6b7280', textTransform: 'uppercase' }}>Met</div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '24px', fontWeight: '700', color: '#ef4444' }}>{results.missing_count}</div>
+            <div style={{ fontSize: '11px', color: '#6b7280', textTransform: 'uppercase' }}>Missing</div>
+          </div>
+        </div>
+      </div>
+
+      {results.missing && results.missing.length > 0 && (
+        <div style={{ marginBottom: '20px' }}>
+          <h4 style={{ fontSize: '15px', fontWeight: '600', marginBottom: '12px' }}>
+            Missing Requirements
+          </h4>
+          {results.missing.map((req, idx) => (
+            <div key={idx} style={{
+              background: '#fef2f2',
+              border: '1px solid #fecaca',
+              borderLeft: '3px solid #ef4444',
+              borderRadius: '6px',
+              padding: '12px',
+              marginBottom: '8px'
+            }}>
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between',
+                marginBottom: '6px'
+              }}>
+                <span style={{ fontWeight: '600', fontSize: '12px', color: '#dc2626' }}>
+                  {req.requirement_id}
+                </span>
+                <span style={{
+                  fontSize: '10px',
+                  textTransform: 'uppercase',
+                  color: '#6b7280',
+                  background: 'white',
+                  padding: '2px 6px',
+                  borderRadius: '3px'
+                }}>
+                  {req.category}
+                </span>
+              </div>
+              <div style={{ fontSize: '13px', color: '#374151' }}>
+                {req.requirement_text}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div>
+        <h4 style={{ fontSize: '15px', fontWeight: '600', marginBottom: '12px' }}>
+          All Requirements
+        </h4>
+        <div style={{ 
+          border: '1px solid #e5e7eb', 
+          borderRadius: '8px',
+          overflow: 'hidden'
+        }}>
+          <table style={{ width: '100%', fontSize: '13px', borderCollapse: 'collapse' }}>
+            <thead style={{ background: '#f9fafb' }}>
+              <tr>
+                <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>ID</th>
+                <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>Requirement</th>
+                <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>Category</th>
+                <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {results.results && results.results.map((req, idx) => (
+                <tr key={idx} style={{ 
+                  background: req.status === 'met' ? '#f0fdf4' : '#fef2f2',
+                  borderTop: '1px solid #e5e7eb'
+                }}>
+                  <td style={{ padding: '12px' }}>{req.requirement_id}</td>
+                  <td style={{ padding: '12px' }}>{req.requirement_text}</td>
+                  <td style={{ padding: '12px' }}>
+                    <span style={{
+                      background: '#e5e7eb',
+                      padding: '4px 8px',
+                      borderRadius: '4px',
+                      fontSize: '11px',
+                      textTransform: 'uppercase',
+                      fontWeight: '600'
+                    }}>
+                      {req.category}
+                    </span>
+                  </td>
+                  <td style={{ padding: '12px' }}>
+                    <span style={{
+                      padding: '4px 12px',
+                      borderRadius: '12px',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      background: req.status === 'met' ? '#d1fae5' : '#fee2e2',
+                      color: req.status === 'met' ? '#065f46' : '#991b1b'
+                    }}>
+                      {req.status === 'met' ? '✓ Met' : '✗ Missing'}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 function App() {
   const [runs, setRuns] = useState([]);
@@ -30,25 +281,30 @@ function App() {
   // Chat interface state
   const [chatMessages, setChatMessages] = useState([]);
   const [chatInput, setChatInput] = useState('');
-  const [chatPanelWidth, setChatPanelWidth] = useState(40); // percentage
+  const [chatPanelWidth, setChatPanelWidth] = useState(40);
   const [isResizing, setIsResizing] = useState(false);
-  const [selectedAgent, setSelectedAgent] = useState('debate');
-  const [currentRunId, setCurrentRunId] = useState(null); // Track active chat run
+  const [selectedAgent, setSelectedAgent] = useState('');
+  const [currentRunId, setCurrentRunId] = useState(null);
   const [isSendingMessage, setIsSendingMessage] = useState(false);
   const [debateProgress, setDebateProgress] = useState('Thinking...');
-  const [observabilityView, setObservabilityView] = useState('overview'); // 'overview', 'trace', or 'coordination'
+  const [observabilityView, setObservabilityView] = useState('overview');
   const [showPerformanceModal, setShowPerformanceModal] = useState(false);
   const [performanceStats, setPerformanceStats] = useState(null);
   
-  // Available agents
+  // Compliance state
+  const [compliancePolicy, setCompliancePolicy] = useState(null);
+  const [compliancePolicyText, setCompliancePolicyText] = useState('');
+  
+  // Available agents - UPDATED with 2 new compliance agents
   const availableAgents = [
     { id: 'debate', name: 'Debate Agent (Multi-Agent)' },
     { id: 'social_media', name: 'Social Media Creator (7 Agents)' },
+    { id: 'compliance_agent_1', name: 'Compliance Agent 1' },
+    { id: 'compliance_agent_2', name: 'Compliance Agent 2' },
     { id: 'test_buggy', name: 'Test: Buggy Single Agent', description: 'Single agent with 7 intentional bugs' },
     { id: 'test_faulty', name: 'Test: Faulty Multi-Agent', description: '3 agents with 8 coordination failures' }
   ];
 
-  // Calculate performance stats from runs
   const calculatePerformanceStats = () => {
     if (!runs || runs.length === 0) {
       setPerformanceStats({
@@ -80,18 +336,16 @@ function App() {
     });
   };
 
-  // Update stats whenever runs change
   useEffect(() => {
     calculatePerformanceStats();
   }, [runs]);
 
-  // Fetch runs on mount and setup WebSocket
   useEffect(() => {
     fetchRuns();
     
-    // Setup WebSocket for real-time updates
-    const wsUrl = BACKEND_URL.replace('https://', 'wss://').replace('http://', 'ws://');
-    const ws = new WebSocket(`${wsUrl}/api/ws`);
+    const wsProto = window.location.protocol === "https:" ? "wss" : "ws";
+    const ws = new WebSocket(`${wsProto}://${window.location.host}/api/ws`);
+
     
     ws.onopen = () => {
       console.log('WebSocket connected');
@@ -102,11 +356,8 @@ function App() {
         const data = JSON.parse(event.data);
         
         if (data.type === 'agent_update') {
-          // If this is for the currently selected run, update it live
           if (selectedRun && data.run_id === selectedRun.id) {
-            // Add/update the agent in runSteps
             setRunSteps(prevSteps => {
-              // Check if agent already exists
               const existingIndex = prevSteps.findIndex(s => s.id === data.agent_id);
               const newAgent = {
                 id: data.agent_id,
@@ -127,24 +378,19 @@ function App() {
               };
               
               if (existingIndex >= 0) {
-                // Update existing agent
                 const updated = [...prevSteps];
                 updated[existingIndex] = newAgent;
                 return updated;
               } else {
-                // Add new agent
                 return [...prevSteps, newAgent];
               }
             });
             
-            // Fetch updated run details to get accurate metrics
             fetchRunDetails(selectedRun.id);
           }
           
-          // Refresh runs list in sidebar
           fetchRuns();
         } else if (data.type === 'debate_progress') {
-          // Update debate progress status
           setDebateProgress(data.status);
         }
       } catch (e) {
@@ -165,7 +411,6 @@ function App() {
     };
   }, [liveExecution]);
 
-  // Poll for updates when a run is selected and status is running
   useEffect(() => {
     if (selectedRun && selectedRun.status === 'running') {
       const interval = setInterval(() => {
@@ -208,31 +453,26 @@ function App() {
 
   const handleRunClick = async (run) => {
     setSelectedRun(run);
-    setLiveExecution(null); // Clear live execution view
-    setExecutionLog([]); // Clear execution log
+    setLiveExecution(null);
+    setExecutionLog([]);
     setSummary(null);
     setCurrentRunId(run.id);
     
-    // Fetch run details for observability
     fetchRunDetails(run.id);
     
-    // Load chat messages for this run
     try {
       const response = await axios.get(`${API}/run/${run.id}/messages`);
       setChatMessages(response.data.messages || []);
     } catch (error) {
       console.error('Error loading chat messages:', error);
-      // If no messages endpoint, clear chat
       setChatMessages([]);
     }
     
-    // Close sidebar on mobile after selection
     if (window.innerWidth < 768) {
       setSidebarOpen(false);
     }
   };
 
-  // Handle panel resize
   const handleMouseDown = (e) => {
     setIsResizing(true);
     e.preventDefault();
@@ -245,7 +485,6 @@ function App() {
       const containerWidth = window.innerWidth - (sidebarOpen ? 280 : 0);
       const newWidth = ((e.clientX - (sidebarOpen ? 280 : 0)) / containerWidth) * 100;
       
-      // Keep between 20% and 80%
       if (newWidth > 20 && newWidth < 80) {
         setChatPanelWidth(newWidth);
       }
@@ -267,7 +506,6 @@ function App() {
   }, [isResizing, sidebarOpen]);
 
   const handleStartNewRun = () => {
-    // Clear current chat and reset session
     setChatMessages([]);
     setCurrentRunId(null);
     setSelectedRun(null);
@@ -280,18 +518,15 @@ function App() {
   const renderMessageWithCitations = (content) => {
     if (!content) return '';
     
-    // Split content by "Sources:" section
     const parts = content.split('---');
     
     if (parts.length === 1) {
-      // No citations, return as-is
       return <div style={{ whiteSpace: 'pre-wrap' }}>{content}</div>;
     }
     
     let mainContent = parts[0];
     const sourcesSection = parts[1];
     
-    // Parse sources section to build citation map
     const sourceLines = sourcesSection.split('\n').filter(line => line.trim().startsWith('['));
     const citationMap = {};
     
@@ -303,7 +538,6 @@ function App() {
       }
     });
     
-    // Replace inline citations [1], [2] etc with clickable superscripts
     const renderContentWithInlineCitations = () => {
       const citationRegex = /\[(\d+)\]/g;
       const parts = [];
@@ -311,12 +545,10 @@ function App() {
       let match;
       
       while ((match = citationRegex.exec(mainContent)) !== null) {
-        // Add text before citation
         if (match.index > lastIndex) {
           parts.push(mainContent.substring(lastIndex, match.index));
         }
         
-        // Add clickable citation
         const citNum = match[1];
         const citUrl = citationMap[citNum];
         
@@ -348,7 +580,6 @@ function App() {
         lastIndex = match.index + match[0].length;
       }
       
-      // Add remaining text
       if (lastIndex < mainContent.length) {
         parts.push(mainContent.substring(lastIndex));
       }
@@ -396,9 +627,8 @@ function App() {
     if (!chatInput.trim() || isSendingMessage) return;
     
     const userMessage = chatInput.trim();
-    setChatInput(''); // Clear input immediately
+    setChatInput('');
     
-    // Add user message to chat
     const userMsg = {
       role: 'user',
       content: userMessage,
@@ -409,7 +639,6 @@ function App() {
     setIsSendingMessage(true);
     
     try {
-      // Send to backend chat API
       const response = await axios.post(`${API}/chat`, {
         run_id: currentRunId,
         message: userMessage,
@@ -418,18 +647,15 @@ function App() {
       
       const { run_id, response: agentResponse, agent_name } = response.data;
       
-      // If this is a new run, set it as current and fetch runs list
       if (!currentRunId) {
         setCurrentRunId(run_id);
-        fetchRuns(); // Refresh sidebar to show new run
+        fetchRuns();
         
-        // Delay fetching details to allow workflow to be created
         setTimeout(() => {
           fetchRunDetails(run_id);
         }, 1000);
       }
       
-      // Add assistant response to chat
       setChatMessages(prev => [...prev, {
         role: 'assistant',
         content: agentResponse,
@@ -441,7 +667,6 @@ function App() {
       console.error('Error sending message:', error);
       toast.error('Failed to send message');
       
-      // Add error message to chat
       setChatMessages(prev => [...prev, {
         role: 'assistant',
         content: 'Sorry, I encountered an error processing your message.',
@@ -501,7 +726,6 @@ function App() {
       const response = await axios.post(`${API}/run-multiagent-demo`);
       const runId = response.data.run_id;
       
-      // Create a placeholder run object to show immediately
       const placeholderRun = {
         id: runId,
         run_id: runId,
@@ -515,14 +739,12 @@ function App() {
         cost: 0
       };
       
-      // Select this run immediately
       setSelectedRun(placeholderRun);
-      setRunSteps([]); // Clear steps initially
+      setRunSteps([]);
       setLiveExecution({ run_id: runId, started: Date.now() });
       
       toast.success('✨ Watch agents execute in real-time!');
       
-      // Refresh runs list to show new run
       setTimeout(() => fetchRuns(), 500);
       
     } catch (error) {
@@ -548,7 +770,6 @@ function App() {
     <div className="app-container" data-testid="agentlens-app">
       <Toaster position="top-right" />
       
-      {/* Top Navigation */}
       <div className="top-nav" data-testid="top-nav">
         <div className="nav-left">
           <button 
@@ -597,12 +818,9 @@ function App() {
         </div>
       </div>
 
-      {/* Main Layout */}
       <div className="main-layout">
-        {/* Mobile Overlay */}
         {sidebarOpen && <div className="mobile-overlay" onClick={() => setSidebarOpen(false)}></div>}
         
-        {/* Left Sidebar - Runs List */}
         <div className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`} data-testid="runs-sidebar">
           <div className="sidebar-search">
             <Search className="search-icon" />
@@ -667,9 +885,7 @@ function App() {
           </ScrollArea>
         </div>
 
-        {/* Split Panel Layout */}
         <div className="split-panel-container">
-          {/* Left Panel - Chat */}
           <div className="chat-panel-split" style={{ width: `${chatPanelWidth}%` }}>
             <div className="chat-panel-header">
               <h3 className="chat-panel-title">Agent Chat</h3>
@@ -730,20 +946,60 @@ function App() {
             </div>
             
             <div className="chat-input-container-new">
-              <div className="chat-input-wrapper">
+              {/* COMPLIANCE POLICY UPLOAD - moved outside wrapper */}
+              <div style={{ padding: '8px 12px', borderBottom: '1px solid #e5e7eb', background: '#f9fafb' }}>
+                <input
+                  type="file"
+                  accept=".txt,.md,.pdf"
+                  onChange={async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                      setCompliancePolicyText(event.target.result);
+                      setCompliancePolicy(file.name);
+                    };
+                    reader.readAsText(file);
+                  }}
+                  style={{ display: 'none' }}
+                  id="policy-upload-input"
+                />
+                <label 
+                  htmlFor="policy-upload-input" 
+                  style={{ 
+                    fontSize: '12px', 
+                    color: '#6b7280',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  {compliancePolicy || 'Upload Compliance Policy'}
+                </label>
+              </div>
+              
+              <div className="chat-input-wrapper" style={{ display: 'flex', alignItems: 'center', padding: '12px' }}>
                 <select 
                   className="agent-selector-inline"
                   value={selectedAgent}
                   onChange={(e) => setSelectedAgent(e.target.value)}
                   title="Select Agent"
+                  style={{ 
+                    minWidth: '180px',
+                    maxWidth: '200px',
+                    flexShrink: 0,
+                    marginRight: '8px'
+                  }}
                 >
+                  <option value="">Select Agent</option>
                   {availableAgents.map(agent => (
                     <option key={agent.id} value={agent.id}>
                       {agent.name}
                     </option>
                   ))}
                 </select>
-                <div className="input-divider"></div>
+                
                 <input
                   type="text"
                   className="chat-input-new"
@@ -752,11 +1008,21 @@ function App() {
                   onChange={(e) => setChatInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
                   disabled={isSendingMessage}
+                  style={{ 
+                    flex: 1, 
+                    minWidth: 0,
+                    border: 'none',
+                    outline: 'none',
+                    padding: '8px 12px',
+                    fontSize: '14px'
+                  }}
                 />
+                
                 <button 
                   className="chat-send-btn-new"
                   onClick={handleSendMessage}
-                  disabled={!chatInput.trim() || isSendingMessage}
+                  disabled={!chatInput.trim() || isSendingMessage || !selectedAgent}
+                  style={{ marginLeft: '8px', flexShrink: 0 }}
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -766,7 +1032,6 @@ function App() {
             </div>
           </div>
           
-          {/* Resize Divider */}
           <div 
             className="panel-divider"
             onMouseDown={handleMouseDown}
@@ -774,7 +1039,6 @@ function App() {
             <div className="divider-handle">⋮</div>
           </div>
           
-          {/* Right Panel - Observability */}
           <div className="observability-panel-split" style={{ width: `${100 - chatPanelWidth}%` }}>
             <div className="observability-panel-header">
               <h3 className="observability-panel-title">Agent Observability</h3>
@@ -800,6 +1064,14 @@ function App() {
                   >
                     Coordination
                   </button>
+                  {/* NEW COMPLIANCE BUTTON */}
+                  <button
+                    className={`view-toggle-btn ${observabilityView === 'compliance' ? 'active' : ''}`}
+                    onClick={() => setObservabilityView('compliance')}
+                    disabled={!selectedRun || !compliancePolicyText}
+                  >
+                    Compliance
+                  </button>
                 </div>
                 <div className="panel-size-hint">{Math.round(100 - chatPanelWidth)}%</div>
               </div>
@@ -814,9 +1086,14 @@ function App() {
               <TraceTimeline runId={selectedRun.id} api={API} />
             ) : observabilityView === 'coordination' ? (
               <CoordinationAnalysis runId={selectedRun.id} api={API} />
+            ) : observabilityView === 'compliance' ? (
+              <ComplianceView 
+                compliancePolicyText={compliancePolicyText}
+                chatMessages={chatMessages}
+                selectedAgent={selectedAgent}
+              />
             ) : (
             <div className="run-detail" data-testid="run-detail">
-              {/* Run Header */}
               <div className="run-header" data-testid="run-header">
                 <div>
                   <h2 className="run-title" data-testid="run-title">
@@ -840,7 +1117,6 @@ function App() {
                 </Badge>
               </div>
 
-              {/* Metrics Row */}
               <div className="metrics-row" data-testid="metrics-row">
                 <div className="metric-card" data-testid="metric-steps">
                   <div className="metric-label">STEPS</div>
@@ -864,7 +1140,6 @@ function App() {
                 </div>
               </div>
 
-              {/* Agent Flow Tree */}
               <div className="agent-flow" data-testid="agent-flow">
                 <h3 className="section-title">Agent Flow</h3>
                 <div className="flow-tree">
@@ -893,7 +1168,6 @@ function App() {
                 </div>
               </div>
 
-              {/* AI Summary Section */}
               {summary && (
                 <div className="summary-section" data-testid="summary-section">
                   <h3 className="section-title">AI Summary (Claude Sonnet 4)</h3>
@@ -906,7 +1180,6 @@ function App() {
           )}
         </div>
 
-        {/* Right Drawer Modal - Agent Detail */}
         {selectedStep && (
           <>
             <div className="drawer-backdrop" onClick={() => setSelectedStep(null)}></div>
@@ -1025,7 +1298,6 @@ function App() {
       </div>
       </div>
 
-      {/* Performance Modal */}
       {showPerformanceModal && performanceStats && (
       <>
         <div className="drawer-backdrop" onClick={() => setShowPerformanceModal(false)}></div>
@@ -1046,7 +1318,6 @@ function App() {
           </div>
 
           <div className="drawer-content">
-            {/* Overview Stats */}
             <div className="performance-stats-grid">
               <div className="perf-stat-card">
                 <div className="perf-stat-label">Total Runs</div>
@@ -1068,7 +1339,6 @@ function App() {
               </div>
             </div>
 
-            {/* Status Breakdown */}
             <div className="performance-section">
               <h4 className="performance-section-title">Run Status Breakdown</h4>
               <div className="status-breakdown">
@@ -1113,7 +1383,6 @@ function App() {
               </div>
             </div>
 
-            {/* Health Indicator */}
             <div className="performance-section">
               <h4 className="performance-section-title">System Health</h4>
               <div className="health-indicator">
@@ -1153,7 +1422,7 @@ function App() {
       </>
     )}
     </div>
-  );
+  ); 
 }
 
 export default App;
